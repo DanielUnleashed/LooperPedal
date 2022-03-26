@@ -1,37 +1,22 @@
 #include "AudioPlayer.h"
 
+uint32_t AudioPlayer::PLAY_TIME_START = 0;
+
 AudioFile AudioPlayer::audioChannels[MAX_AUDIO_CHANNELS];
 hw_timer_t* AudioPlayer::timer;
 uint8_t AudioPlayer::channelsUsed = 0;
 uint8_t AudioPlayer::longestChannel = 0;
-
 CircularBuffer AudioPlayer::globalBuf;
-
 uint8_t AudioPlayer::playMode = 0; 
-
 portMUX_TYPE AudioPlayer::timerMux = portMUX_INITIALIZER_UNLOCKED;
-
-uint32_t AudioPlayer::PLAY_TIME_START = 0;
-
-void AudioPlayer::addAudioFile(char* filePath){
-  audioChannels[channelsUsed++].open(filePath);
-  debug("Added audio file %s at Channel %d", filePath, channelsUsed-1);
-  if(audioChannels[channelsUsed-1].getFileSize() >= audioChannels[longestChannel].getFileSize()){
-    longestChannel = channelsUsed-1;
-    debug(" (longest)");
-  }
-  debug("\n");
-}
-
-void AudioPlayer::addAudioFile(AudioFile newAudioFile){
-  audioChannels[channelsUsed++] = newAudioFile;
-}
+DAC AudioPlayer::dac(CS_DAC);
 
 void AudioPlayer::start(){
   setAllTo(AudioFile::FILE_PLAYING);
+  dac.begin();
 
   // Audio processing and signal managing task running on core 0
-  xTaskCreatePinnedToCore(audioProcessingTask, "AudProcTask", 10000, NULL, 5, NULL, 0); //deleted
+  xTaskCreatePinnedToCore(audioProcessingTask, "AudProcTask", 10000, NULL, 5, NULL, 0);
   xTaskCreatePinnedToCore(statusMonitorTask, "MonitorTask", 10000, NULL, 1, NULL, 0);
   // Memory task running on core 1
   xTaskCreatePinnedToCore(memoryTask, "MemoryTask", 10000, NULL, 5, NULL, 1);
@@ -39,7 +24,6 @@ void AudioPlayer::start(){
   delay(10);
 
   //Start frequency playback interrupt
-  dac_output_enable(DAC_CHANNEL_1);
   /*With prescaler of 8, resolution of 0.1 us.*/
   timer = timerBegin(0, 8, true);
   timerAttachInterrupt(timer, frequencyTimer, true);
@@ -101,8 +85,22 @@ void AudioPlayer::audioProcessingTask(void* funcParams){
 
 void IRAM_ATTR AudioPlayer::frequencyTimer(){
   portENTER_CRITICAL(&timerMux);
-  dac_output_voltage(DAC_CHANNEL_1, globalBuf.get());
+  dac.writeFromISR(globalBuf.get());
   portEXIT_CRITICAL(&timerMux);
+}
+
+void AudioPlayer::addAudioFile(char* filePath){
+  audioChannels[channelsUsed++].open(filePath);
+  debug("Added audio file %s at Channel %d", filePath, channelsUsed-1);
+  if(audioChannels[channelsUsed-1].getFileSize() >= audioChannels[longestChannel].getFileSize()){
+    longestChannel = channelsUsed-1;
+    debug(" (longest)");
+  }
+  debug("\n");
+}
+
+void AudioPlayer::addAudioFile(AudioFile newAudioFile){
+  audioChannels[channelsUsed++] = newAudioFile;
 }
 
 void AudioPlayer::begin(){  

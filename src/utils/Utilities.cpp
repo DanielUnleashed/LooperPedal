@@ -33,7 +33,6 @@ void Utilities::enterErrorState(){
 }
 
 void Utilities::errorTask(void *funcParams){
-  Serial.println("There has been a fatal error!");
   for(;;){
     delay(1000);
     digitalWrite(ERROR_LED, 1);
@@ -46,25 +45,25 @@ void Utilities::debug(const char* x, ... ) {
   if(!GLOBAL_DEBUG) return;
   va_list args;
   va_start(args, x);
-  ESP_LOGI("[D]", x, args);
+  vfprintf(stdout, x, args);
   va_end(args );
 }
 
 void Utilities::debug(const char* x, va_list args) {
   if(!GLOBAL_DEBUG) return;
-  ESP_LOGI("[D]", x, args);
+  vfprintf(stdout, x, args);
 }
 
 void Utilities::error(const char* x, ... ) {
   va_list args;
   //fprintf(stderr, "AF: ");
   va_start(args, x);
-  ESP_LOGI("[E]", x, args);
+  vfprintf(stderr, x, args);
   va_end(args );
   enterErrorState();
 }
 
 void Utilities::error(const char* x, va_list args) {
-  ESP_LOGI("[E]", x, args);
+  fprintf(stderr, x, args);
   enterErrorState();
 }

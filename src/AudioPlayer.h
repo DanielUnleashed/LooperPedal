@@ -8,9 +8,8 @@
 // For eliptic arguments (...) in debug().
 #include <stdarg.h>
 
-//Temporary to simulate DAC output
-#include <driver/dac.h>
-#include <esp_task_wdt.h>
+#include "chip/DAC.h"
+#define CS_DAC 34
 
 #define MAX_AUDIO_CHANNELS 5
 #define PLAY_BIT_RESOLUTION 8
@@ -45,6 +44,8 @@ class AudioPlayer{
     static portMUX_TYPE timerMux;
     static hw_timer_t *timer;
     static uint8_t playMode;
+
+    static DAC dac;
 
     static void setAllTo(const uint8_t state);
 
