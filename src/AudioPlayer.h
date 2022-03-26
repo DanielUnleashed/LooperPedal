@@ -42,7 +42,6 @@ class AudioPlayer{
 
     static CircularBuffer globalBuf;
 
-    static SemaphoreHandle_t semPlayFreq;
     static portMUX_TYPE timerMux;
     static hw_timer_t *timer;
     static uint8_t playMode;

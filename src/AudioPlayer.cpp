@@ -9,7 +9,6 @@ CircularBuffer AudioPlayer::globalBuf;
 
 uint8_t AudioPlayer::playMode = 0; 
 
-SemaphoreHandle_t AudioPlayer::semPlayFreq = NULL;
 portMUX_TYPE AudioPlayer::timerMux = portMUX_INITIALIZER_UNLOCKED;
 
 uint32_t AudioPlayer::PLAY_TIME_START = 0;
@@ -106,9 +105,7 @@ void IRAM_ATTR AudioPlayer::frequencyTimer(){
   portEXIT_CRITICAL(&timerMux);
 }
 
-void AudioPlayer::begin(){
-  semPlayFreq = xSemaphoreCreateBinary();
-  
+void AudioPlayer::begin(){  
   playMode = PLAY_ONCE;
   
   if (!SD.begin()) error("Card Mount Failed\n");

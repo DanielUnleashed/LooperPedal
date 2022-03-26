@@ -46,25 +46,25 @@ void Utilities::debug(const char* x, ... ) {
   if(!GLOBAL_DEBUG) return;
   va_list args;
   va_start(args, x);
-  vfprintf(stderr, x, args);
+  ESP_LOGI("[D]", x, args);
   va_end(args );
 }
 
 void Utilities::debug(const char* x, va_list args) {
   if(!GLOBAL_DEBUG) return;
-  vfprintf(stderr, x, args);
+  ESP_LOGI("[D]", x, args);
 }
 
 void Utilities::error(const char* x, ... ) {
   va_list args;
   //fprintf(stderr, "AF: ");
   va_start(args, x);
-  vfprintf(stderr, x, args);
+  ESP_LOGI("[E]", x, args);
   va_end(args );
   enterErrorState();
 }
 
 void Utilities::error(const char* x, va_list args) {
-  vfprintf(stderr, x, args);
+  ESP_LOGI("[E]", x, args);
   enterErrorState();
 }

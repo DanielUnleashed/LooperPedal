@@ -100,11 +100,12 @@ uint32_t AudioFile::getFileSize(){
 }
 
 AUDIO_FILE_INFO AudioFile::getAudioFileInfo(){
-  AUDIO_FILE_INFO ret;
-  ret.fileName = String(fileName);
-  ret.currentFileDirection = fileDirectionToBuffer;
-  ret.size = fileSize;
-  ret.state = getStatusString();
+  AUDIO_FILE_INFO ret = {
+    .fileName = String(fileName),
+    .currentFileDirection = fileDirectionToBuffer,
+    .size = fileSize,
+    .state = getStatusString(),
+  };
   return ret;
 }
 
