@@ -9,7 +9,7 @@
 #include <stdarg.h>
 
 #include "chip/DAC.h"
-#define CS_DAC 34
+#define CS_DAC 15
 
 #define MAX_AUDIO_CHANNELS 5
 #define PLAY_BIT_RESOLUTION 8

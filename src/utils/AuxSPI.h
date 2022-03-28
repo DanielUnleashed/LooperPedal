@@ -3,6 +3,9 @@
 
 #include <SPI.h>
 #include "Arduino.h"
+#include "freertos/task.h"
+
+#define SPI_CLK 10000000
 
 struct HOLDOUT_PACKET{
     uint16_t data;
@@ -15,9 +18,8 @@ class AuxSPI{
         static void writeFromISR(uint8_t chipSelect, uint16_t data);
         static void write(uint8_t chipSelect, uint16_t data);
     private:
-        static SPIClass SPI2;
+        static SPIClass* SPI2;
         static HOLDOUT_PACKET outputHoldout;
-        static SPISettings spiSettings;
         static bool alreadyDefined;
         static TaskHandle_t SPI2_Task;
 

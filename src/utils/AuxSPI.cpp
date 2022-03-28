@@ -1,14 +1,15 @@
 #include "AuxSPI.h"
 
-SPIClass AuxSPI::SPI2 = SPIClass(HSPI);
+SPIClass* AuxSPI::SPI2 = NULL;
 HOLDOUT_PACKET AuxSPI::outputHoldout = {0,0};
-SPISettings AuxSPI::spiSettings = SPISettings(20000000, SPI_MSBFIRST, SPI_MODE0);
 bool AuxSPI::alreadyDefined = false;
 TaskHandle_t AuxSPI::SPI2_Task = NULL;
 
 void AuxSPI::begin(){
     if(alreadyDefined) return;
-    SPI2.begin(14,12,13,15);
+    
+    SPI2 = new SPIClass(HSPI);
+    SPI2 -> begin();
     xTaskCreatePinnedToCore(SPI2_Sender, "AuxSPISender", 10000, NULL, 7, &SPI2_Task, 0);
     alreadyDefined = true;
 }
@@ -17,25 +18,29 @@ void AuxSPI::SPI2_Sender(void* funcParams){
     for(;;){
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         if(outputHoldout.data != 0){
-            write(outputHoldout.data, outputHoldout.pin);
-            outputHoldout.data = 0;
+            uint8_t pin = outputHoldout.pin;
+            uint16_t data = outputHoldout.data;
+            write(pin, data);
         }
     }
     vTaskDelete(NULL);
 }
 
 void AuxSPI::writeFromISR(uint8_t chipSelect, uint16_t data){
-    outputHoldout = {
-        .data = data,
-        .pin = chipSelect,
-    };
-    vTaskNotifyGiveFromISR(SPI2_Task, pdFALSE);
+    outputHoldout.data = data;
+    outputHoldout.pin = chipSelect;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    vTaskNotifyGiveFromISR(SPI2_Task, &xHigherPriorityTaskWoken);
 }
 
+static const SPISettings sett(SPI_CLK, MSBFIRST, SPI_MODE0);
 void AuxSPI::write(uint8_t chipSelect, uint16_t data){
+    portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
+    vTaskEnterCritical(&timerMux);
+    SPI2 -> beginTransaction(sett);
     digitalWrite(chipSelect, LOW);
-    SPI2.beginTransaction(spiSettings);
-    SPI2.transfer16(data);
-    SPI2.endTransaction();
+    SPI2 -> transfer16(data);
     digitalWrite(chipSelect, HIGH);
+    SPI2 -> endTransaction();
+    vTaskExitCritical(&timerMux);
 }

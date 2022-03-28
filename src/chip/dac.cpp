@@ -5,9 +5,9 @@ DAC::DAC(uint8_t cs){
 }
 
 void DAC::begin(){
+    AuxSPI::begin();
     pinMode(chipSelect, OUTPUT);
     digitalWrite(chipSelect, HIGH);
-    AuxSPI::begin();
 }
 
 void DAC::writeFromISR(uint16_t data){

@@ -68,7 +68,7 @@ void AudioPlayer::audioProcessingTask(void* funcParams){
     while(globalBuf.getFreeSpace() > BUFFER_REFRESH){
       uint32_t samples = 0;
       for(uint8_t i = 0; i < channelsUsed; i++){
-        samples += audioChannels[i].getSample();
+        samples += audioChannels[i].getSample()<<4;
       }
       uint16_t finalMix = samples/channelsUsed;
       globalBuf.put(finalMix);
