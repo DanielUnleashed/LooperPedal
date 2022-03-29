@@ -38,23 +38,25 @@ uint16_t AudioFile::getSample(){
   }
 
   if(fileState == FILE_PLAYING) return buf.get();
-  else return 0x80; // For unsigned 8 bit audio.
+  //else return 0x80; // For unsigned 8 bit audio.
+  else return 0x8000; // For unsigned 16 bit audio.
 }
 
 void AudioFile::refreshBuffer(){
   if(buf.getFreeSpace() >= BUFFER_REFRESH){
     dataFile.seek(fileDirectionToBuffer);
     for(uint16_t i = 0; i < BUFFER_REFRESH; i++){
-      // For unsigned 16 bit audio.
-      /*uint16_t data = dataFile.read();
-      data = (data << 8) | dataFile.read();
+      // For unsigned 16 bit audio (little indian). 
+      uint16_t data = dataFile.read();
+      data |= dataFile.read()<<8;
+      data += 0x8000;
       buf.put(data);
-      fileDirectionToBuffer+=2;*/
+      fileDirectionToBuffer+=2;
 
       // For unsigned 8 bit audio.
-      uint8_t data = dataFile.read();
+      /*uint8_t data = dataFile.read();
       buf.put(data);
-      fileDirectionToBuffer++;
+      fileDirectionToBuffer++;*/
 
       if(fileDirectionToBuffer >= fileSize){
         fileDirectionToBuffer = 0;

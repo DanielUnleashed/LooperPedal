@@ -12,8 +12,8 @@ void setup() {
   AudioPlayer::begin();
 
   Utilities::debug("Loading starting files\n");
-  AudioPlayer::addAudioFile("/aud1.raw");
-  AudioPlayer::addAudioFile("/aud2.raw");
+  //AudioPlayer::addAudioFile("/aud1.raw");
+  AudioPlayer::addAudioFile("/full16.raw");
 
   Utilities::debug("All done!\n");
   AudioPlayer::start();
