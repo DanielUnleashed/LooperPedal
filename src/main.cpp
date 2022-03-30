@@ -13,7 +13,8 @@ void setup() {
 
   Utilities::debug("Loading starting files\n");
   //AudioPlayer::addAudioFile("/aud1.raw");
-  AudioPlayer::addAudioFile("/full16.raw");
+  //AudioPlayer::addAudioFile("/full16.raw");
+  AudioPlayer::addAudioFile("/test_8000.wav");
 
   Utilities::debug("All done!\n");
   AudioPlayer::start();

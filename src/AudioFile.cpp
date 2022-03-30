@@ -31,6 +31,10 @@ bool AudioFile::hasFileEnded(){
 }
 
 uint16_t AudioFile::getSample(){
+  /* If it's the case that inside the circular buffer it's the end of the song
+     then, the file will be tagged as 'ended' and so, in the next iteration, if
+     it reamains as such state, it will return silence.   
+  */
   if(buf.getReadIndex() == finalReadIndexOfFile){
     fileState = FILE_ENDED;
     finalReadIndexOfFile = 0xFFFF;
@@ -43,15 +47,33 @@ uint16_t AudioFile::getSample(){
 }
 
 void AudioFile::refreshBuffer(){
+  //double freqRatio = audioFrequency/PLAY_FREQUENCY;
+  dataFile.seek(fileDirectionToBuffer);
   if(buf.getFreeSpace() >= BUFFER_REFRESH){
-    dataFile.seek(fileDirectionToBuffer);
     for(uint16_t i = 0; i < BUFFER_REFRESH; i++){
-      // For unsigned 16 bit audio (little indian). 
-      uint16_t data = dataFile.read();
-      data |= dataFile.read()<<8;
-      data += 0x8000;
-      buf.put(data);
-      fileDirectionToBuffer+=2;
+      //For signed 16 bit audio.
+      uint32_t mixBuff = 0; //For multiple channel audio to mono
+      for(uint8_t j = 0; j < channelNumber; j++){
+        uint16_t data = read16();
+        data += 0x8000; //For converting from signed 16 bit int to uint16.
+        mixBuff += data;
+      }
+      mixBuff /= channelNumber;
+
+      uint16_t bufData = 0;
+      if(mixBuff > 0xFFFF) bufData = 0xFFFF; //To prevent clipping
+      else bufData = mixBuff;
+
+      buf.put(bufData);
+
+      /*if(isOversampled){
+        fileDirectionToBuffer = byteAudioResolution*channelNumber*round(sampleIndex*freqRatio);
+        sampleIndex++;
+      }else{
+        fileDirectionToBuffer += 2*channelNumber;
+      }*/
+
+      fileDirectionToBuffer += 2*channelNumber;
 
       // For unsigned 8 bit audio.
       /*uint8_t data = dataFile.read();
@@ -59,8 +81,11 @@ void AudioFile::refreshBuffer(){
       fileDirectionToBuffer++;*/
 
       if(fileDirectionToBuffer >= fileSize){
-        fileDirectionToBuffer = 0;
-        dataFile.seek(0);
+        if(fileType == WAV_FILE) fileDirectionToBuffer = 44;
+        else fileDirectionToBuffer = 0;
+
+        dataFile.seek(fileDirectionToBuffer);
+        sampleIndex = 0;
         finalReadIndexOfFile = buf.getWriteIndex();
       }
     }
@@ -73,28 +98,43 @@ void AudioFile::fetchAudioFileData(){
     fileType = WAV_FILE;
     
     dataFile.seek(24);
-    for(uint8_t i = 0; i < 4; i++){
-      audioFrequency = (audioFrequency<<8) | dataFile.read();
-    }
+    audioFrequency = read32();
+
+    dataFile.seek(22);
+    channelNumber = read16();
+
     dataFile.seek(34);
-    for(uint8_t i = 0; i < 2; i++){
-      audioResolution = (audioResolution<<8) | dataFile.read();
-    }
+    audioResolution = read16();
+
     dataFile.seek(40);
-    for(uint8_t i = 0; i < 4; i++){
-      fileSize = (fileSize<<8) | dataFile.read();
-    }
+    fileSize = read32();
+
+    fileDirectionToBuffer = 44; //Skip the RIFF header.
   }else{
     fileType = RAW_FILE;
     audioResolution = 8;
     audioFrequency = 8000;
     fileSize = dataFile.size();
+
+    fileDirectionToBuffer = 0;
   }
 
-  byteAudioResolution = audioResolution>>3;
-  if((audioResolution & 0x07) > 0) byteAudioResolution++; // Same as audioResolution % 8
-  
+  //Byte res. = audioRes/8 (+ 1 if audioRes%8 > 0)
+  byteAudioResolution = (audioResolution>>3) + ((audioResolution & 0x07)>0);
+  isOversampled = audioFrequency!=PLAY_FREQUENCY;
   debug("Loaded %s (size %d bytes) loaded! [AUDIO RESOLUTION: %d (%d bytes)]\n", fileName, fileSize, audioResolution, byteAudioResolution);
+}
+
+uint16_t AudioFile::read16(){
+     return dataFile.read() | (dataFile.read() << 8);
+}
+
+uint32_t AudioFile::read32(){
+  uint32_t ans = 0;
+  for(uint8_t i = 0; i < 4; i++){
+    ans |= dataFile.read()<<(8*i);
+  }
+  return ans;
 }
 
 uint32_t AudioFile::getFileSize(){
@@ -103,10 +143,13 @@ uint32_t AudioFile::getFileSize(){
 
 AUDIO_FILE_INFO AudioFile::getAudioFileInfo(){
   AUDIO_FILE_INFO ret = {
-    .fileName = String(fileName),
+    .fileName = fileName,
     .currentFileDirection = fileDirectionToBuffer,
     .size = fileSize,
+    .progress = (fileDirectionToBuffer*100UL)/fileSize,
     .state = getStatusString(),
+    .frequency = audioFrequency,
+    .bitRes = audioResolution,
   };
   return ret;
 }

@@ -39,10 +39,10 @@ void AudioPlayer::statusMonitorTask(void* funcParams){
     PLAYBACK_TIME pt = Utilities::toPlaybackTimeStruct(elapsedPlayback);
     PLAYBACK_TIME total_pt = Utilities::toPlaybackTimeStruct(totalPlaybackMillis);
     debug("\n*********** CHANNEL STATUS %s/%s ************\n", Utilities::playBackTimeToString(pt), Utilities::playBackTimeToString(total_pt));
-    debug("%s\t%-20s%-10s%8s/%-10s\n", "CH.", "FILE NAME", "STATUS", "NOW", "SIZE"); 
+    debug("%s\t%-30s%-10s%-6s%-9s%-6s  %8s/%-10s\n", "CH.", "FILE NAME", "STATUS", "RES.", "FREQ.", "PROG.", "NOW", "SIZE"); 
     for(uint8_t i = 0; i < channelsUsed; i++){
       AUDIO_FILE_INFO n = audioChannels[i].getAudioFileInfo();
-      debug("%02d\t%-20s%-10s%8d/%-10d\n", i, n.fileName, n.state, n.currentFileDirection,n.size); 
+      debug("%02d\t%-30s%-10s%-6d%-9d%-6d%% %8d/%-10d\n", i, n.fileName, n.state, n.bitRes, n.frequency, n.progress, n.currentFileDirection, n.size); 
     }
     vTaskDelay(5000 / portTICK_PERIOD_MS);
   }

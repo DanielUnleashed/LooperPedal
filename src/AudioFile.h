@@ -12,11 +12,16 @@
 // For eliptic arguments (...) in debug().
 #include <stdarg.h>
 
+#define PLAY_FREQUENCY 8000
+
 struct AUDIO_FILE_INFO{
-  String fileName;
+  char* fileName;
   uint32_t currentFileDirection;
   uint32_t size;
+  uint8_t progress;
   String state;
+  uint16_t frequency;
+  uint8_t bitRes;
 };
 
 class AudioFile {
@@ -45,10 +50,14 @@ class AudioFile {
     uint16_t audioFrequency;
     uint8_t audioResolution;
     uint8_t byteAudioResolution;
+    uint8_t channelNumber;
 
     CircularBuffer buf;
+    // The number of samples taken, aka. total number of iterations inside refreshBuffer().
+    uint32_t sampleIndex = 0;
     uint32_t fileDirectionToBuffer = 0;
     uint16_t finalReadIndexOfFile = 0xFFFF;
+    bool isOversampled = false;
 
     static const uint8_t FILE_OPENING = 0;
     static const uint8_t FILE_READY   = 1;
@@ -58,6 +67,8 @@ class AudioFile {
     uint8_t fileState = FILE_UNKNOWN_STATE;
 
     void fetchAudioFileData();
+    uint16_t read16();
+    uint32_t read32();
 
     String getStatusString();
 
