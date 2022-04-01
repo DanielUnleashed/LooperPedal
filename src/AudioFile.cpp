@@ -1,8 +1,10 @@
 #include "AudioFile.h"
 
+const String AudioFile::PROCESSED_FOLDER = "/proc";
+
 AudioFile::AudioFile(){}
 
-void AudioFile::open(char *filePath){
+bool AudioFile::open(char *filePath){
   fileState = FILE_OPENING;
 
   fileName = (char*)malloc(sizeof(filePath));
@@ -11,15 +13,19 @@ void AudioFile::open(char *filePath){
   dataFile = SD.open(filePath, FILE_READ);
   if (!dataFile) {
     error("Failed to open file for reading/writing\n");
+    return false;
   }
 
   if(dataFile.size() == 0){
     error("File %s is empty!\n", filePath);
+    return false;
   }
 
   fetchAudioFileData();
   refreshBuffer();
+  Serial.println("done!");
   fileState = FILE_READY;
+  return true;
 }
 
 void AudioFile::setTo(const uint8_t state){
@@ -47,45 +53,16 @@ uint16_t AudioFile::getSample(){
 }
 
 void AudioFile::refreshBuffer(){
-  //double freqRatio = audioFrequency/PLAY_FREQUENCY;
   dataFile.seek(fileDirectionToBuffer);
   if(buf.getFreeSpace() >= BUFFER_REFRESH){
     for(uint16_t i = 0; i < BUFFER_REFRESH; i++){
-      //For signed 16 bit audio.
-      uint32_t mixBuff = 0; //For multiple channel audio to mono
-      for(uint8_t j = 0; j < channelNumber; j++){
-        uint16_t data = read16();
-        data += 0x8000; //For converting from signed 16 bit int to uint16.
-        mixBuff += data;
-      }
-      mixBuff /= channelNumber;
-
-      uint16_t bufData = 0;
-      if(mixBuff > 0xFFFF) bufData = 0xFFFF; //To prevent clipping
-      else bufData = mixBuff;
-
+      uint16_t bufData = dataFile.read() | (dataFile.read() << 8);
       buf.put(bufData);
 
-      /*if(isOversampled){
-        fileDirectionToBuffer = byteAudioResolution*channelNumber*round(sampleIndex*freqRatio);
-        sampleIndex++;
-      }else{
-        fileDirectionToBuffer += 2*channelNumber;
-      }*/
-
-      fileDirectionToBuffer += 2*channelNumber;
-
-      // For unsigned 8 bit audio.
-      /*uint8_t data = dataFile.read();
-      buf.put(data);
-      fileDirectionToBuffer++;*/
+      fileDirectionToBuffer += 2;
 
       if(fileDirectionToBuffer >= fileSize){
-        if(fileType == WAV_FILE) fileDirectionToBuffer = 44;
-        else fileDirectionToBuffer = 0;
-
-        dataFile.seek(fileDirectionToBuffer);
-        sampleIndex = 0;
+        dataFile.seek(0);
         finalReadIndexOfFile = buf.getWriteIndex();
       }
     }
@@ -95,46 +72,18 @@ void AudioFile::refreshBuffer(){
 void AudioFile::fetchAudioFileData(){
   String str = String(fileName);
   if(str.endsWith(".wav")){
-    fileType = WAV_FILE;
-    
-    dataFile.seek(24);
-    audioFrequency = read32();
-
-    dataFile.seek(22);
-    channelNumber = read16();
-
-    dataFile.seek(34);
-    audioResolution = read16();
-
-    dataFile.seek(40);
-    fileSize = read32();
-
-    fileDirectionToBuffer = 44; //Skip the RIFF header.
+    WavFile wavFile(dataFile);
+    dataFile = wavFile.processToRawFile();
+    fileName = dataFile.name();
   }else{
-    fileType = RAW_FILE;
     audioResolution = 8;
-    audioFrequency = 8000;
     fileSize = dataFile.size();
-
-    fileDirectionToBuffer = 0;
   }
 
+  fileDirectionToBuffer = 0;
   //Byte res. = audioRes/8 (+ 1 if audioRes%8 > 0)
   byteAudioResolution = (audioResolution>>3) + ((audioResolution & 0x07)>0);
-  isOversampled = audioFrequency!=PLAY_FREQUENCY;
   debug("Loaded %s (size %d bytes) loaded! [AUDIO RESOLUTION: %d (%d bytes)]\n", fileName, fileSize, audioResolution, byteAudioResolution);
-}
-
-uint16_t AudioFile::read16(){
-     return dataFile.read() | (dataFile.read() << 8);
-}
-
-uint32_t AudioFile::read32(){
-  uint32_t ans = 0;
-  for(uint8_t i = 0; i < 4; i++){
-    ans |= dataFile.read()<<(8*i);
-  }
-  return ans;
 }
 
 uint32_t AudioFile::getFileSize(){
@@ -143,12 +92,11 @@ uint32_t AudioFile::getFileSize(){
 
 AUDIO_FILE_INFO AudioFile::getAudioFileInfo(){
   AUDIO_FILE_INFO ret = {
-    .fileName = fileName,
+    .fileName = fileName.c_str(),
     .currentFileDirection = fileDirectionToBuffer,
     .size = fileSize,
     .progress = (fileDirectionToBuffer*100UL)/fileSize,
     .state = getStatusString(),
-    .frequency = audioFrequency,
     .bitRes = audioResolution,
   };
   return ret;

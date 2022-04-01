@@ -5,7 +5,7 @@
 #include "Arduino.h"
 #include "freertos/task.h"
 
-#define SPI_CLK 10000000
+#define SPI_CLK 20000000
 
 struct HOLDOUT_PACKET{
     uint16_t data;

@@ -130,5 +130,6 @@
   ],
   "files.associations": {
     "string": "cpp"
-  }
+  },
+  "cmake.configureOnOpen": false
 }
