@@ -14,12 +14,12 @@ File WavFile::processToRawFile(){
     fileLoc.concat(fileName);
 
     File transformedFile = SD.open(fileLoc, FILE_READ);
-    /*if(transformedFile.size() > 0){ //Maybe do something more sophisticated like CRC (?)
+    if(transformedFile.size() > 0){ //Maybe do something more sophisticated like CRC (?)
         wavFile.close();
         return transformedFile;
     }else{
         Utilities::debug("File %s exists, but is empty!\n", fileLoc.c_str());
-    }*/
+    }
 
     transformedFile.close();
     transformedFile = SD.open(fileLoc, FILE_WRITE);
@@ -52,6 +52,7 @@ void WavFile::getHeader(){
     wavInfo = wavHeader;
 }
 
+//TODO: Add support for lower frequencies.
 bool WavFile::processAudioData(File outFile){
     if(wavInfo.sampleRate == PLAY_FREQUENCY && wavInfo.channelNum == 1) return directCopy(outFile);
 
