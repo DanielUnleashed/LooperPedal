@@ -13,27 +13,32 @@ File WavFile::processToRawFile(){
     String fileLoc = "/proc";
     fileLoc.concat(fileName);
 
-    File transformedFile = SD.open(fileLoc, FILE_WRITE); //Must be also opened to read!
-    if(transformedFile.size() > 0){
+    File transformedFile = SD.open(fileLoc, FILE_READ);
+    /*if(transformedFile.size() > 0){ //Maybe do something more sophisticated like CRC (?)
         wavFile.close();
         return transformedFile;
     }else{
         Utilities::debug("File %s exists, but is empty!\n", fileLoc.c_str());
-    }
+    }*/
 
-    Utilities::debug("Parsing %s\n", fileLoc.c_str());
-    processAudioData(transformedFile);
+    transformedFile.close();
+    transformedFile = SD.open(fileLoc, FILE_WRITE);
+
+    Utilities::debug("File %s (%d bytes) will be parsed into %s\n", wavFile.name(), wavFile.size(), fileLoc.c_str());
+    if(!processAudioData(transformedFile)) Serial.printf("Something happened parsing %s\n", wavFile.name());
     wavFile.close();
+    transformedFile.close();
+    transformedFile = SD.open(fileLoc, FILE_READ);
     return transformedFile;
 }
 
 void WavFile::getHeader(){
     WAV_HEADER wavHeader = {
         //TODO: This could be done better...
-        .RIFF_ID = (char*)"RIFF",
+        .RIFF_ID = readBytes(4),
         .RIFF_DataSize = read32(),
-        .RIFF_TYPE_ID = (char*)"WAVE",
-        .fmt_ID = (char*)"fmt ",
+        .RIFF_TYPE_ID = readBytes(4),
+        .fmt_ID = readBytes(4),
         .fmt_DataSize = read32(),
         .fmt_FormatTag = read16(),
         .channelNum = read16(),
@@ -41,7 +46,7 @@ void WavFile::getHeader(){
         .byteRate = read32(),
         .blockAlign = read16(),
         .bitsPerSample = read16(),
-        .data_ID = (char*)"data",
+        .data_ID = readBytes(4),
         .data_DataSize = read32(),
     };
     wavInfo = wavHeader;
@@ -50,65 +55,93 @@ void WavFile::getHeader(){
 bool WavFile::processAudioData(File outFile){
     if(wavInfo.sampleRate == PLAY_FREQUENCY && wavInfo.channelNum == 1) return directCopy(outFile);
 
-    double freqRatio = wavInfo.sampleRate/PLAY_FREQUENCY;
-    uint32_t sampleIndex = 0;
-    uint32_t fileDir = 40;
-    uint32_t topIndex = wavInfo.data_DataSize/wavInfo.channelNum/2;
-    Serial.printf("TopIndex: %d\n", topIndex);
+    Serial.printf("Input freq.: %d,  Channels: %d\n", wavInfo.sampleRate, wavInfo.channelNum);
 
+    double freqRatio = ((double)wavInfo.sampleRate)/PLAY_FREQUENCY;
+
+    Serial.printf("Freq. ratio = %.4f\n", freqRatio);
+
+    uint16_t maxProcessedBufferSize = ceil(DATA_COPY_BUFFER_SIZE/freqRatio);
+    uint32_t startTime = millis();
+
+    uint16_t totalIt = wavFile.size()/DATA_COPY_BUFFER_SIZE/2;
+    uint32_t dir = 40;
     uint16_t it = 0;
-    while(sampleIndex < topIndex){
-        Serial.printf("It.: %d\n", it);
-        uint16_t dataToBuffer[1024];
-        uint16_t currIndex;
-        for(currIndex = 0; currIndex < 1024; currIndex++){
-            if(!wavFile.seek(fileDir+40)) break;
+
+    uint16_t startingPosition = 0;
+
+    wavFile.seek(40);
+
+    while(true){
+        uint16_t bufLength = DATA_COPY_BUFFER_SIZE;
+        if((dir + DATA_COPY_BUFFER_SIZE*2) > wavFile.size()) bufLength = (wavFile.size() - dir)/2;
+        else dir += DATA_COPY_BUFFER_SIZE*2;
+
+        uint16_t dataToBuffer[bufLength];
+        uint16_t processedBuffer[maxProcessedBufferSize];
+        uint16_t realProcBuffLength = 0;
+
+        wavFile.read((uint8_t*)&dataToBuffer, bufLength*2);
+        for(realProcBuffLength= 0; realProcBuffLength < maxProcessedBufferSize; realProcBuffLength++){
+            // Sampling section
+            uint16_t bufferIndex = (uint16_t) (round(realProcBuffLength*freqRatio))*wavInfo.channelNum + startingPosition;
+            //Serial.printf("buffInd: %d, ind: %d, start: %d", bufferIndex, realProcBuffLength, startingPosition);
+            //delay(100);
+            if(bufferIndex >= bufLength){
+                // startingPosition shifts the bufferIndex so that when in a previous loop the next
+                // sample is out of reach, it can be reached in the next iteration.
+                startingPosition = bufferIndex - bufLength;
+                break;
+            }
 
             uint32_t mixBuff = 0; //For multiple channel audio to mono
-            for(uint8_t j = 0; j < wavInfo.channelNum; j++){
-                uint16_t data = read16();
-                data += 0x8000; //For converting from signed 16 bit int to uint16.
-                mixBuff += data;
+            uint8_t j = 0;
+            for(j = 0; j < wavInfo.channelNum; j++){
+                if(bufferIndex + j >= bufLength){
+                    startingPosition++; 
+                    break; // Will take only one sample in this case. Oh well... 
+                } 
+                mixBuff += (uint16_t)(dataToBuffer[bufferIndex+j] + 0x8000);
             }
-            mixBuff /= wavInfo.channelNum;
+            //Average the channels.
+            mixBuff /= (j+1);
 
             uint16_t bufData = 0;
             if(mixBuff > 0xFFFF) bufData = 0xFFFF; //To prevent clipping
             else bufData = mixBuff;
-            
-            dataToBuffer[currIndex] = bufData;
 
-            if(wavInfo.sampleRate != PLAY_FREQUENCY){        
-                fileDir = 2*wavInfo.channelNum*round(sampleIndex*freqRatio);
-            }else{
-                fileDir += 2*wavInfo.channelNum;
-            }
-            sampleIndex++;
+            processedBuffer[realProcBuffLength] = bufData;
         }
 
-        for(uint16_t i = 0; i < currIndex; i++)
-            outFile.write((uint8_t *)&dataToBuffer[i],2);
+        if(outFile.write((uint8_t*)&processedBuffer, realProcBuffLength*2) != realProcBuffLength*2){
+            Serial.println("Write failed!");
+            break;
+        }
 
-        outFile.flush();
+        if(it % 100 == 0) Utilities::debug("Progress: %d %%\n", it*100/totalIt);
         it++;
+
+        if(bufLength != DATA_COPY_BUFFER_SIZE) break;
     }
+
+    uint32_t ellapsed = millis() - startTime;
+    Serial.printf("That took %d ms\n", ellapsed);
     return true;
 }
 
 bool WavFile::directCopy(File outFile){
-    Utilities::debug("File can be directly copied!");
+    Utilities::debug("File can be directly copied!\n");
     wavFile.seek(40);
     uint32_t startTime = millis();
 
-    const uint16_t dataBufferSize = 512;
-    uint16_t totalIt = wavFile.size()/dataBufferSize/2;
+    uint16_t totalIt = wavFile.size()/DATA_COPY_BUFFER_SIZE/2;
     uint32_t dir = 40;
     uint16_t it = 0;
 
     while(true){
-        uint16_t bufLength = dataBufferSize;
-        if((dir + dataBufferSize*2) > wavFile.size()) bufLength = (wavFile.size() - dir)/2;
-        else dir += dataBufferSize*2;
+        uint16_t bufLength = DATA_COPY_BUFFER_SIZE;
+        if((dir + DATA_COPY_BUFFER_SIZE*2) > wavFile.size()) bufLength = (wavFile.size() - dir)/2;
+        else dir += DATA_COPY_BUFFER_SIZE*2;
 
         uint16_t dataToBuffer[bufLength];
         wavFile.read((uint8_t*)&dataToBuffer, bufLength*2);
@@ -124,12 +157,12 @@ bool WavFile::directCopy(File outFile){
         if(it % 100 == 0) Serial.printf("Progress: %d %%\n", it*100/totalIt);
         it++;
 
-        if(bufLength != dataBufferSize) break;
+        if(bufLength != DATA_COPY_BUFFER_SIZE) break;
     }
 
     uint32_t ellapsed = millis() - startTime;
     Serial.printf("That took %d ms\n", ellapsed);
-    outFile.flush();
+    return true;
 }
 
 //TODO: change so a WAV_HEADER can be used.
@@ -155,6 +188,13 @@ void WavFile::printHeader(File outFile){
     outFile.write((const uint8_t*)"data", 4); // Chunk1 ID 
     outFile.write((uint8_t*)&outFileSize, 4);      // Chunk data size 
     outFile.close();
+}
+
+uint8_t* WavFile::readBytes(uint8_t length){
+    uint8_t* ret;
+    ret = (uint8_t*) malloc(4);
+    wavFile.read(ret, 4);
+    return ret;
 }
 
 uint16_t WavFile::read16(){

@@ -46,8 +46,6 @@ void AudioPlayer::begin(){
   SDBoot();
   dac.begin();
 
-  setAllTo(AudioFile::FILE_PLAYING);
-
   // Audio processing and signal managing task running on core 0
   xTaskCreatePinnedToCore(audioProcessingTask, "AudProcTask", 10000, NULL, 5, &audioProcessingTaskHandle, 0);
   xTaskCreatePinnedToCore(statusMonitorTask, "MonitorTask", 10000, NULL, 1, &statusMonitorTaskHandle, 0);
@@ -61,19 +59,24 @@ void AudioPlayer::begin(){
   timer = timerBegin(0, 8, true);
   timerAttachInterrupt(timer, frequencyTimer, true);
   timerAlarmWrite(timer, 10000000/PLAY_FREQUENCY, true);
+
+  isPlaying = false;
+  longestChannel = 0;
 }
 
 void AudioPlayer::play(){
-  timerAlarmEnable(timer);
   vTaskResume(statusMonitorTaskHandle);
   PLAY_TIME_START = millis();
   isPlaying = true;
+  setAllTo(AudioFile::FILE_PLAYING);
+  timerAlarmEnable(timer);
   Serial.println("-Resumed.");
 }
 
 void AudioPlayer::pause(){
   timerAlarmDisable(timer);
   isPlaying = false;
+  setAllTo(AudioFile::FILE_PAUSED);
   Serial.println("-Paused.");
 }
 

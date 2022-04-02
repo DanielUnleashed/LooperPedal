@@ -14,11 +14,11 @@
 
 struct  WAV_HEADER {
     // RIFF Chunk
-    char*           RIFF_ID;        // RIFF
+    uint8_t*        RIFF_ID;        // RIFF
     uint32_t        RIFF_DataSize;    // RIFF Chunk data Size
-    char*           RIFF_TYPE_ID;    // WAVE
+    uint8_t*        RIFF_TYPE_ID;    // WAVE
     // format sub-chunk
-    char*           fmt_ID;       // fmt
+    uint8_t*        fmt_ID;       // fmt
     uint32_t        fmt_DataSize;   // Size of the format chunk
     uint16_t        fmt_FormatTag;         //  format_Tag 1=PCM
     uint16_t        channelNum;       //  1=Mono 2=Stereo
@@ -27,7 +27,7 @@ struct  WAV_HEADER {
     uint16_t        blockAlign;        // 4
     uint16_t        bitsPerSample;    // 16
     /* "data" sub-chunk */
-    char*           data_ID;       // data
+    uint8_t*        data_ID;       // data
     uint32_t        data_DataSize;   // Size of the audio data
 };
 
@@ -46,6 +46,7 @@ class WavFile {
         File wavFile; 
         uint16_t read16();
         uint32_t read32();
+        uint8_t* readBytes(uint8_t length);
 };
 
 #endif

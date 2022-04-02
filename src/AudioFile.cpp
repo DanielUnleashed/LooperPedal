@@ -23,7 +23,6 @@ bool AudioFile::open(char *filePath){
 
   fetchAudioFileData();
   refreshBuffer();
-  Serial.println("done!");
   fileState = FILE_READY;
   return true;
 }
@@ -56,12 +55,15 @@ void AudioFile::refreshBuffer(){
   dataFile.seek(fileDirectionToBuffer);
   if(buf.getFreeSpace() >= BUFFER_REFRESH){
     for(uint16_t i = 0; i < BUFFER_REFRESH; i++){
-      uint16_t bufData = dataFile.read() | (dataFile.read() << 8);
+      //TODO: Optimize using dataFile.read(buf, size);
+      uint16_t bufData = 0;
+      dataFile.read((uint8_t*)&bufData, 2);
       buf.put(bufData);
 
       fileDirectionToBuffer += 2;
 
       if(fileDirectionToBuffer >= fileSize){
+        fileDirectionToBuffer = 0;
         dataFile.seek(0);
         finalReadIndexOfFile = buf.getWriteIndex();
       }
@@ -74,16 +76,16 @@ void AudioFile::fetchAudioFileData(){
   if(str.endsWith(".wav")){
     WavFile wavFile(dataFile);
     dataFile = wavFile.processToRawFile();
-    fileName = dataFile.name();
-  }else{
-    audioResolution = 8;
-    fileSize = dataFile.size();
+    fileName = String(dataFile.name());
   }
+
+  audioResolution = 16;
+  fileSize = dataFile.size();
 
   fileDirectionToBuffer = 0;
   //Byte res. = audioRes/8 (+ 1 if audioRes%8 > 0)
   byteAudioResolution = (audioResolution>>3) + ((audioResolution & 0x07)>0);
-  debug("Loaded %s (size %d bytes) loaded! [AUDIO RESOLUTION: %d (%d bytes)]\n", fileName, fileSize, audioResolution, byteAudioResolution);
+  debug("Loaded %s (size %d bytes) loaded! [AUDIO RESOLUTION: %d (%d bytes)]\n", fileName.c_str(), fileSize, audioResolution, byteAudioResolution);
 }
 
 uint32_t AudioFile::getFileSize(){
