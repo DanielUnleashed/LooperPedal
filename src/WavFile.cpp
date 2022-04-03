@@ -9,6 +9,7 @@ File WavFile::processToRawFile(){
     SD.mkdir("/proc");
     String fileName = String(wavFile.name());
     fileName = fileName.substring(0, fileName.length()-4);
+    fileName.concat(PLAY_FREQUENCY);
     fileName.concat(".raw");
     String fileLoc = "/proc";
     fileLoc.concat(fileName);
@@ -65,9 +66,9 @@ bool WavFile::processAudioData(File outFile){
     uint16_t maxProcessedBufferSize = ceil(DATA_COPY_BUFFER_SIZE/freqRatio);
     uint32_t startTime = millis();
 
-    uint16_t totalIt = wavFile.size()/DATA_COPY_BUFFER_SIZE/2;
+    uint32_t totalIt = wavFile.size()/DATA_COPY_BUFFER_SIZE/2;
     uint32_t dir = 40;
-    uint16_t it = 0;
+    uint32_t it = 0;
 
     uint16_t startingPosition = 0;
 
@@ -135,9 +136,9 @@ bool WavFile::directCopy(File outFile){
     wavFile.seek(40);
     uint32_t startTime = millis();
 
-    uint16_t totalIt = wavFile.size()/DATA_COPY_BUFFER_SIZE/2;
+    uint32_t totalIt = wavFile.size()/DATA_COPY_BUFFER_SIZE/2;
     uint32_t dir = 40;
-    uint16_t it = 0;
+    uint32_t it = 0;
 
     while(true){
         uint16_t bufLength = DATA_COPY_BUFFER_SIZE;

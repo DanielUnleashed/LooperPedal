@@ -10,7 +10,7 @@ void setup() {
   delay(1);
   
   AudioPlayer::begin();
-  AudioPlayer::addAudioFile("/tereza_44100_2ch.wav");
+  AudioPlayer::addAudioFile("/tereza.wav");
   AudioPlayer::play();
 
   //vTaskStartScheduler();
