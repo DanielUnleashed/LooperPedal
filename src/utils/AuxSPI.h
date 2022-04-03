@@ -7,9 +7,18 @@
 
 #define SPI_CLK 20000000
 
+/* A HOLDOUT_PACKET will store the data to be sended to the chip when
+the ISR ends. It will also wait for a response from the chip if it is 
+requested and store the given value in the responseBuffer.
+Only one HOLDOUT_PACKET will be stored for each CS, that way there will
+be no need to keep controlling the number of requests made. Furthermore, there 
+wouldn't be much reason to store different commands to be sent to the same chip
+in the same instant.*/
 struct HOLDOUT_PACKET{
-    uint16_t data;
-    uint8_t pin;
+    uint16_t dataOut;           // Command to send to the chip.
+    uint8_t pin;                // Chip select (CS)
+    bool needsResponse;
+    uint16_t* responseBuffer;
 };
 
 class AuxSPI{
