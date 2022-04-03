@@ -6,6 +6,7 @@
 #include "freertos/task.h"
 
 #define SPI_CLK 20000000
+#define MAX_HOLDOUT_PACKETS 3 
 
 /* A HOLDOUT_PACKET will store the data to be sended to the chip when
 the ISR ends. It will also wait for a response from the chip if it is 
@@ -13,22 +14,25 @@ requested and store the given value in the responseBuffer.
 Only one HOLDOUT_PACKET will be stored for each CS, that way there will
 be no need to keep controlling the number of requests made. Furthermore, there 
 wouldn't be much reason to store different commands to be sent to the same chip
-in the same instant.*/
+in the same instant. The data released will be the last to be added. */
 struct HOLDOUT_PACKET{
-    uint16_t dataOut;           // Command to send to the chip.
+    uint8_t* dataOut;           // Command to send to the chip.
     uint8_t pin;                // Chip select (CS)
     bool needsResponse;
-    uint16_t* responseBuffer;
+    uint8_t* responseBuffer;
 };
 
 class AuxSPI{
     public:
         static void begin();
-        static void writeFromISR(uint8_t chipSelect, uint16_t data);
-        static void write(uint8_t chipSelect, uint16_t data);
+        static HOLDOUT_PACKET* writeFromISR(uint8_t chipSelect, uint8_t* data);
+        static void write(uint8_t chipSelect, uint8_t* data);
+        static HOLDOUT_PACKET* writeAndReadFromISR(uint8_t chipSelect, uint8_t* dataOut, uint8_t* dataInBuff);
+        static void writeAndRead(uint8_t chipSelect, uint8_t* dataOut, uint8_t* dataInBuff);
     private:
         static SPIClass* SPI2;
-        static HOLDOUT_PACKET outputHoldout;
+        static HOLDOUT_PACKET* holdPackets;
+        static volatile uint8_t holdPacketCount;
         static bool alreadyDefined;
         static TaskHandle_t SPI2_Task;
 

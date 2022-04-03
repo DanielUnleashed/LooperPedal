@@ -12,11 +12,22 @@ void setup() {
   AudioPlayer::begin();
   AudioPlayer::addAudioFile("/tereza.wav");
   AudioPlayer::play();
-
-  //vTaskStartScheduler();
 }
 
 void loop() {
   
 }
 
+/*#include "chip/adc.h"
+
+ADC adc(26);
+
+void setup(){
+  Serial.begin(115200);
+  adc.begin();
+}
+
+void loop(){
+    Serial.println(adc.read(false));
+    delay(500);
+}*/
