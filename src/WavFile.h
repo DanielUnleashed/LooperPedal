@@ -12,6 +12,11 @@
 #define WAV_TRANSFORM_BITS          16
 #define DATA_COPY_BUFFER_SIZE       512
 
+struct WAV_FILE_INFO {
+    String fileName;
+    uint32_t dataSize;
+};
+
 struct  WAV_HEADER {
     // RIFF Chunk
     uint8_t*        RIFF_ID;        // RIFF
@@ -33,8 +38,9 @@ struct  WAV_HEADER {
 
 class WavFile {
     public:
-        WavFile(File f);
-        File processToRawFile();
+        WavFile(String loc);
+        String fileLoc;
+        WAV_FILE_INFO processToRawFile();
     private:
         WAV_HEADER wavInfo;
 

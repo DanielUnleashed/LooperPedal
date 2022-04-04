@@ -1,8 +1,10 @@
 #include "CircularBuffer.h"
 
-void CircularBuffer::put(uint16_t data){
+bool CircularBuffer::put(uint16_t data){
+  if(getFreeSpace() == 0) return false;
   buf[writeIndex++] = data;
   if(writeIndex == AUD_MAX_BUFFER_LENGTH) writeIndex = 0;
+  return true;
 }
 
 uint16_t CircularBuffer::get(){

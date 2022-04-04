@@ -63,7 +63,7 @@ HOLDOUT_PACKET* AuxSPI::writeAndReadFromISR(uint8_t chipSelect, uint8_t* dataOut
 
 static const SPISettings sett(SPI_CLK, MSBFIRST, SPI_MODE0);
 void AuxSPI::writeAndRead(uint8_t chipSelect, uint8_t* dataOut, uint8_t* dataInBuff){
-    SPI2 -> beginTransaction(sett);
+    SPI2 -> beginTransaction(SPISettings(800000, MSBFIRST, SPI_MODE0));
     digitalWrite(chipSelect, LOW);
     SPI2 -> transferBytes(dataOut, dataInBuff, sizeof(dataOut));
     digitalWrite(chipSelect, HIGH);

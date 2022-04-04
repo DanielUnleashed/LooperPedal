@@ -30,6 +30,7 @@ void Utilities::enterErrorState(){
   xTaskCreatePinnedToCore(
     errorTask, "ErrorTask", 2048, NULL, 5,
     NULL, 1);
+  vTaskDelete(NULL);
 }
 
 void Utilities::errorTask(void *funcParams){

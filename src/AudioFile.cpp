@@ -6,20 +6,7 @@ AudioFile::AudioFile(){}
 
 bool AudioFile::open(char *filePath){
   fileState = FILE_OPENING;
-
-  fileName = (char*)malloc(sizeof(filePath));
-  fileName = filePath;
-
-  dataFile = SD.open(filePath, FILE_READ);
-  if (!dataFile) {
-    error("Failed to open file for reading/writing\n");
-    return false;
-  }
-
-  if(dataFile.size() == 0){
-    error("File %s is empty!\n", filePath);
-    return false;
-  }
+  fileName = String(filePath);
 
   fetchAudioFileData();
   refreshBuffer();
@@ -52,40 +39,41 @@ uint16_t AudioFile::getSample(){
 }
 
 void AudioFile::refreshBuffer(){
+  File dataFile = SD.open(fileName, FILE_READ);
   dataFile.seek(fileDirectionToBuffer);
   if(buf.getFreeSpace() >= BUFFER_REFRESH){
-    for(uint16_t i = 0; i < BUFFER_REFRESH; i++){
-      //TODO: Optimize using dataFile.read(buf, size);
-      uint16_t bufData = 0;
-      dataFile.read((uint8_t*)&bufData, 2);
-      buf.put(bufData);
+    uint16_t bufData[128];
+    dataFile.read((uint8_t*)&bufData, sizeof(bufData));
 
+    for(uint16_t i = 0; i < 128; i++){
+      if(!buf.put(bufData[i])) return;
       fileDirectionToBuffer += 2;
 
       if(fileDirectionToBuffer >= fileSize){
         fileDirectionToBuffer = 0;
         dataFile.seek(0);
         finalReadIndexOfFile = buf.getWriteIndex();
+        break;
       }
     }
   }
+  dataFile.close();
 }
 
-void AudioFile::fetchAudioFileData(){
-  String str = String(fileName);
-  if(str.endsWith(".wav")){
-    WavFile wavFile(dataFile);
-    dataFile = wavFile.processToRawFile();
-    fileName = String(dataFile.name());
+bool AudioFile::fetchAudioFileData(){
+  if(fileName.endsWith(".wav")){
+    WavFile wavFile(fileName);
+    WAV_FILE_INFO wavInfo = wavFile.processToRawFile();
+    fileName = String(wavInfo.fileName);
+    fileSize = wavInfo.dataSize;
   }
-
-  audioResolution = 16;
-  fileSize = dataFile.size();
 
   fileDirectionToBuffer = 0;
   //Byte res. = audioRes/8 (+ 1 if audioRes%8 > 0)
   byteAudioResolution = (audioResolution>>3) + ((audioResolution & 0x07)>0);
+
   debug("Loaded %s (size %d bytes) loaded! [AUDIO RESOLUTION: %d (%d bytes)]\n", fileName.c_str(), fileSize, audioResolution, byteAudioResolution);
+  return true;
 }
 
 uint32_t AudioFile::getFileSize(){

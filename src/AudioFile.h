@@ -48,10 +48,9 @@ class AudioFile {
     AUDIO_FILE_INFO getAudioFileInfo();
     
   private:
-    File dataFile;
     uint32_t fileSize = 0;
 
-    uint8_t audioResolution;
+    uint8_t audioResolution = 16;
     uint8_t byteAudioResolution;
 
     CircularBuffer buf;
@@ -65,7 +64,7 @@ class AudioFile {
 
     uint8_t fileState = FILE_UNKNOWN_STATE;
 
-    void fetchAudioFileData();
+    bool fetchAudioFileData();
 
     String getStatusString();
 

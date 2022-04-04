@@ -9,7 +9,7 @@ class CircularBuffer{
   public:
     static const uint16_t AUD_MAX_BUFFER_LENGTH = 8192;
   
-    void put(uint16_t data);
+    bool put(uint16_t data);
     uint16_t get();
     uint16_t getFreeSpace();
     uint16_t getWriteIndex();
