@@ -2,6 +2,12 @@
 #include "utils/AuxSPI.h"
 #include "utils/Utilities.h"
 
+char a[] = "/Bass.wav";
+char b[] = "/Beat.wav";
+char c[] = "/Beep.wav";
+char d[] = "/Guitar.wav";
+char e[] = "/Pad.wav";
+
 void setup() {
   Serial.begin(115200);
   Utilities::debug("\n*********************************************\n");
@@ -10,11 +16,12 @@ void setup() {
   delay(1);
   
   AudioPlayer::begin();
-  AudioPlayer::addAudioFile("/Bass.wav");
-  AudioPlayer::addAudioFile("/Beat.wav");
-  AudioPlayer::addAudioFile("/Beep.wav");
-  AudioPlayer::addAudioFile("/Guitar.wav");
-  //AudioPlayer::addAudioFile("/Pad.wav");
+  AudioPlayer::addAudioFile(a);
+  AudioPlayer::addAudioFile(b);
+  AudioPlayer::addAudioFile(c);
+  AudioPlayer::addAudioFile(d);
+  AudioPlayer::addAudioFile(e);
+  AudioPlayer::addAudioFile("/Rhode.wav");
   AudioPlayer::play();
 }
 
