@@ -90,7 +90,7 @@ void AudioPlayer::statusMonitorTask(void* funcParams){
       uint32_t elapsedPlayback = audioChannels[longestChannel].getCurrentFileDirection() * 1000/ 2 / PLAY_FREQUENCY;
       PLAYBACK_TIME pt = Utilities::toPlaybackTimeStruct(elapsedPlayback);
       PLAYBACK_TIME total_pt = Utilities::toPlaybackTimeStruct(totalPlaybackMillis);
-      debug("\n*********** CHANNEL STATUS %s/%s ************\n", Utilities::playBackTimeToString(pt), Utilities::playBackTimeToString(total_pt));
+      debug("\n********************** CHANNEL STATUS %s/%s ***********************\n", Utilities::playBackTimeToString(pt), Utilities::playBackTimeToString(total_pt));
       debug("%s\t%-30s%-10s%-6s%-6s  %8s/%-10s\n", "CH.", "FILE NAME", "STATUS", "RES.", "PROG.", "NOW", "SIZE"); 
       for(uint8_t i = 0; i < channelsUsed; i++){
         AUDIO_FILE_INFO n = audioChannels[i].getAudioFileInfo();
@@ -152,6 +152,11 @@ void IRAM_ATTR AudioPlayer::frequencyTimer(){
 }
 
 void AudioPlayer::addAudioFile(char* filePath){
+  if(channelsUsed == MAX_AUDIO_CHANNELS){
+    debug("Reached max. number of channels!\n");
+    return;
+  }
+
   if(!audioChannels[channelsUsed].open(filePath)) error("Fatal fail opening file %s", filePath);
   debug("Added audio file %s at Channel %d", audioChannels[channelsUsed].fileName.c_str(), channelsUsed);
   if(audioChannels[channelsUsed].getFileSize() >= audioChannels[longestChannel].getFileSize()){

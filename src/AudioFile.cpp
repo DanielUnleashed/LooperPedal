@@ -6,20 +6,7 @@ AudioFile::AudioFile(){}
 
 bool AudioFile::open(char *filePath){
   fileState = FILE_OPENING;
-
-  fileName = (char*)malloc(sizeof(filePath));
-  fileName = filePath;
-
-  dataFile = SD.open(filePath, FILE_READ);
-  if (!dataFile) {
-    error("Failed to open file for reading/writing\n");
-    return false;
-  }
-
-  if(dataFile.size() == 0){
-    error("File %s is empty!\n", filePath);
-    return false;
-  }
+  fileName = String(filePath);
 
   fetchAudioFileData();
   refreshBuffer();
@@ -38,7 +25,7 @@ bool AudioFile::hasFileEnded(){
 uint16_t AudioFile::getSample(){
   /* If it's the case that inside the circular buffer it's the end of the song
      then, the file will be tagged as 'ended' and so, in the next iteration, if
-     it reamains as such state, it will return silence.   
+     it remains as such state, it will return silence.   
   */
   if(buf.getReadIndex() == finalReadIndexOfFile){
     fileState = FILE_ENDED;
@@ -52,41 +39,39 @@ uint16_t AudioFile::getSample(){
 }
 
 void AudioFile::refreshBuffer(){
-  if(buf.getFreeSpace() >= BUFFER_REFRESH){
-    dataFile.seek(fileDirectionToBuffer);
-    //TODO: Optimize this, so it turns back when end of file is reached.
-    uint8_t bufData[BUFFER_REFRESH*2];
-    dataFile.read(bufData, BUFFER_REFRESH*2);
-    for(uint16_t i = 0; i < BUFFER_REFRESH; i+=2){
-      buf.put(bufData[i] | (bufData[i+1] << 8));
+  if(buf.getFreeSpace() < BUFFER_REFRESH) return;
+  dataFile.seek(fileDirectionToBuffer);
+  uint8_t bufData[BUFFER_REFRESH*2];
+  dataFile.read(bufData, BUFFER_REFRESH*2);
+  for(uint16_t i = 0; i < BUFFER_REFRESH; i+=2){
+    buf.put(bufData[i] | (bufData[i+1] << 8));
 
-      fileDirectionToBuffer += 2;
+    fileDirectionToBuffer += 2;
 
-      if(fileDirectionToBuffer >= fileSize){
-        fileDirectionToBuffer = 0;
-        dataFile.seek(0);
-        finalReadIndexOfFile = buf.getWriteIndex();
-        return;
-      }
+    if(fileDirectionToBuffer >= fileSize){
+      fileDirectionToBuffer = 0;
+      dataFile.seek(0);
+      finalReadIndexOfFile = buf.getWriteIndex();
+      break;
     }
   }
 }
 
-void AudioFile::fetchAudioFileData(){
-  String str = String(fileName);
-  if(str.endsWith(".wav")){
-    WavFile wavFile(dataFile);
-    dataFile = wavFile.processToRawFile();
-    fileName = String(dataFile.name());
+bool AudioFile::fetchAudioFileData(){
+  if(fileName.endsWith(".wav")){
+    WavFile wavFile(fileName);
+    WAV_FILE_INFO wavInfo = wavFile.processToRawFile();
+    fileName = String(wavInfo.fileName);
+    fileSize = wavInfo.dataSize;
   }
 
-  audioResolution = 16;
-  fileSize = dataFile.size();
+  dataFile = SD.open(fileName, FILE_READ);
 
   fileDirectionToBuffer = 0;
   //Byte res. = audioRes/8 (+ 1 if audioRes%8 > 0)
   byteAudioResolution = (audioResolution>>3) + ((audioResolution & 0x07)>0);
   debug("Loaded %s (size %d bytes) loaded! [AUDIO RESOLUTION: %d (%d bytes)]\n", fileName.c_str(), fileSize, audioResolution, byteAudioResolution);
+  return true;
 }
 
 uint32_t AudioFile::getFileSize(){

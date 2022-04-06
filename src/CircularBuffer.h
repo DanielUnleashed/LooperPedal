@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-#define BUFFER_REFRESH 1024
+#define BUFFER_REFRESH 2048
 #define MAX_BUFFER_LENGTH 4096
 
 class CircularBuffer{

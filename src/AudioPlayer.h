@@ -6,15 +6,13 @@
 
 #define DEBUG_AUDIOPLAYER_MESSAGES true
 #include "utils/Utilities.h"
-// For eliptic arguments (...) in debug().
-#include <stdarg.h>
 
 #include "chip/DAC.h"
 #include "chip/ADC.h"
-#define CS_DAC 15
+#define CS_DAC 25
 #define CS_ADC 26
 
-#define MAX_AUDIO_CHANNELS 5
+#define MAX_AUDIO_CHANNELS 6
 
 class AudioPlayer{
   public:
