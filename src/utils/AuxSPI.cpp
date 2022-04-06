@@ -4,7 +4,7 @@ SPIClass* AuxSPI::SPI2 = NULL;
 HOLDOUT_PACKET* AuxSPI::holdPackets = NULL;
 volatile uint8_t AuxSPI::holdPacketCount = 0;
 bool AuxSPI::alreadyDefined = false;
-TaskHandle_t AuxSPI::SPI2_Task = NULL;
+TaskHandle_t AuxSPI::SPI2_TaskHandler = NULL;
 
 void AuxSPI::begin(){
     if(alreadyDefined) return;
@@ -12,7 +12,7 @@ void AuxSPI::begin(){
     SPI2 = new SPIClass(HSPI);
     SPI2 -> begin();
     holdPackets = (HOLDOUT_PACKET*) malloc(MAX_HOLDOUT_PACKETS*sizeof(HOLDOUT_PACKET));
-    xTaskCreatePinnedToCore(SPI2_Sender, "AuxSPISender", 10000, NULL, 7, &SPI2_Task, 0);
+    xTaskCreatePinnedToCore(SPI2_Sender, "AuxSPISender", 10000, NULL, 7, &SPI2_TaskHandler, 0);
     alreadyDefined = true;
 }
 
@@ -50,7 +50,7 @@ HOLDOUT_PACKET* AuxSPI::writeFromISR(uint8_t chipSelect, uint8_t* data){
         .needsResponse = false,
     };
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    vTaskNotifyGiveFromISR(SPI2_Task, &xHigherPriorityTaskWoken);
+    vTaskNotifyGiveFromISR(SPI2_TaskHandler, &xHigherPriorityTaskWoken);
     return &holdPackets[holdPacketCount-1];
 }
 
@@ -63,7 +63,7 @@ HOLDOUT_PACKET* AuxSPI::writeAndReadFromISR(uint8_t chipSelect, uint8_t* dataOut
 
 static const SPISettings sett(SPI_CLK, MSBFIRST, SPI_MODE0);
 void AuxSPI::writeAndRead(uint8_t chipSelect, uint8_t* dataOut, uint8_t* dataInBuff){
-    SPI2 -> beginTransaction(sett);
+    SPI2 -> beginTransaction(SPISettings(800000, MSBFIRST, SPI_MODE0));
     digitalWrite(chipSelect, LOW);
     SPI2 -> transferBytes(dataOut, dataInBuff, sizeof(dataOut));
     digitalWrite(chipSelect, HIGH);

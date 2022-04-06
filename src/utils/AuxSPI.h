@@ -34,7 +34,7 @@ class AuxSPI{
         static HOLDOUT_PACKET* holdPackets;
         static volatile uint8_t holdPacketCount;
         static bool alreadyDefined;
-        static TaskHandle_t SPI2_Task;
+        static TaskHandle_t SPI2_TaskHandler;
 
         static void SPI2_Sender(void* funcParams);
 };

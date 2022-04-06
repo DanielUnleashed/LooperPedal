@@ -10,14 +10,14 @@
 #include <stdarg.h>
 
 #include "chip/DAC.h"
+#include "chip/ADC.h"
 #define CS_DAC 15
+#define CS_ADC 26
 
 #define MAX_AUDIO_CHANNELS 5
 
 class AudioPlayer{
   public:
-    static uint32_t PLAY_TIME_START;
-
     static void play();
     static void pause();
 
@@ -44,6 +44,7 @@ class AudioPlayer{
     static bool isPlaying;
 
     static DAC dac;
+    static ADC adc;
 
     static TaskHandle_t audioProcessingTaskHandle;
     static TaskHandle_t statusMonitorTaskHandle;

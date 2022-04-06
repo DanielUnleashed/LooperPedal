@@ -52,13 +52,13 @@ uint16_t AudioFile::getSample(){
 }
 
 void AudioFile::refreshBuffer(){
-  dataFile.seek(fileDirectionToBuffer);
   if(buf.getFreeSpace() >= BUFFER_REFRESH){
-    for(uint16_t i = 0; i < BUFFER_REFRESH; i++){
-      //TODO: Optimize using dataFile.read(buf, size);
-      uint16_t bufData = 0;
-      dataFile.read((uint8_t*)&bufData, 2);
-      buf.put(bufData);
+    dataFile.seek(fileDirectionToBuffer);
+    //TODO: Optimize this, so it turns back when end of file is reached.
+    uint8_t bufData[BUFFER_REFRESH*2];
+    dataFile.read(bufData, BUFFER_REFRESH*2);
+    for(uint16_t i = 0; i < BUFFER_REFRESH; i+=2){
+      buf.put(bufData[i] | (bufData[i+1] << 8));
 
       fileDirectionToBuffer += 2;
 
@@ -66,6 +66,7 @@ void AudioFile::refreshBuffer(){
         fileDirectionToBuffer = 0;
         dataFile.seek(0);
         finalReadIndexOfFile = buf.getWriteIndex();
+        return;
       }
     }
   }
@@ -90,6 +91,10 @@ void AudioFile::fetchAudioFileData(){
 
 uint32_t AudioFile::getFileSize(){
   return fileSize;
+}
+
+uint32_t AudioFile::getCurrentFileDirection(){
+  return fileDirectionToBuffer;
 }
 
 AUDIO_FILE_INFO AudioFile::getAudioFileInfo(){

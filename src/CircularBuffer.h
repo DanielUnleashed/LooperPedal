@@ -4,11 +4,10 @@
 #include "Arduino.h"
 
 #define BUFFER_REFRESH 1024
+#define MAX_BUFFER_LENGTH 4096
 
 class CircularBuffer{
   public:
-    static const uint16_t AUD_MAX_BUFFER_LENGTH = 8192;
-  
     void put(uint16_t data);
     uint16_t get();
     uint16_t getFreeSpace();
@@ -18,7 +17,7 @@ class CircularBuffer{
   private:
     uint16_t writeIndex = 0;
     uint16_t readIndex = 0;
-    uint16_t buf[AUD_MAX_BUFFER_LENGTH];
+    uint16_t buf[MAX_BUFFER_LENGTH];
 };
 
 #endif

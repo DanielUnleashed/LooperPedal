@@ -15,6 +15,7 @@ class ADC{
         uint16_t readFromISR(bool channel);
         uint16_t read(bool channel);
     private:
+        uint8_t readBuffer[3] = {0,0,0};
         uint16_t readValue = 0;
         uint8_t chipSelect;
 

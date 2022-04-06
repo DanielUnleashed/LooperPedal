@@ -1,7 +1,5 @@
 #include "AudioPlayer.h"
 
-uint32_t AudioPlayer::PLAY_TIME_START = 0;
-
 AudioFile AudioPlayer::audioChannels[MAX_AUDIO_CHANNELS];
 hw_timer_t* AudioPlayer::timer;
 uint8_t AudioPlayer::channelsUsed = 0;
@@ -11,6 +9,7 @@ uint8_t AudioPlayer::playMode = 0;
 bool AudioPlayer::isPlaying = false;
 portMUX_TYPE AudioPlayer::timerMux = portMUX_INITIALIZER_UNLOCKED;
 DAC AudioPlayer::dac(CS_DAC);
+ADC AudioPlayer::adc(CS_ADC);
 TaskHandle_t AudioPlayer::audioProcessingTaskHandle;
 TaskHandle_t AudioPlayer::statusMonitorTaskHandle;
 TaskHandle_t AudioPlayer::memoryTaskHandle;
@@ -45,12 +44,15 @@ void AudioPlayer::begin(){
 
   SDBoot();
   dac.begin();
+  adc.begin();
 
   // Audio processing and signal managing task running on core 0
-  xTaskCreatePinnedToCore(audioProcessingTask, "AudProcTask", 10000, NULL, 5, &audioProcessingTaskHandle, 0);
   xTaskCreatePinnedToCore(statusMonitorTask, "MonitorTask", 10000, NULL, 1, &statusMonitorTaskHandle, 0);
   // Memory task running on core 1
   xTaskCreatePinnedToCore(memoryTask, "MemoryTask", 10000, NULL, 5, &memoryTaskHandle, 1);
+
+  vTaskSuspend(statusMonitorTaskHandle);
+  vTaskSuspend(memoryTaskHandle);
 
   delay(10);
 
@@ -65,8 +67,8 @@ void AudioPlayer::begin(){
 }
 
 void AudioPlayer::play(){
+  vTaskResume(memoryTaskHandle);
   vTaskResume(statusMonitorTaskHandle);
-  PLAY_TIME_START = millis();
   isPlaying = true;
   setAllTo(AudioFile::FILE_PLAYING);
   timerAlarmEnable(timer);
@@ -75,6 +77,7 @@ void AudioPlayer::play(){
 
 void AudioPlayer::pause(){
   timerAlarmDisable(timer);
+  vTaskSuspend(memoryTaskHandle);
   isPlaying = false;
   setAllTo(AudioFile::FILE_PAUSED);
   Serial.println("-Paused.");
@@ -84,14 +87,14 @@ void AudioPlayer::statusMonitorTask(void* funcParams){
   for(;;){
     if(isPlaying && channelsUsed>0){
       uint32_t totalPlaybackMillis = audioChannels[longestChannel].getFileSize() * 1000/ 2 / PLAY_FREQUENCY;
-      uint32_t elapsedPlayback = millis() - PLAY_TIME_START;
+      uint32_t elapsedPlayback = audioChannels[longestChannel].getCurrentFileDirection() * 1000/ 2 / PLAY_FREQUENCY;
       PLAYBACK_TIME pt = Utilities::toPlaybackTimeStruct(elapsedPlayback);
       PLAYBACK_TIME total_pt = Utilities::toPlaybackTimeStruct(totalPlaybackMillis);
       debug("\n*********** CHANNEL STATUS %s/%s ************\n", Utilities::playBackTimeToString(pt), Utilities::playBackTimeToString(total_pt));
       debug("%s\t%-30s%-10s%-6s%-6s  %8s/%-10s\n", "CH.", "FILE NAME", "STATUS", "RES.", "PROG.", "NOW", "SIZE"); 
       for(uint8_t i = 0; i < channelsUsed; i++){
         AUDIO_FILE_INFO n = audioChannels[i].getAudioFileInfo();
-        debug("%02d\t%-30s%-10s%-6d%-6d%% %8d/%-10d\n", i, n.fileName, n.state, n.bitRes, n.progress, n.currentFileDirection, n.size); 
+        debug("%02d%s\t%-30s%-10s%-6d%-6d%% %8d/%-10d\n", i, i == longestChannel ? "*" : "", n.fileName, n.state, n.bitRes, n.progress, n.currentFileDirection, n.size); 
       }
     }else{
       const char* stat;
@@ -117,16 +120,11 @@ void AudioPlayer::setAllTo(const uint8_t state){
 
 void AudioPlayer::memoryTask(void* funcParams){ 
   for(;;){
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     for(uint8_t i = 0; i < channelsUsed; i++){
       audioChannels[i].refreshBuffer();
     }
-    vTaskDelay(2 / portTICK_PERIOD_MS);
-  }
-  vTaskDelete(NULL);
-}
 
-void AudioPlayer::audioProcessingTask(void* funcParams){
-  for(;;){
     while(globalBuf.getFreeSpace() > BUFFER_REFRESH && isPlaying){
       uint32_t samples = 0;
       for(uint8_t i = 0; i < channelsUsed; i++){
@@ -137,10 +135,8 @@ void AudioPlayer::audioProcessingTask(void* funcParams){
     
       if(audioChannels[longestChannel].hasFileEnded()){
         setAllTo(AudioFile::FILE_PLAYING);
-        PLAY_TIME_START = millis();
       }
     }
-    vTaskDelay(2 / portTICK_PERIOD_MS);
   }
   vTaskDelete(NULL);
 }
@@ -148,6 +144,10 @@ void AudioPlayer::audioProcessingTask(void* funcParams){
 void IRAM_ATTR AudioPlayer::frequencyTimer(){
   portENTER_CRITICAL(&timerMux);
   dac.writeFromISR(globalBuf.get());
+  if(globalBuf.getFreeSpace() > BUFFER_REFRESH){
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    vTaskNotifyGiveFromISR(memoryTaskHandle, &xHigherPriorityTaskWoken);
+  }
   portEXIT_CRITICAL(&timerMux);
 }
 

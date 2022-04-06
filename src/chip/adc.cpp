@@ -12,19 +12,14 @@ void ADC::begin(){
 
 uint16_t ADC::readFromISR(bool channel){
     uint8_t data[3] = {0x01u, 0xA0u | (channel << 6), 0x00};
-    uint8_t buff[3] = {0,0,0};
-    AuxSPI::writeAndReadFromISR(chipSelect, data, buff);
-    Serial.printf("OUT: 0: %02X, 1: %02X, 2: %02X\n", data[0], data[1], data[2]);
-    Serial.printf("IN:  0: %02X, 1: %02X, 2: %02X\n", buff[0], buff[1], buff[2]);
-    return ((buff[1] & 0x0F) << 8) | buff[2];
+    AuxSPI::writeAndReadFromISR(chipSelect, data, readBuffer);
+    return readValue;
 }
 
 
 uint16_t ADC::read(bool channel){
     uint8_t data[3] = {0x01u, 0xA0u | (channel << 6), 0x00};
-    uint8_t buff[3] = {0,0,0};
-    AuxSPI::writeAndRead(chipSelect, data, buff);
-    Serial.printf("OUT: 0: %02X, 1: %02X, 2: %02X\n", data[0], data[1], data[2]);
-    Serial.printf("IN:  0: %02X, 1: %02X, 2: %02X\n", buff[0], buff[1], buff[2]);
-    return ((buff[1] & 0x0F) << 8) | buff[2];
+    AuxSPI::writeAndRead(chipSelect, data, readBuffer);
+    readValue = ((readBuffer[1] & 0x0F) << 8) | readBuffer[2];
+    return readValue;
 }

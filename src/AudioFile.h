@@ -45,6 +45,7 @@ class AudioFile {
     void setTo(const uint8_t state);
     bool hasFileEnded();
     uint32_t getFileSize();
+    uint32_t getCurrentFileDirection();
     AUDIO_FILE_INFO getAudioFileInfo();
     
   private:

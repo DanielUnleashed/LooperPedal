@@ -2,18 +2,18 @@
 
 void CircularBuffer::put(uint16_t data){
   buf[writeIndex++] = data;
-  if(writeIndex == AUD_MAX_BUFFER_LENGTH) writeIndex = 0;
+  if(writeIndex == MAX_BUFFER_LENGTH) writeIndex = 0;
 }
 
 uint16_t CircularBuffer::get(){
   uint16_t data = buf[readIndex++];
-  if(readIndex == AUD_MAX_BUFFER_LENGTH) readIndex = 0;
+  if(readIndex == MAX_BUFFER_LENGTH) readIndex = 0;
   return data;
 }
 
 uint16_t CircularBuffer::getFreeSpace(){
   uint16_t dist = 0;
-  if(writeIndex >= readIndex) dist = AUD_MAX_BUFFER_LENGTH - writeIndex + readIndex;
+  if(writeIndex >= readIndex) dist = MAX_BUFFER_LENGTH - writeIndex + readIndex;
   else dist = readIndex - writeIndex;
   return dist;
 }

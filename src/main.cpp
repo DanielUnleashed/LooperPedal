@@ -10,7 +10,11 @@ void setup() {
   delay(1);
   
   AudioPlayer::begin();
-  AudioPlayer::addAudioFile("/tereza.wav");
+  AudioPlayer::addAudioFile("/Bass.wav");
+  AudioPlayer::addAudioFile("/Beat.wav");
+  AudioPlayer::addAudioFile("/Beep.wav");
+  AudioPlayer::addAudioFile("/Guitar.wav");
+  //AudioPlayer::addAudioFile("/Pad.wav");
   AudioPlayer::play();
 }
 
