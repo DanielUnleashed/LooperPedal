@@ -1,20 +1,11 @@
 #ifndef SDAudioFile_h
 #define SDAudioFile_h
 
-#include "CircularBuffer.h"
-
-#include "FS.h"
-#include "SD.h"
-#include <SPI.h>
-
 #include "AudioFile.h"
 #include "WavFile.h"
 #include "defines.h"
 
 #define DEBUG_FILE_MESSAGES true
-#include "utils/Utilities.h"
-// For eliptic arguments (...) in debug().
-#include <stdarg.h>
 
 #define PUSH_BUTTON_1 34
 #define PUSH_BUTTON_2 35
@@ -23,9 +14,6 @@
 
 class SDAudioFile : public AudioFile {
   public:
-    static const uint8_t FILE_PAUSED  = 3;
-    static const uint8_t FILE_PLAYING = 4;
-
     static const String PROCESSED_FOLDER;
 
     SDAudioFile();
@@ -43,7 +31,6 @@ class SDAudioFile : public AudioFile {
 
     File dataFile;
 
-    uint32_t fileDirectionToBuffer = 0;
     uint16_t finalReadIndexOfFile = 0xFFFF;
 
     uint16_t currentIteration = 0;

@@ -70,7 +70,7 @@ void AudioPlayer::play(){
   vTaskResume(memoryTaskHandle);
   vTaskResume(statusMonitorTaskHandle);
   isPlaying = true;
-  setAllTo(SDAudioFile::FILE_PLAYING);
+  setAllTo(AudioFile::FILE_PLAYING);
   timerAlarmEnable(timer);
   Serial.println("-Resumed.");
 }
@@ -79,7 +79,7 @@ void AudioPlayer::pause(){
   timerAlarmDisable(timer);
   vTaskSuspend(memoryTaskHandle);
   isPlaying = false;
-  setAllTo(SDAudioFile::FILE_PAUSED);
+  setAllTo(AudioFile::FILE_PAUSED);
   Serial.println("-Paused.");
 }
 

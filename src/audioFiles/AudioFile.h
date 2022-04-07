@@ -4,6 +4,12 @@
 #include "Arduino.h"
 #include "CircularBuffer.h"
 
+#include "utils/Utilities.h"
+
+#include "FS.h"
+#include "SD.h"
+#include <SPI.h>
+
 struct AUDIO_FILE_INFO{
   const char* fileName;
   uint32_t currentFileDirection;
@@ -15,6 +21,9 @@ struct AUDIO_FILE_INFO{
 
 class AudioFile{
     public: 
+        static const uint8_t FILE_PAUSED  = 3;
+        static const uint8_t FILE_PLAYING = 4;
+
         String fileName;
         uint8_t ID;
 
