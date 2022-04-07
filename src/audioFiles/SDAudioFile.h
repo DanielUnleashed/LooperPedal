@@ -7,6 +7,7 @@
 #include "SD.h"
 #include <SPI.h>
 
+#include "AudioFile.h"
 #include "WavFile.h"
 #include "defines.h"
 
@@ -20,44 +21,28 @@
 #define PUSH_BUTTON_3 36
 #define PUSH_BUTTON_4 39
 
-struct AUDIO_FILE_INFO{
-  const char* fileName;
-  uint32_t currentFileDirection;
-  uint32_t size;
-  uint8_t progress;
-  String state;
-  uint8_t bitRes;
-};
-
-class SDAudioFile {
+class SDAudioFile : public AudioFile {
   public:
     static const uint8_t FILE_PAUSED  = 3;
     static const uint8_t FILE_PLAYING = 4;
 
     static const String PROCESSED_FOLDER;
 
-    String fileName;
-
     SDAudioFile();
     bool open(char *filePath);
-    void refreshBuffer();
-    uint16_t getSample();
-    void setTo(const uint8_t state);
-    bool hasFileEnded();
-    uint32_t getFileSize();
-    uint32_t getCurrentFileDirection();
-    AUDIO_FILE_INFO getAudioFileInfo();
+    
     void calculateTotalIteration(uint32_t maxFileSize);
 
-  private:
-    uint32_t fileSize = 0;
+    uint16_t getSample() override;
+    void refreshBuffer() override;
+    String getStatusString() override;
+    bool hasFileEnded() override;
 
-    uint8_t audioResolution = 16;
+  private:
     uint8_t byteAudioResolution;
 
     File dataFile;
 
-    CircularBuffer buf;
     uint32_t fileDirectionToBuffer = 0;
     uint16_t finalReadIndexOfFile = 0xFFFF;
 
@@ -69,11 +54,7 @@ class SDAudioFile {
     static const uint8_t FILE_ENDED   = 2;
     static const uint8_t FILE_UNKNOWN_STATE = 0xFF;
 
-    uint8_t fileState = FILE_UNKNOWN_STATE;
-
-    bool fetchAudioFileData();
-
-    String getStatusString();
+    bool fetchSDAudioFileData();
 
     static void IRAM_ATTR ISR_BUTTON_1();
     static void IRAM_ATTR ISR_BUTTON_2();

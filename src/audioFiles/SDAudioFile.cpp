@@ -5,21 +5,21 @@ const String SDAudioFile::PROCESSED_FOLDER = "/proc";
 SDAudioFile::SDAudioFile(){}
 
 bool SDAudioFile::open(char *filePath){
-  fileState = FILE_OPENING;
+  fileStatus = FILE_OPENING;
   fileName = String(filePath);
 
-  if(!fetchAudioFileData()) return false;
+  if(!fetchSDAudioFileData()) return false;
   refreshBuffer();
-  fileState = FILE_READY;
+  fileStatus = FILE_READY;
   return true;
 }
 
-void SDAudioFile::setTo(const uint8_t state){
-  fileState = state;
+bool SDAudioFile::hasFileEnded(){
+  return fileStatus == FILE_ENDED;
 }
 
-bool SDAudioFile::hasFileEnded(){
-  return fileState == FILE_ENDED;
+void SDAudioFile::calculateTotalIteration(uint32_t maxFileSize){
+  maxIterations = maxFileSize/fileSize;
 }
 
 uint16_t SDAudioFile::getSample(){
@@ -29,23 +29,19 @@ uint16_t SDAudioFile::getSample(){
   */
   if(buf.getReadIndex() == finalReadIndexOfFile){
     if(currentIteration < maxIterations){
-      fileState = FILE_ENDED;
+      fileStatus = FILE_ENDED;
       currentIteration = 0;
     }else{
-      // Same fileState.
+      // Same fileStatus.
       currentIteration++;
     }
     finalReadIndexOfFile = 0xFFFF;
     return buf.get();
   }
 
-  if(fileState == FILE_PLAYING) return buf.get();
+  if(fileStatus == FILE_PLAYING) return buf.get();
   //else return 0x80; // For unsigned 8 bit audio.
   else return 0x8000; // For unsigned 16 bit audio.
-}
-
-void SDAudioFile::calculateTotalIteration(uint32_t maxFileSize){
-  maxIterations = maxFileSize/fileSize;
 }
 
 void SDAudioFile::refreshBuffer(){
@@ -67,7 +63,7 @@ void SDAudioFile::refreshBuffer(){
   }
 }
 
-bool SDAudioFile::fetchAudioFileData(){
+bool SDAudioFile::fetchSDAudioFileData(){
   if(fileName.endsWith(".wav")){
     WavFile wavFile(fileName);
     WAV_FILE_INFO wavInfo = wavFile.processToRawFile();
@@ -96,29 +92,9 @@ bool SDAudioFile::fetchAudioFileData(){
   return true;
 }
 
-uint32_t SDAudioFile::getFileSize(){
-  return fileSize;
-}
-
-uint32_t SDAudioFile::getCurrentFileDirection(){
-  return fileDirectionToBuffer;
-}
-
-AUDIO_FILE_INFO SDAudioFile::getAudioFileInfo(){
-  AUDIO_FILE_INFO ret = {
-    .fileName = fileName.c_str(),
-    .currentFileDirection = fileDirectionToBuffer,
-    .size = fileSize,
-    .progress = (fileDirectionToBuffer*100UL)/fileSize,
-    .state = getStatusString(),
-    .bitRes = audioResolution,
-  };
-  return ret;
-}
-
 String SDAudioFile::getStatusString(){
   String status = "";
-  switch (fileState) {
+  switch (fileStatus) {
   case FILE_OPENING:
     status = "OPENING";
     break;

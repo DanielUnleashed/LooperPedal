@@ -115,7 +115,7 @@ void AudioPlayer::statusMonitorTask(void* funcParams){
 }
 
 void AudioPlayer::setAllTo(const uint8_t state){
-  for(uint8_t i = 0; i < channelsUsed; i++) audioChannels[i].setTo(state);
+  for(uint8_t i = 0; i < channelsUsed; i++) audioChannels[i].setStatus(state);
 }
 
 void AudioPlayer::memoryTask(void* funcParams){ 
