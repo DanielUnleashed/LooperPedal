@@ -1,10 +1,10 @@
-#include "AudioFile.h"
+#include "SDAudioFile.h"
 
-const String AudioFile::PROCESSED_FOLDER = "/proc";
+const String SDAudioFile::PROCESSED_FOLDER = "/proc";
 
-AudioFile::AudioFile(){}
+SDAudioFile::SDAudioFile(){}
 
-bool AudioFile::open(char *filePath){
+bool SDAudioFile::open(char *filePath){
   fileState = FILE_OPENING;
   fileName = String(filePath);
 
@@ -14,15 +14,15 @@ bool AudioFile::open(char *filePath){
   return true;
 }
 
-void AudioFile::setTo(const uint8_t state){
+void SDAudioFile::setTo(const uint8_t state){
   fileState = state;
 }
 
-bool AudioFile::hasFileEnded(){
+bool SDAudioFile::hasFileEnded(){
   return fileState == FILE_ENDED;
 }
 
-uint16_t AudioFile::getSample(){
+uint16_t SDAudioFile::getSample(){
   /* If it's the case that inside the circular buffer it's the end of the song
      then, the file will be tagged as 'ended' and so, in the next iteration, if
      it remains as such state, it will return silence.   
@@ -44,11 +44,11 @@ uint16_t AudioFile::getSample(){
   else return 0x8000; // For unsigned 16 bit audio.
 }
 
-void AudioFile::calculateTotalIteration(uint32_t maxFileSize){
+void SDAudioFile::calculateTotalIteration(uint32_t maxFileSize){
   maxIterations = maxFileSize/fileSize;
 }
 
-void AudioFile::refreshBuffer(){
+void SDAudioFile::refreshBuffer(){
   if(buf.getFreeSpace() < BUFFER_REFRESH) return;
   dataFile.seek(fileDirectionToBuffer);
   uint8_t bufData[BUFFER_REFRESH*2];
@@ -67,7 +67,7 @@ void AudioFile::refreshBuffer(){
   }
 }
 
-bool AudioFile::fetchAudioFileData(){
+bool SDAudioFile::fetchAudioFileData(){
   if(fileName.endsWith(".wav")){
     WavFile wavFile(fileName);
     WAV_FILE_INFO wavInfo = wavFile.processToRawFile();
@@ -96,15 +96,15 @@ bool AudioFile::fetchAudioFileData(){
   return true;
 }
 
-uint32_t AudioFile::getFileSize(){
+uint32_t SDAudioFile::getFileSize(){
   return fileSize;
 }
 
-uint32_t AudioFile::getCurrentFileDirection(){
+uint32_t SDAudioFile::getCurrentFileDirection(){
   return fileDirectionToBuffer;
 }
 
-AUDIO_FILE_INFO AudioFile::getAudioFileInfo(){
+AUDIO_FILE_INFO SDAudioFile::getAudioFileInfo(){
   AUDIO_FILE_INFO ret = {
     .fileName = fileName.c_str(),
     .currentFileDirection = fileDirectionToBuffer,
@@ -116,7 +116,7 @@ AUDIO_FILE_INFO AudioFile::getAudioFileInfo(){
   return ret;
 }
 
-String AudioFile::getStatusString(){
+String SDAudioFile::getStatusString(){
   String status = "";
   switch (fileState) {
   case FILE_OPENING:
@@ -141,7 +141,7 @@ String AudioFile::getStatusString(){
   return status;
 }
 
-void AudioFile::debug(const char* x, ... ) {
+void SDAudioFile::debug(const char* x, ... ) {
   if(!DEBUG_FILE_MESSAGES) return;
   va_list args;
   va_start(args, x);
@@ -149,7 +149,7 @@ void AudioFile::debug(const char* x, ... ) {
   va_end(args);
 }
 
-void AudioFile::error(const char* x, ... ) {
+void SDAudioFile::error(const char* x, ... ) {
   va_list args;
   va_start(args, x);
   Utilities::error(x, args);

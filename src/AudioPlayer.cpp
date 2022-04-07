@@ -1,6 +1,6 @@
 #include "AudioPlayer.h"
 
-AudioFile AudioPlayer::audioChannels[MAX_AUDIO_CHANNELS];
+SDAudioFile AudioPlayer::audioChannels[MAX_AUDIO_CHANNELS];
 hw_timer_t* AudioPlayer::timer;
 uint8_t AudioPlayer::channelsUsed = 0;
 uint8_t AudioPlayer::longestChannel = 0;
@@ -70,7 +70,7 @@ void AudioPlayer::play(){
   vTaskResume(memoryTaskHandle);
   vTaskResume(statusMonitorTaskHandle);
   isPlaying = true;
-  setAllTo(AudioFile::FILE_PLAYING);
+  setAllTo(SDAudioFile::FILE_PLAYING);
   timerAlarmEnable(timer);
   Serial.println("-Resumed.");
 }
@@ -79,7 +79,7 @@ void AudioPlayer::pause(){
   timerAlarmDisable(timer);
   vTaskSuspend(memoryTaskHandle);
   isPlaying = false;
-  setAllTo(AudioFile::FILE_PAUSED);
+  setAllTo(SDAudioFile::FILE_PAUSED);
   Serial.println("-Paused.");
 }
 
@@ -134,7 +134,7 @@ void AudioPlayer::memoryTask(void* funcParams){
       globalBuf.put(finalMix);
     
       if(audioChannels[longestChannel].hasFileEnded()){
-        setAllTo(AudioFile::FILE_PLAYING);
+        setAllTo(SDAudioFile::FILE_PLAYING);
       }
     }
   }
@@ -172,7 +172,7 @@ void AudioPlayer::addAudioFile(char* filePath){
   }
 }
 
-void AudioPlayer::addAudioFile(AudioFile newAudioFile){
+void AudioPlayer::addAudioFile(SDAudioFile newAudioFile){
   audioChannels[channelsUsed++] = newAudioFile;
 }
 

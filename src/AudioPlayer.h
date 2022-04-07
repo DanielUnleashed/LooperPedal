@@ -1,7 +1,7 @@
 #ifndef AudioPlayer_h
 #define AudioPlayer_h
 
-#include "AudioFile.h"
+#include "audioFiles/SDAudioFile.h"
 #include "defines.h"
 
 #define DEBUG_AUDIOPLAYER_MESSAGES true
@@ -19,7 +19,7 @@ class AudioPlayer{
     static void play();
     static void pause();
 
-    static void addAudioFile(AudioFile file);
+    static void addAudioFile(SDAudioFile file);
     static void addAudioFile(char* filePath);
     static void memoryTask(void* funcParams);
     static void statusMonitorTask(void* funcParams);
@@ -30,7 +30,7 @@ class AudioPlayer{
     static const uint8_t PLAY_ONCE     = 2;
     static const uint8_t PLAY_LOOP     = 3;
 
-    static AudioFile audioChannels[MAX_AUDIO_CHANNELS];
+    static SDAudioFile audioChannels[MAX_AUDIO_CHANNELS];
     static uint8_t channelsUsed;    // Number of channels used.
     static uint8_t longestChannel;  // Index of the longest audio track in audioChannels.
 

@@ -1,5 +1,5 @@
-#ifndef AudioFile_h
-#define AudioFile_h
+#ifndef SDAudioFile_h
+#define SDAudioFile_h
 
 #include "CircularBuffer.h"
 
@@ -29,7 +29,7 @@ struct AUDIO_FILE_INFO{
   uint8_t bitRes;
 };
 
-class AudioFile {
+class SDAudioFile {
   public:
     static const uint8_t FILE_PAUSED  = 3;
     static const uint8_t FILE_PLAYING = 4;
@@ -38,7 +38,7 @@ class AudioFile {
 
     String fileName;
 
-    AudioFile();
+    SDAudioFile();
     bool open(char *filePath);
     void refreshBuffer();
     uint16_t getSample();
