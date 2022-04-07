@@ -165,6 +165,11 @@ void AudioPlayer::addAudioFile(char* filePath){
   }
   channelsUsed++;
   debug("\n");
+
+  uint32_t longestChannelSize = audioChannels[longestChannel].getFileSize();
+  for(uint8_t i = 0; i < channelsUsed; i++){
+    audioChannels[i].calculateTotalIteration(longestChannelSize);
+  }
 }
 
 void AudioPlayer::addAudioFile(AudioFile newAudioFile){

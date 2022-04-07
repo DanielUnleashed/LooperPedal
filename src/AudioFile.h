@@ -47,7 +47,8 @@ class AudioFile {
     uint32_t getFileSize();
     uint32_t getCurrentFileDirection();
     AUDIO_FILE_INFO getAudioFileInfo();
-    
+    void calculateTotalIteration(uint32_t maxFileSize);
+
   private:
     uint32_t fileSize = 0;
 
@@ -59,6 +60,9 @@ class AudioFile {
     CircularBuffer buf;
     uint32_t fileDirectionToBuffer = 0;
     uint16_t finalReadIndexOfFile = 0xFFFF;
+
+    uint16_t currentIteration = 0;
+    uint16_t maxIterations = 1;
 
     static const uint8_t FILE_OPENING = 0;
     static const uint8_t FILE_READY   = 1;

@@ -19,8 +19,6 @@ void AuxSPI::begin(){
 void AuxSPI::SPI2_Sender(void* funcParams){
     for(;;){
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
-        vTaskEnterCritical(&timerMux);
         for(uint8_t i = 0; i < holdPacketCount; i++){
             if(holdPackets[i].needsResponse){
                 writeAndRead(holdPackets[i].pin, holdPackets[i].dataOut, holdPackets[i].responseBuffer);
@@ -29,7 +27,6 @@ void AuxSPI::SPI2_Sender(void* funcParams){
             }
         }
         holdPacketCount = 0; // Clear all packets.
-        vTaskExitCritical(&timerMux);
     }
     vTaskDelete(NULL);
 }
@@ -63,17 +60,27 @@ HOLDOUT_PACKET* AuxSPI::writeAndReadFromISR(uint8_t chipSelect, uint8_t* dataOut
 
 static const SPISettings sett(SPI_CLK, MSBFIRST, SPI_MODE0);
 void AuxSPI::writeAndRead(uint8_t chipSelect, uint8_t* dataOut, uint8_t* dataInBuff){
-    SPI2 -> beginTransaction(SPISettings(800000, MSBFIRST, SPI_MODE0));
+    portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
+    vTaskEnterCritical(&timerMux);
+    
+    SPI2 -> beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0)); //If substituted by sett, it implodes (doesn't work)
     digitalWrite(chipSelect, LOW);
     SPI2 -> transferBytes(dataOut, dataInBuff, sizeof(dataOut));
     digitalWrite(chipSelect, HIGH);
     SPI2 -> endTransaction();
+    
+    vTaskExitCritical(&timerMux);
 }
 
 void AuxSPI::write(uint8_t chipSelect, uint8_t* data){
+    portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
+    vTaskEnterCritical(&timerMux);
+    
     SPI2 -> beginTransaction(sett);
     digitalWrite(chipSelect, LOW);
     SPI2 -> writeBytes(data, sizeof(data));
     digitalWrite(chipSelect, HIGH);
     SPI2 -> endTransaction();
+
+    vTaskExitCritical(&timerMux);
 }

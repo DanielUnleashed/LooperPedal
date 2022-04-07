@@ -8,7 +8,7 @@ bool AudioFile::open(char *filePath){
   fileState = FILE_OPENING;
   fileName = String(filePath);
 
-  fetchAudioFileData();
+  if(!fetchAudioFileData()) return false;
   refreshBuffer();
   fileState = FILE_READY;
   return true;
@@ -28,7 +28,13 @@ uint16_t AudioFile::getSample(){
      it remains as such state, it will return silence.   
   */
   if(buf.getReadIndex() == finalReadIndexOfFile){
-    fileState = FILE_ENDED;
+    if(currentIteration < maxIterations){
+      fileState = FILE_ENDED;
+      currentIteration = 0;
+    }else{
+      // Same fileState.
+      currentIteration++;
+    }
     finalReadIndexOfFile = 0xFFFF;
     return buf.get();
   }
@@ -36,6 +42,10 @@ uint16_t AudioFile::getSample(){
   if(fileState == FILE_PLAYING) return buf.get();
   //else return 0x80; // For unsigned 8 bit audio.
   else return 0x8000; // For unsigned 16 bit audio.
+}
+
+void AudioFile::calculateTotalIteration(uint32_t maxFileSize){
+  maxIterations = maxFileSize/fileSize;
 }
 
 void AudioFile::refreshBuffer(){
@@ -62,10 +72,22 @@ bool AudioFile::fetchAudioFileData(){
     WavFile wavFile(fileName);
     WAV_FILE_INFO wavInfo = wavFile.processToRawFile();
     fileName = String(wavInfo.fileName);
-    fileSize = wavInfo.dataSize;
+    //fileSize = wavInfo.dataSize;
+  } else if(fileName.endsWith(".raw")){
+    // Nothing at the moment.
+  }else{
+    error("Filetype not suported!");
+    return false;
   }
 
+  // Must be sure it is a .raw file.
   dataFile = SD.open(fileName, FILE_READ);
+  fileSize = dataFile.size();
+
+  if(fileSize == 0){
+    debug("File %s is empty!\n", fileName.c_str());
+    return false;
+  }
 
   fileDirectionToBuffer = 0;
   //Byte res. = audioRes/8 (+ 1 if audioRes%8 > 0)

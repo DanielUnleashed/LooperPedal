@@ -11,10 +11,23 @@ uint16_t CircularBuffer::get(){
   return data;
 }
 
+void CircularBuffer::get(uint16_t* outBuffer, uint16_t size){
+  for(uint16_t i = 0; i < size; i++){
+    outBuffer[i] = get();
+  }
+}
+
 uint16_t CircularBuffer::getFreeSpace(){
   uint16_t dist = 0;
-  if(writeIndex >= readIndex) dist = MAX_BUFFER_LENGTH - writeIndex + readIndex;
-  else dist = readIndex - writeIndex;
+  if(writeIndex < readIndex) dist = readIndex - writeIndex;
+  else dist = MAX_BUFFER_LENGTH - writeIndex + readIndex;
+  return dist;
+}
+
+uint16_t CircularBuffer::getWrittenSpace(){
+  uint16_t dist = 0;
+  if(writeIndex < readIndex) dist = MAX_BUFFER_LENGTH - readIndex + writeIndex;
+  else dist = writeIndex - readIndex;
   return dist;
 }
 

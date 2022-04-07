@@ -1,6 +1,6 @@
 #ifndef defines_h
 #define defines_h
 
-#define PLAY_FREQUENCY 22050
+#define PLAY_FREQUENCY 16000
 
 #endif
