@@ -2,7 +2,9 @@
 
 const String SDAudioFile::PROCESSED_FOLDER = "/proc";
 
-SDAudioFile::SDAudioFile(){}
+SDAudioFile::SDAudioFile(){
+  ID = SD_FILE_ID;
+}
 
 bool SDAudioFile::open(char *filePath){
   fileStatus = FILE_OPENING;
@@ -47,20 +49,22 @@ uint16_t SDAudioFile::getSample(){
 void SDAudioFile::refreshBuffer(){
   if(buf.getFreeSpace() < BUFFER_REFRESH) return;
   dataFile.seek(fileDirectionToBuffer);
-  uint8_t bufData[BUFFER_REFRESH*2];
-  dataFile.read(bufData, BUFFER_REFRESH*2);
-  for(uint16_t i = 0; i < BUFFER_REFRESH; i+=2){
+  
+  uint32_t remainingBytes = fileSize - fileDirectionToBuffer;
+  uint16_t buffSize = BUFFER_REFRESH<<1;
+  if(remainingBytes < buffSize){
+    buffSize = remainingBytes;
+    fileDirectionToBuffer = 0;
+  }else{
+    fileDirectionToBuffer += buffSize;
+  }
+  uint8_t bufData[buffSize];
+  dataFile.read(bufData, buffSize);
+
+  for(uint16_t i = 0; i < buffSize; i+=2)
     buf.put(bufData[i] | (bufData[i+1] << 8));
 
-    fileDirectionToBuffer += 2;
-
-    if(fileDirectionToBuffer >= fileSize){
-      fileDirectionToBuffer = 0;
-      dataFile.seek(0);
-      finalReadIndexOfFile = buf.getWriteIndex();
-      break;
-    }
-  }
+  if(buffSize != (BUFFER_REFRESH<<1)) finalReadIndexOfFile = buf.getWriteIndex();
 }
 
 bool SDAudioFile::fetchSDAudioFileData(){

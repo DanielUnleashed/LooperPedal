@@ -16,7 +16,12 @@ void setup() {
   delay(1);
   
   AudioPlayer::begin();
-  AudioPlayer::addRECAudioFile(false);
+  AudioPlayer::addSDAudioFile(a);
+  AudioPlayer::addSDAudioFile(b);
+  AudioPlayer::addSDAudioFile(c);
+  AudioPlayer::addSDAudioFile(d);
+  AudioPlayer::addSDAudioFile(e);
+  //AudioPlayer::addSDAudioFile("/Rhode.wav");
   AudioPlayer::play();
 }
 

@@ -1,4 +1,4 @@
-/*#include <SPI.h>
+#include <SPI.h>
 #include "Arduino.h"
 
 SPIClass *hspi = NULL; 
@@ -22,4 +22,4 @@ void spiCommand(byte stuff) {
   hspi->transfer(stuff);
   digitalWrite(15, HIGH);
   hspi->endTransaction();
-}*/
+}

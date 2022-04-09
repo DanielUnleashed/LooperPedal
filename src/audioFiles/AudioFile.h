@@ -10,6 +10,10 @@
 #include "SD.h"
 #include <SPI.h>
 
+#define SD_FILE_ID 0
+#define REC_FILE_ID 1
+//#define MIDI_FILE 2
+
 struct AUDIO_FILE_INFO{
   const char* fileName;
   uint32_t currentFileDirection;

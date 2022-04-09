@@ -2,6 +2,7 @@
 #define AudioPlayer_h
 
 #include "audioFiles/SDAudioFile.h"
+#include "audioFiles/RECAudioFile.h"
 #include "defines.h"
 
 #define DEBUG_AUDIOPLAYER_MESSAGES true
@@ -19,8 +20,8 @@ class AudioPlayer{
     static void play();
     static void pause();
 
-    static void addAudioFile(SDAudioFile file);
-    static void addAudioFile(char* filePath);
+    static void addSDAudioFile(char* filePath);
+    static void addRECAudioFile(bool channel);
     static void memoryTask(void* funcParams);
     static void statusMonitorTask(void* funcParams);
     static void audioProcessingTask(void* funcParams);
@@ -30,7 +31,7 @@ class AudioPlayer{
     static const uint8_t PLAY_ONCE     = 2;
     static const uint8_t PLAY_LOOP     = 3;
 
-    static SDAudioFile audioChannels[MAX_AUDIO_CHANNELS];
+    static AudioFile* audioChannels[MAX_AUDIO_CHANNELS];
     static uint8_t channelsUsed;    // Number of channels used.
     static uint8_t longestChannel;  // Index of the longest audio track in audioChannels.
 
@@ -49,7 +50,7 @@ class AudioPlayer{
     static TaskHandle_t memoryTaskHandle;
 
     static void SDBoot();
-    static void setAllTo(const uint8_t state);
+    static void setAllTo(const uint8_t audioFileID, const uint8_t state);
 
     static void IRAM_ATTR frequencyTimer();
 
