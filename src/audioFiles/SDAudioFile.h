@@ -7,11 +7,6 @@
 
 #define DEBUG_FILE_MESSAGES true
 
-#define PUSH_BUTTON_1 34
-#define PUSH_BUTTON_2 35
-#define PUSH_BUTTON_3 36
-#define PUSH_BUTTON_4 39
-
 class SDAudioFile : public AudioFile {
   public:
     static const String PROCESSED_FOLDER;

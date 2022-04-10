@@ -14,12 +14,21 @@ TaskHandle_t AudioPlayer::audioProcessingTaskHandle;
 TaskHandle_t AudioPlayer::statusMonitorTaskHandle;
 TaskHandle_t AudioPlayer::memoryTaskHandle;
 
+DebounceButton AudioPlayer::button1(PUSH_BUTTON_1);
+DebounceButton AudioPlayer::button2(PUSH_BUTTON_2);
+DebounceButton AudioPlayer::button3(PUSH_BUTTON_3);
+DebounceButton AudioPlayer::button4(PUSH_BUTTON_4);
+
 void IRAM_ATTR AudioPlayer::ISR_BUTTON_1(){
+  if(!button1.buttonClicked()) return;
+
   if(isPlaying) pause();
   else play();
 }
 
 void IRAM_ATTR AudioPlayer::ISR_BUTTON_2(){
+  if(!button2.buttonClicked()) return;
+
   for(uint8_t i = 0; i < channelsUsed; i++){
     if(audioChannels[i]->ID == REC_FILE_ID) 
       ((RECAudioFile*) audioChannels[i]) -> startRecording();
