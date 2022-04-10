@@ -1,30 +1,38 @@
 #include "RECAudioFile.h"
 
+RECAudioFile::RECAudioFile(){}
+
 RECAudioFile::RECAudioFile(bool channel, ADC* inputADC){
     ID = REC_FILE_ID;
     adcChannel = channel;
     adc = inputADC;
+    SD.mkdir("/rec");
     currentRecording = SD.open("/rec/0.raw", FILE_WRITE);
 }
 
 uint16_t RECAudioFile::getSample(){
-    if(isRecording){
-        uint16_t inputData = adc -> read(adcChannel);
-        buf.put(inputData);
-    }
-
     fileDirectionToBuffer += 2;
 
     uint32_t mix = 0;
+    if(isRecording){
+        //uint16_t inputData = adc -> readFromISR(adcChannel);
+        uint16_t inputData = 0x8000;
+        buf.put(inputData);
+        mix += inputData;
+    }
+
     if(currentRecording == 1){
-        if(playLastRecording){
-            mix = recBuf[0].get();
-        }
-    }else if(currentRecording > 1){
-        mix = recBuf[1].get();
         if(playLastRecording){
             mix += recBuf[0].get();
             mix = mix >> 1;
+        }
+    }else if(currentRecording > 1){
+        mix += recBuf[1].get();
+        if(playLastRecording){
+            mix += recBuf[0].get();
+            mix /= 3;
+        }else{
+            mix /= 2;
         }
     }
     return mix;
@@ -36,12 +44,9 @@ void RECAudioFile::refreshBuffer(){
     // undone and later done.
     if(isRecording && buf.getWrittenSpace() > BUFFER_REFRESH) writeToFile();
 
-    if(recordingCount == 1){
-        readFromSD(0);
-    }else if(recordingCount > 1){
-        readFromSD(0);
-        mixFromSD(1);
-    }
+    if(recordingCount > 0) readFromSD(0);
+    
+    if(recordingCount > 1) mixFromSD(1);
 }
 
 void RECAudioFile::readFromSD(uint8_t channel){
@@ -93,30 +98,44 @@ void RECAudioFile::writeToFile(){
     uint16_t arr[totalW];
     buf.get(arr, totalW);
     currentRecording.write((uint8_t*)arr, totalW>>1);
-    currentRecording.flush();
 }
 
 void RECAudioFile::startRecording(){
     isRecording = true;
     // Delete the last recording.
     if(!playLastRecording) recordingCount--;
+    Serial.println("Now recording...");
 }
 
 void RECAudioFile::stopRecording(){
+    Serial.println("Stopping...");
     isRecording = false;
+    
+    currentRecording.close(); // <- Gives fatal error abort()
 
-    currentRecording.close();
+    Serial.println("a");
+    delay(1);
 
     recFiles[1] = recFiles[0];
     recFiles[0] = SD.open(fileName, FILE_READ);
+    if(recordingCount == 0) fileSize = recFiles[0].size();
     
+
+    Serial.println("c");
+    delay(1);
+
+
     recordingCount++;
     currentRecording = SD.open(generateFileName(recordingCount), FILE_WRITE);
+
+Serial.println("b");
+    delay(1);
 
     if(recordingCount > 2){
         tempMixingChannel = SD.open(generateFileName(recordingCount-2, recordingCount-1), FILE_WRITE);
         laterPrevHasBeenMixed = false;
     } 
+    Serial.println("Stopped recording\n");
 }
 
 String RECAudioFile::generateFileName(uint8_t number){

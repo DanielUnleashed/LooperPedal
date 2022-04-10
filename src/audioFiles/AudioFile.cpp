@@ -21,9 +21,10 @@ AUDIO_FILE_INFO AudioFile::getAudioFileInfo(){
     .fileName = fileName.c_str(),
     .currentFileDirection = fileDirectionToBuffer,
     .size = fileSize,
-    .progress = (fileDirectionToBuffer*100UL)/fileSize,
+    .progress = 0,
     .state = getStatusString(),
     .bitRes = audioResolution,
   };
+  if(fileSize != 0) ret.progress = (fileDirectionToBuffer*100UL)/fileSize;
   return ret;
 }

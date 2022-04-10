@@ -10,6 +10,7 @@
 class RECAudioFile : public AudioFile {
 
     public:
+        RECAudioFile();
         RECAudioFile(bool channel, ADC* inputADC);
 
         uint16_t getSample() override;

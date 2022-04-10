@@ -24,7 +24,7 @@ void setup(){
 
   xTaskCreatePinnedToCore(memoryTask, "Memorytask", 10000, NULL, 7, &memoryTaskHandle, 1);
 
-  attachInterrupt(PUSH_BUTTON_2, ISR_BUTTON, CHANGE);
+  attachInterrupt(PUSH_BUTTON_2, ISR_BUTTON, RISING);
 
   timer = timerBegin(0, 8, true);
   timerAttachInterrupt(timer, frequencyTimer, true);

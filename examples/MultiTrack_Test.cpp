@@ -1,6 +1,4 @@
 #include "AudioPlayer.h"
-#include "utils/AuxSPI.h"
-#include "utils/Utilities.h"
 
 char a[] = "/Bass.wav";
 char b[] = "/Beat.wav";

@@ -43,6 +43,7 @@ class AudioPlayer{
     static hw_timer_t *timer;
     static uint8_t playMode;
     static bool isPlaying;
+    static bool isRecording;
 
     static DAC dac;
     static ADC adc;

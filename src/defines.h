@@ -1,7 +1,7 @@
 #ifndef defines_h
 #define defines_h
 
-#define PLAY_FREQUENCY 22050
+#define PLAY_FREQUENCY 8000
 
 #define PUSH_BUTTON_1 34
 #define PUSH_BUTTON_2 35

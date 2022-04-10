@@ -10,17 +10,17 @@ class DebounceButton{
     public:
         DebounceButton(uint8_t chipPin);
 
-        bool buttonClicked();
-        bool buttonClicked(uint8_t timesPressed);
-        bool buttonDoubleClicked();
+        bool clicked();
+        bool clicked(uint8_t timesPressed);
+        bool doubleClicked();
     private:
-        uint32_t lastTimePressed;
-        uint32_t doubleClickedTime;
-        bool lastState = LOW;
+        volatile uint32_t lastTimePressed = 0;
+        volatile uint32_t doubleClickedTime;
+        volatile bool lastState = LOW;
         uint8_t pin;
 
-        bool buttonIsPressed = false;
-        uint8_t repeatedPressesCount = 0;
+        volatile bool buttonIsPressed = false;
+        volatile uint8_t repeatedPressesCount = 0;
 
         bool updateState();
 };
