@@ -51,6 +51,7 @@ void loop(){}
 portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
 void IRAM_ATTR frequencyTimer(){
   portENTER_CRITICAL(&timerMux);
+  adc.updateReadings();
   dac.writeFromISR(recFile -> getSample());
   portEXIT_CRITICAL(&timerMux);
 }

@@ -12,10 +12,6 @@
 
 #include "chip/DAC.h"
 #include "chip/ADC.h"
-#define CS_DAC 25
-#define CS_ADC 26
-
-#define MAX_AUDIO_CHANNELS 6
 
 class AudioPlayer{
   public:
@@ -33,8 +29,14 @@ class AudioPlayer{
     static const uint8_t PLAY_ONCE     = 2;
     static const uint8_t PLAY_LOOP     = 3;
 
-    static AudioFile* audioChannels[MAX_AUDIO_CHANNELS];
-    static uint8_t channelsUsed;    // Number of channels used.
+    static AudioFile* audioChannels[MAX_TOTAL_CHANNELS];
+    static uint8_t channelsUsed;    // Total sum of channels.
+
+    static uint8_t SDChannelPos[MAX_AUDIO_CHANNELS];
+    static uint8_t RECChannelPos[MAX_REC_CHANNELS];
+    static uint8_t audioChannelsUsed;
+    static uint8_t recChannelsUsed;
+
     static uint8_t longestChannel;  // Index of the longest audio track in audioChannels.
 
     static CircularBuffer globalBuf;
@@ -66,6 +68,9 @@ class AudioPlayer{
     static void IRAM_ATTR ISR_BUTTON_2();
     static void IRAM_ATTR ISR_BUTTON_3();
     static void IRAM_ATTR ISR_BUTTON_4();
+
+    static RECAudioFile* getRECAudioFile(uint8_t index);
+    static SDAudioFile* getSDAudioFile(uint8_t index);
 
     static void debug(const char* x, ...);
     static void error(const char* x, ...);

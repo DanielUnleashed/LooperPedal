@@ -41,6 +41,7 @@ class AudioFile{
         uint32_t getCurrentFileDirection();
         uint32_t getFileSize();
         AUDIO_FILE_INFO getAudioFileInfo();
+        bool is(uint8_t askID);
 
     private:
 

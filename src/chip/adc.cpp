@@ -10,17 +10,25 @@ void ADC::begin(){
     digitalWrite(chipSelect, HIGH);
 }
 
-uint16_t ADC::readFromISR(bool channel){
-    uint8_t data[3] = {0x01u, 0xA0u | (channel << 6), 0x00};
-    readValue = ((readBuffer[1] & 0x0F) << 8) | readBuffer[2];
-    AuxSPI::writeAndReadFromISR(chipSelect, data, readBuffer);
-    return readValue;
+uint16_t ADC::getLastReading(bool channel){
+    return readValue[channel];
 }
 
+void ADC::updateReadings(){
+    readFromISR(0);
+    //readFromISR(1);
+}
+
+uint16_t ADC::readFromISR(bool channel){
+    uint8_t data[3] = {0x01u, 0xA0u | (channel << 6), 0x00};
+    readValue[channel] = ((readBuffer[channel][1] & 0x0F) << 8) | readBuffer[channel][2];
+    AuxSPI::writeAndReadFromISR(chipSelect, data, readBuffer[channel]);
+    return readValue[channel];
+}
 
 uint16_t ADC::read(bool channel){
     uint8_t data[3] = {0x01u, 0xA0u | (channel << 6), 0x00};
-    AuxSPI::writeAndRead(chipSelect, data, readBuffer);
-    readValue = ((readBuffer[1] & 0x0F) << 8) | readBuffer[2];
-    return readValue;
+    AuxSPI::writeAndRead(chipSelect, data, readBuffer[channel]);
+    readValue[channel] = ((readBuffer[channel][1] & 0x0F) << 8) | readBuffer[channel][2];
+    return readValue[channel];
 }

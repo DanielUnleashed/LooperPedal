@@ -20,7 +20,7 @@ uint16_t RECAudioFile::getSample(){
     uint32_t mix = 0;
     uint8_t mixedChannels = 0;
     if(isRecording){
-        uint16_t inputData = adc -> readFromISR(adcChannel);
+        uint16_t inputData = adc -> getLastReading(adcChannel);
         buf.put(inputData);
         mix += inputData;
         mixedChannels++;

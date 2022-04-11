@@ -1,8 +1,14 @@
 #include "AudioPlayer.h"
 
-AudioFile* AudioPlayer::audioChannels[MAX_AUDIO_CHANNELS];
-hw_timer_t* AudioPlayer::timer;
+AudioFile* AudioPlayer::audioChannels[MAX_TOTAL_CHANNELS];
 uint8_t AudioPlayer::channelsUsed = 0;
+hw_timer_t* AudioPlayer::timer;
+
+uint8_t AudioPlayer::SDChannelPos[MAX_AUDIO_CHANNELS];
+uint8_t AudioPlayer::RECChannelPos[MAX_REC_CHANNELS];
+uint8_t AudioPlayer::audioChannelsUsed = 0;
+uint8_t AudioPlayer::recChannelsUsed = 0;
+
 uint8_t AudioPlayer::longestChannel = 0;
 CircularBuffer AudioPlayer::globalBuf;
 uint8_t AudioPlayer::playMode = 0; 
@@ -29,29 +35,30 @@ void IRAM_ATTR AudioPlayer::ISR_BUTTON_1(){
 
 void IRAM_ATTR AudioPlayer::ISR_BUTTON_2(){
   if(!button2.clicked()) return;
-  for(uint8_t i = 0; i < channelsUsed; i++){
-    if(audioChannels[i]->ID == REC_FILE_ID){
-      if(isRecording) ((RECAudioFile*) audioChannels[i]) -> stopRecording();
-      else ((RECAudioFile*) audioChannels[i]) -> startRecording();
-    }
-  }
 
-  if(!isPlaying) play();;
+  for(uint8_t i = 0; i < recChannelsUsed; i++){
+    RECAudioFile* currCh = getRECAudioFile(i);
+    if(isRecording) currCh -> stopRecording();
+    else currCh -> startRecording();
+  }
+  isRecording = !isRecording;
+  if(!isPlaying) play();
 }
 
 void IRAM_ATTR AudioPlayer::ISR_BUTTON_3(){
-  
+  if(!button3.clicked()) return;
+
+  for(uint8_t i = 0; i < recChannelsUsed; i++)
+    getRECAudioFile(i) -> undoRedoLastRecording();
 }
 
-void IRAM_ATTR AudioPlayer::ISR_BUTTON_4(){
-  
-}
+void IRAM_ATTR AudioPlayer::ISR_BUTTON_4(){}
 
 void AudioPlayer::begin(){
-  attachInterrupt(PUSH_BUTTON_1, ISR_BUTTON_1, RISING);
-  attachInterrupt(PUSH_BUTTON_2, ISR_BUTTON_2, RISING);
-  attachInterrupt(PUSH_BUTTON_3, ISR_BUTTON_3, RISING);
-  attachInterrupt(PUSH_BUTTON_4, ISR_BUTTON_4, RISING);
+  attachInterrupt(PUSH_BUTTON_1, ISR_BUTTON_1, CHANGE);
+  attachInterrupt(PUSH_BUTTON_2, ISR_BUTTON_2, CHANGE);
+  attachInterrupt(PUSH_BUTTON_3, ISR_BUTTON_3, CHANGE);
+  attachInterrupt(PUSH_BUTTON_4, ISR_BUTTON_4, CHANGE);
 
   SDBoot();
   dac.begin();
@@ -59,12 +66,14 @@ void AudioPlayer::begin(){
 
   delay(10);
 
+#ifdef LAUNCH_CONSOLE
   // Audio processing and signal managing task running on core 0
   xTaskCreatePinnedToCore(statusMonitorTask, "MonitorTask", 10000, NULL, 1, &statusMonitorTaskHandle, 0);
+  vTaskSuspend(statusMonitorTaskHandle);
+ #endif 
+
   // Memory task running on core 1
   xTaskCreatePinnedToCore(memoryTask, "MemoryTask", 10000, NULL, 5, &memoryTaskHandle, 1);
-
-  vTaskSuspend(statusMonitorTaskHandle);
   vTaskSuspend(memoryTaskHandle);
 
   //Start frequency playback interrupt
@@ -80,10 +89,11 @@ void AudioPlayer::begin(){
 void AudioPlayer::play(){
   isPlaying = true;
   vTaskResume(memoryTaskHandle);
+#ifdef LAUNCH_CONSOLE
   vTaskResume(statusMonitorTaskHandle);
+#endif
   setAllTo(SD_FILE_ID, AudioFile::FILE_PLAYING);
   timerAlarmEnable(timer);
-  Serial.println("-Resumed.");
 }
 
 void AudioPlayer::pause(){
@@ -91,7 +101,6 @@ void AudioPlayer::pause(){
   vTaskSuspend(memoryTaskHandle);
   isPlaying = false;
   setAllTo(SD_FILE_ID, AudioFile::FILE_PAUSED);
-  Serial.println("-Paused.");
 }
 
 void AudioPlayer::statusMonitorTask(void* funcParams){
@@ -126,25 +135,23 @@ void AudioPlayer::statusMonitorTask(void* funcParams){
 }
 
 void AudioPlayer::setAllTo(const uint8_t audioFileID, const uint8_t state){
-  for(uint8_t i = 0; i < channelsUsed; i++)
-    if(audioChannels[i]->ID == audioFileID) audioChannels[i]->setStatus(state);
+  for(uint8_t i = 0; i < audioChannelsUsed; i++)
+    getSDAudioFile(i) -> setStatus(state);
 }
 
 void AudioPlayer::memoryTask(void* funcParams){ 
   for(;;){
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        Serial.printf("here");
-    delay(10);
+    if(channelsUsed == 0) continue;
+
     for(uint8_t i = 0; i < channelsUsed; i++){
       audioChannels[i]->refreshBuffer();
     }
 
-    delay(10);
-
     while(globalBuf.getFreeSpace() > BUFFER_REFRESH && isPlaying){
       uint32_t samples = 0;
-      for(uint8_t i = 0; i < channelsUsed; i++){
-        samples += audioChannels[i]->getSample() >> 4;
+      for(uint8_t i = 0; i < audioChannelsUsed; i++){
+        samples += getSDAudioFile(i)->getSample() >> 4;
       }
       uint16_t finalMix = samples/channelsUsed;
       globalBuf.put(finalMix);
@@ -159,12 +166,27 @@ void AudioPlayer::memoryTask(void* funcParams){
 
 void IRAM_ATTR AudioPlayer::frequencyTimer(){
   portENTER_CRITICAL(&timerMux);
-  dac.writeFromISR(globalBuf.get());
+
+  adc.updateReadings();
+  uint32_t mix = globalBuf.get();
+  for(uint8_t i = 0; i < recChannelsUsed; i++){
+    mix += getRECAudioFile(i) -> getSample();
+  }
+  dac.writeFromISR(mix/recChannelsUsed);
+
   if(globalBuf.getFreeSpace() > BUFFER_REFRESH){
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     vTaskNotifyGiveFromISR(memoryTaskHandle, &xHigherPriorityTaskWoken);
   }
   portEXIT_CRITICAL(&timerMux);
+}
+
+SDAudioFile* AudioPlayer::getSDAudioFile(uint8_t index){
+  return (SDAudioFile*) audioChannels[SDChannelPos[index]];
+}
+
+RECAudioFile* AudioPlayer::getRECAudioFile(uint8_t index){
+  return (RECAudioFile*) audioChannels[RECChannelPos[index]];
 }
 
 void AudioPlayer::addSDAudioFile(char* filePath){
@@ -181,9 +203,9 @@ void AudioPlayer::addSDAudioFile(char* filePath){
     longestChannel = channelsUsed;
     debug(" (longest)");
   }
-  channelsUsed++;
   debug("\n");
 
+  SDChannelPos[audioChannelsUsed++] = channelsUsed++;
   uint32_t longestChannelSize = audioChannels[longestChannel]->getFileSize();
   for(uint8_t i = 0; i < channelsUsed; i++){
     if(audioChannels[i] -> ID == SD_FILE_ID)
@@ -194,6 +216,7 @@ void AudioPlayer::addSDAudioFile(char* filePath){
 void AudioPlayer::addRECAudioFile(bool channel){
   RECAudioFile* recFile = new RECAudioFile(channel, &adc);
   debug("New REC on channel %d\n", channelsUsed);
+  RECChannelPos[recChannelsUsed++] = channelsUsed;
   audioChannels[channelsUsed++] = recFile;
 }
 

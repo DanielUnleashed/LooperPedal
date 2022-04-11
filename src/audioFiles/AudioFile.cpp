@@ -28,3 +28,7 @@ AUDIO_FILE_INFO AudioFile::getAudioFileInfo(){
   if(fileSize != 0) ret.progress = (fileDirectionToBuffer*100UL)/fileSize;
   return ret;
 }
+
+bool AudioFile::is(uint8_t askID){
+  return ID == askID;
+}
