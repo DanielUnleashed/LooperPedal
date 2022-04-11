@@ -33,6 +33,7 @@ class RECAudioFile : public AudioFile {
 
         // Stores the current recording.
         File currentRecording;
+        uint32_t recordingStartingDirection = 0;
 
         uint8_t recordingCount = 0;
 
@@ -40,10 +41,13 @@ class RECAudioFile : public AudioFile {
         bool laterPrevHasBeenMixed = true;
         bool playLastRecording = true;
 
+        bool stopRecordingFlag = false;
+
         String generateFileName(uint8_t number);
         String generateFileName(uint8_t chA, uint8_t chB);
         void readFromSD(uint8_t channel);
         void mixFromSD(uint8_t channel);
+        void generateNewRECLayer();
 
 };
 

@@ -12,6 +12,7 @@ void ADC::begin(){
 
 uint16_t ADC::readFromISR(bool channel){
     uint8_t data[3] = {0x01u, 0xA0u | (channel << 6), 0x00};
+    readValue = ((readBuffer[1] & 0x0F) << 8) | readBuffer[2];
     AuxSPI::writeAndReadFromISR(chipSelect, data, readBuffer);
     return readValue;
 }

@@ -8,7 +8,7 @@ DebounceButton::DebounceButton(uint8_t chipPin){
 bool DebounceButton::updateState(){
     bool currentPinState = digitalRead(pin);
     uint32_t currentTime = millis();
-    Serial.printf("Curr:%d  Last:%d  Curr:%d Last:%d\n", currentPinState, lastState, currentTime, lastTimePressed);
+    //Serial.printf("Curr:%d  Last:%d  Curr:%d Last:%d\n", currentPinState, lastState, currentTime, lastTimePressed);
     if(currentPinState != lastState){
         if((currentTime - lastTimePressed) > DEFAULT_DEBOUNCE_TIME){
             lastTimePressed = currentTime;
