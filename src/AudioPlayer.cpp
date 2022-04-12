@@ -103,6 +103,52 @@ void AudioPlayer::pause(){
   setAllTo(SD_FILE_ID, AudioFile::FILE_PAUSED);
 }
 
+void AudioPlayer::memoryTask(void* funcParams){ 
+  for(;;){
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    if(channelsUsed == 0) continue;
+
+    for(uint8_t i = 0; i < channelsUsed; i++){
+      audioChannels[i]->refreshBuffer();
+    }
+
+    while(globalBuf.getFreeSpace() > BUFFER_REFRESH && isPlaying){
+      uint32_t samples = 0;
+      for(uint8_t i = 0; i < channelsUsed; i++){
+        samples += audioChannels[i]->getSample() >> 4;
+      }
+      uint16_t finalMix = samples/channelsUsed;
+      globalBuf.put(finalMix);
+    
+      if(audioChannels[longestChannel]->hasFileEnded()){
+        setAllTo(SD_FILE_ID, AudioFile::FILE_PLAYING);
+      }
+    }
+  }
+  vTaskDelete(NULL);
+}
+
+void IRAM_ATTR AudioPlayer::frequencyTimer(){
+  portENTER_CRITICAL(&timerMux);
+
+#ifdef PASS_AUDIO_INPUT_DURING_RECORDING
+  uint16_t adcRead = adc.updateReadings();
+  uint32_t mix;
+  if(isRecording) mix = (globalBuf.get() + adcRead)>>1;
+  else mix = globalBuf.get();
+  dac.writeFromISR(mix);
+#else
+  adc.updateReadings();
+  dac.writeFromISR(globalBuf.get());
+#endif
+
+  if(globalBuf.getFreeSpace() > BUFFER_REFRESH){
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    vTaskNotifyGiveFromISR(memoryTaskHandle, &xHigherPriorityTaskWoken);
+  }
+  portEXIT_CRITICAL(&timerMux);
+}
+
 void AudioPlayer::statusMonitorTask(void* funcParams){
   for(;;){
     if(isPlaying && channelsUsed>0){
@@ -137,48 +183,6 @@ void AudioPlayer::statusMonitorTask(void* funcParams){
 void AudioPlayer::setAllTo(const uint8_t audioFileID, const uint8_t state){
   for(uint8_t i = 0; i < audioChannelsUsed; i++)
     getSDAudioFile(i) -> setStatus(state);
-}
-
-void AudioPlayer::memoryTask(void* funcParams){ 
-  for(;;){
-    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-    if(channelsUsed == 0) continue;
-
-    for(uint8_t i = 0; i < channelsUsed; i++){
-      audioChannels[i]->refreshBuffer();
-    }
-
-    while(globalBuf.getFreeSpace() > BUFFER_REFRESH && isPlaying){
-      uint32_t samples = 0;
-      for(uint8_t i = 0; i < audioChannelsUsed; i++){
-        samples += getSDAudioFile(i)->getSample() >> 4;
-      }
-      uint16_t finalMix = samples/channelsUsed;
-      globalBuf.put(finalMix);
-    
-      if(audioChannels[longestChannel]->hasFileEnded()){
-        setAllTo(SD_FILE_ID, AudioFile::FILE_PLAYING);
-      }
-    }
-  }
-  vTaskDelete(NULL);
-}
-
-void IRAM_ATTR AudioPlayer::frequencyTimer(){
-  portENTER_CRITICAL(&timerMux);
-
-  adc.updateReadings();
-  uint32_t mix = globalBuf.get();
-  for(uint8_t i = 0; i < recChannelsUsed; i++){
-    mix += getRECAudioFile(i) -> getSample();
-  }
-  dac.writeFromISR(mix/recChannelsUsed);
-
-  if(globalBuf.getFreeSpace() > BUFFER_REFRESH){
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    vTaskNotifyGiveFromISR(memoryTaskHandle, &xHigherPriorityTaskWoken);
-  }
-  portEXIT_CRITICAL(&timerMux);
 }
 
 SDAudioFile* AudioPlayer::getSDAudioFile(uint8_t index){

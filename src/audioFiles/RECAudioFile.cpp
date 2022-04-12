@@ -13,39 +13,10 @@ RECAudioFile::RECAudioFile(bool channel, ADC* inputADC){
 }
 
 uint16_t RECAudioFile::getSample(){
-    if(recordingCount == 0 && !isRecording) return 0x8000;
-
+    if(recordingCount == 0) return 0x8000;
     fileDirectionToBuffer += 2;
-    uint32_t mix = 0;
-    uint8_t mixedChannels = 0;
-    if(isRecording){
-        uint16_t inputData = adc -> getLastReading(adcChannel);
-        if(inputData != 0){
-            buf.put(inputData);
-            mix += inputData;
-        }else{
-            // This helps softening the transition between a loop.
-            fileDirectionToBuffer-=2;
-            mix += 0x8000;
-        }
-        mixedChannels++;
-    }
-
-    if(recordingCount > 0){
-        if(fileDirectionToBuffer >= fileSize) fileDirectionToBuffer = 0;
-        if(playLastRecording){
-            mix += recBuf[0].get();
-            mixedChannels++;
-        }
-    }
-    if(recordingCount > 1){
-        mix += recBuf[1].get();
-        mixedChannels++;
-    }
-    
-    if(mixedChannels == 0) return 0x8000;
-    uint16_t finalMix = mix/mixedChannels;
-    return finalMix;
+    if(recordingCount>0 && fileDirectionToBuffer >= fileSize) fileDirectionToBuffer = 0;
+    return buf.get();
 }
 
 void RECAudioFile::refreshBuffer(){
@@ -58,6 +29,27 @@ void RECAudioFile::refreshBuffer(){
     if(recordingCount > 0) readFromSD(0);
     
     if(recordingCount > 1) mixFromSD(1);
+
+    if(buf.getFreeSpace() < BUFFER_REFRESH) return;
+
+    for(uint16_t i = 0; i < BUFFER_REFRESH; i++){
+        uint32_t mix = 0;
+        uint8_t mixedChannels = 0;
+
+        if(recordingCount > 0){
+            if(playLastRecording){
+                mix += recBuf[0].get();
+                mixedChannels++;
+            }
+        }
+        if(recordingCount > 1){
+            mix += recBuf[1].get();
+            mixedChannels++;
+        }
+        
+        if(mixedChannels == 0) buf.put(0x8000);
+        else buf.put(mix/mixedChannels);
+    }
 }
 
 void RECAudioFile::readFromSD(uint8_t channel){
@@ -78,7 +70,7 @@ void RECAudioFile::readFromSD(uint8_t channel, uint32_t dir, uint16_t dataLength
     
     recBuf[channel].put(bufData, buffSize);
 
-    if(buffSize != dataLength<<1) readFromSD(channel, 0, dataLength-(buffSize>>1));
+    //if(buffSize != dataLength<<1) readFromSD(channel, 0, dataLength-(buffSize>>1));
 }
 
 void RECAudioFile::mixFromSD(uint8_t channel){
@@ -111,8 +103,8 @@ void RECAudioFile::mixFromSD(uint8_t channel){
 }
 
 void RECAudioFile::writeToFile(){
-    if(buf.getWrittenSpace() < BUFFER_REFRESH) return;
-    uint16_t totalW = buf.getWrittenSpace();
+    uint16_t totalW = adc->getSavedReadingsCount(adcChannel);
+    if(totalW < BUFFER_REFRESH) return;
     
     bool endOfFileFlag = false;
     if(recordingCount>0 && fileDirectionToBuffer + totalW > fileSize){
@@ -127,7 +119,7 @@ void RECAudioFile::writeToFile(){
     }
 
     uint16_t arr[totalW];
-    buf.get(arr, totalW);
+    adc->getLastReadings(adcChannel, arr, totalW);
     currentRecording.write((uint8_t*)arr, totalW<<1);
 
     if(loopEndedFlag){

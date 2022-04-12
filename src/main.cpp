@@ -1,16 +1,13 @@
-#include "AudioPlayer.h"
+#include "Metronome.h"
+
+Metronome met(4,180,4,4);
 
 void setup() {
   Serial.begin(115200);
-  Utilities::debug("\n*********************************************\n");
-  Utilities::debug("    LOOPER PEDAL v0.1, by DanielUnleashed\n");
-  Utilities::debug("*********************************************\n");
-  delay(1);
-  
-  AudioPlayer::begin();
-  AudioPlayer::addRECAudioFile(0);
+  met.start();
 }
 
 void loop() {
-  
+  met.update();
+  delay(100);
 }

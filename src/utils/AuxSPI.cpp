@@ -17,10 +17,24 @@ void AuxSPI::begin(){
 }
 
 void AuxSPI::SPI2_Sender(void* funcParams){
+    //Uncomment for real sample frequency speed.
+    uint32_t lastCall = millis();
+    uint32_t average = 0;
+    uint16_t it = 0;
     for(;;){
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
         vTaskEnterCritical(&timerMux);
+        
+        uint32_t now = micros();
+        average += now-lastCall;
+        it++;
+        if(it == 0xFFFF){
+            Serial.printf("\nReal freq: %d\n", 1000000/(average>>16));
+            average = 0;
+        }
+        lastCall = now;
+        
         for(uint8_t i = 0; i < holdPacketCount; i++){
             if(holdPackets[i].needsResponse){
                 writeAndRead(holdPackets[i].pin, holdPackets[i].dataOut, holdPackets[i].responseBuffer);
@@ -61,7 +75,6 @@ HOLDOUT_PACKET* AuxSPI::writeAndReadFromISR(uint8_t chipSelect, uint8_t* dataOut
     return pack;
 }
 
-static const SPISettings sett(SPI_CLK, MSBFIRST, SPI_MODE0);
 void AuxSPI::writeAndRead(uint8_t chipSelect, uint8_t* dataOut, uint8_t* dataInBuff){
     SPI2 -> beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0)); //If substituted by sett, it implodes (doesn't work)
     digitalWrite(chipSelect, LOW);
@@ -71,7 +84,7 @@ void AuxSPI::writeAndRead(uint8_t chipSelect, uint8_t* dataOut, uint8_t* dataInB
 }
 
 void AuxSPI::write(uint8_t chipSelect, uint8_t* data){
-    SPI2 -> beginTransaction(sett);
+    SPI2 -> beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
     digitalWrite(chipSelect, LOW);
     SPI2 -> writeBytes(data, sizeof(data));
     digitalWrite(chipSelect, HIGH);

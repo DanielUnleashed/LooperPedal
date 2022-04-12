@@ -3,6 +3,8 @@
 
 #include "Arduino.h"
 #include "utils/AuxSPI.h"
+#include "defines.h"
+#include "CircularBuffer.h"
 
 #define ADC_CH0 0
 #define ADC_CH1 1
@@ -12,13 +14,24 @@ class ADC{
         ADC(uint8_t cs);
         void begin();
 
-        void updateReadings();
+        uint16_t updateReadings();
         uint16_t getLastReading(bool channel);
         uint16_t readFromISR(bool channel);
         uint16_t read(bool channel);
+
+        void getLastReadings(bool channel, uint16_t* buff, uint16_t size);
+        uint16_t getSavedReadingsCount(bool channel);
     private:
+
+#ifdef USE_BOTH_ADC_CHANNELS
         uint8_t readBuffer[2][3] = {{0,0,0},{0,0,0}};
         uint16_t readValue[2] = {0,0};
+        CircularBuffer lastReadings[2];
+#else
+        uint8_t readBuffer[3] = {0,0,0};
+        uint16_t readValue = 0;
+        CircularBuffer lastReadings;
+#endif
         uint8_t chipSelect;
 
 };
