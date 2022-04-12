@@ -46,6 +46,7 @@ class RECAudioFile : public AudioFile {
         String generateFileName(uint8_t number);
         String generateFileName(uint8_t chA, uint8_t chB);
         void readFromSD(uint8_t channel);
+        void readFromSD(uint8_t channel, uint32_t dir, uint16_t dataLength);
         void mixFromSD(uint8_t channel);
         void generateNewRECLayer();
 

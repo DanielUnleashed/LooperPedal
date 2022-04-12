@@ -61,8 +61,7 @@ void SDAudioFile::refreshBuffer(){
   uint8_t bufData[buffSize];
   dataFile.read(bufData, buffSize);
 
-  for(uint16_t i = 0; i < buffSize; i+=2)
-    buf.put(bufData[i] | (bufData[i+1] << 8));
+  buf.put(bufData, buffSize);
 
   if(buffSize != (BUFFER_REFRESH<<1)) finalReadIndexOfFile = buf.getWriteIndex();
 }

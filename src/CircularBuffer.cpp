@@ -5,6 +5,11 @@ void CircularBuffer::put(uint16_t data){
   if(writeIndex == MAX_BUFFER_LENGTH) writeIndex = 0;
 }
 
+void CircularBuffer::put(uint8_t* data, uint16_t size){
+  for(uint16_t i = 0; i < size; i+=2)
+    put(data[i] | (data[i+1] << 8));
+}
+
 uint16_t CircularBuffer::get(){
   uint16_t data = buf[readIndex++];
   if(readIndex == MAX_BUFFER_LENGTH) readIndex = 0;

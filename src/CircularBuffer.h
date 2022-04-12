@@ -9,6 +9,7 @@
 class CircularBuffer{
   public:
     void put(uint16_t data);
+    void put(uint8_t* data, uint16_t size);
     uint16_t get();
     void get(uint16_t* outbuffer, uint16_t size);
     uint16_t getFreeSpace();

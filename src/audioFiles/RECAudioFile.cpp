@@ -16,18 +16,23 @@ uint16_t RECAudioFile::getSample(){
     if(recordingCount == 0 && !isRecording) return 0x8000;
 
     fileDirectionToBuffer += 2;
-
     uint32_t mix = 0;
     uint8_t mixedChannels = 0;
     if(isRecording){
         uint16_t inputData = adc -> getLastReading(adcChannel);
-        buf.put(inputData);
-        mix += inputData;
+        if(inputData != 0){
+            buf.put(inputData);
+            mix += inputData;
+        }else{
+            // This helps softening the transition between a loop.
+            fileDirectionToBuffer-=2;
+            mix += 0x8000;
+        }
         mixedChannels++;
     }
 
     if(recordingCount > 0){
-        fileDirectionToBuffer %= fileSize;
+        if(fileDirectionToBuffer >= fileSize) fileDirectionToBuffer = 0;
         if(playLastRecording){
             mix += recBuf[0].get();
             mixedChannels++;
@@ -39,7 +44,8 @@ uint16_t RECAudioFile::getSample(){
     }
     
     if(mixedChannels == 0) return 0x8000;
-    return mix/mixedChannels;
+    uint16_t finalMix = mix/mixedChannels;
+    return finalMix;
 }
 
 void RECAudioFile::refreshBuffer(){
@@ -55,19 +61,24 @@ void RECAudioFile::refreshBuffer(){
 }
 
 void RECAudioFile::readFromSD(uint8_t channel){
-    if(recBuf[channel].getFreeSpace() < BUFFER_REFRESH) return;
-    recFiles[channel].seek(fileDirectionToBuffer);
+    uint16_t freeBufferSpace = recBuf[channel].getFreeSpace();
+    if(freeBufferSpace < BUFFER_REFRESH) return;
+    readFromSD(channel, fileDirectionToBuffer, freeBufferSpace);
+}
 
+void RECAudioFile::readFromSD(uint8_t channel, uint32_t dir, uint16_t dataLength){
+    recFiles[channel].seek(dir);
     uint32_t remainingBytes = fileSize - fileDirectionToBuffer;
-    uint16_t buffSize = BUFFER_REFRESH<<1;
+    uint16_t buffSize = dataLength<<1;
     if(remainingBytes < buffSize) buffSize = remainingBytes;
     uint8_t bufData[buffSize];
     recFiles[channel].read(bufData, buffSize);
 
     //Serial.printf("rem: %d,  buffs: %d", remainingBytes, buffSize);
     
-    for(uint16_t i = 0; i < buffSize; i+=2)
-        recBuf[channel].put(bufData[i] | (bufData[i+1] << 8));
+    recBuf[channel].put(bufData, buffSize);
+
+    if(buffSize != dataLength<<1) readFromSD(channel, 0, dataLength-(buffSize>>1));
 }
 
 void RECAudioFile::mixFromSD(uint8_t channel){
