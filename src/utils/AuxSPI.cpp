@@ -16,30 +16,14 @@ void AuxSPI::begin(){
     alreadyDefined = true;
 }
 
-uint32_t lastCall = 0;
 void AuxSPI::SPI2_Sender(void* funcParams){
-    //Uncomment for real sample frequency speed.
-    uint32_t average = 0;
-    uint16_t it = 0;
-    uint32_t min = 0xFFFF;
     for(;;){
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
         portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
         vTaskEnterCritical(&timerMux);
         
-        uint32_t now = micros();
-        uint32_t real = now-lastCall;
-        if(real < min) min = real;
-        average += real;
-        it++;
-        if(it == 0xFFFF){
-            Serial.printf("\nReal freq: %d, min: %d\n", average>>16, min);
-            //Serial.printf("\n el: %d, min: %d\n", average>>16, min);
-            average = 0;
-            min = 0xFFFF;
-        }
-        lastCall = now;
+        printRealFrequency();
         
         //uint32_t start = micros();
         for(uint8_t i = 0; i < holdPacketCount; i++){
@@ -49,17 +33,30 @@ void AuxSPI::SPI2_Sender(void* funcParams){
                 write(holdPackets[i].pin, holdPackets[i].dataOut);
             }
         }
-        /*uint32_t ellapsed = micros() - start;
-        average += ellapsed;
-        it++;
-        if(it == 0xFFFF){
-            Serial.printf("Av. elaps: %d\n", (average>>16));
-            average = 0;
-        }*/
         holdPacketCount = 0; // Clear all packets.
         vTaskExitCritical(&timerMux);
     }
     vTaskDelete(NULL);
+}
+
+
+uint32_t lastCall = 0;
+uint32_t average = 0;
+uint16_t it = 0;
+uint32_t min = 0xFFFF;
+void printRealFrequency(){
+    uint32_t now = micros();
+    uint32_t real = now-lastCall;
+    if(real < min) min = real;
+    average += real;
+    it++;
+    if(it == 0xFFFF){
+        Serial.printf("\nReal freq: %d, min: %d\n", average>>16, min);
+        //Serial.printf("\n el: %d, min: %d\n", average>>16, min);
+        average = 0;
+        min = 0xFFFF;
+    }
+    lastCall = now;
 }
 
 HOLDOUT_PACKET* AuxSPI::writeFromISR(uint8_t chipSelect, uint8_t* data){
