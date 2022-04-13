@@ -5,7 +5,6 @@
 #include "Arduino.h"
 #include "freertos/task.h"
 
-#define SPI_CLK 20000000
 #define MAX_HOLDOUT_PACKETS 3 
 
 /* A HOLDOUT_PACKET will store the data to be sended to the chip when

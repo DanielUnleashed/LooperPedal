@@ -1,19 +1,18 @@
 #ifndef defines_h
 #define defines_h
 
-#define LAUNCH_CONSOLE
+//#define LAUNCH_CONSOLE
 
 //#define USE_BOTH_ADC_CHANNELS
 
-#define PASS_AUDIO_INPUT_DURING_RECORDING
+//#define PASS_AUDIO_INPUT_DURING_RECORDING
 
-#define PLAY_FREQUENCY 11025
+#define PLAY_FREQUENCY 22050
 
 #define PUSH_BUTTON_1 34
 #define PUSH_BUTTON_2 35
 #define PUSH_BUTTON_3 36
 #define PUSH_BUTTON_4 39
-
 
 #define CS_DAC 25
 #define CS_ADC 26

@@ -19,6 +19,7 @@ void Metronome::start(){
 void Metronome::update(){
     uint32_t currentTime = (millis()-startTime) % timePerBar;
     uint8_t progress = currentTime/timePerBeatUnit;
+    
 }
 
 void Metronome::lightLEDs(uint8_t ledCode){

@@ -104,15 +104,20 @@ void AudioPlayer::pause(){
 }
 
 void AudioPlayer::memoryTask(void* funcParams){ 
+  /*uint32_t average = 0;
+  uint16_t it = 0;
+  uint32_t min = 0xFF;
+  uint32_t max = 0;*/
   for(;;){
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-    if(channelsUsed == 0) continue;
+    if(!isPlaying || channelsUsed == 0) continue;
 
-    for(uint8_t i = 0; i < channelsUsed; i++){
-      audioChannels[i]->refreshBuffer();
-    }
+    //uint32_t start = micros();
 
-    while(globalBuf.getFreeSpace() > BUFFER_REFRESH && isPlaying){
+    for(uint8_t i = 0; i < channelsUsed; i++) audioChannels[i]->refreshBuffer();
+
+    uint16_t totalIt = globalBuf.getFreeSpace();
+    for(uint16_t i = 0; i < totalIt; i++){
       uint32_t samples = 0;
       for(uint8_t i = 0; i < channelsUsed; i++){
         samples += audioChannels[i]->getSample() >> 4;
@@ -124,13 +129,25 @@ void AudioPlayer::memoryTask(void* funcParams){
         setAllTo(SD_FILE_ID, AudioFile::FILE_PLAYING);
       }
     }
+    /*uint32_t ellapsed = micros() - start;
+    average += ellapsed;
+    it++;
+    if(ellapsed > max) max = ellapsed;
+    else if(ellapsed < min) min = ellapsed;
+    if(it == 0xFF){
+      average = average>>8;
+      Serial.printf("\nAv: %d, min: %d, max: %d\n", average, min, max);
+      average = 0;
+      it = 0;
+      min = 0xFFFF;
+      max = 0;
+    }*/
   }
   vTaskDelete(NULL);
 }
 
 void IRAM_ATTR AudioPlayer::frequencyTimer(){
-  portENTER_CRITICAL(&timerMux);
-
+  vTaskEnterCritical(&timerMux);
 #ifdef PASS_AUDIO_INPUT_DURING_RECORDING
   uint16_t adcRead = adc.updateReadings();
   uint32_t mix;
@@ -138,7 +155,7 @@ void IRAM_ATTR AudioPlayer::frequencyTimer(){
   else mix = globalBuf.get();
   dac.writeFromISR(mix);
 #else
-  adc.updateReadings();
+  //adc.updateReadings();
   dac.writeFromISR(globalBuf.get());
 #endif
 
@@ -146,7 +163,7 @@ void IRAM_ATTR AudioPlayer::frequencyTimer(){
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     vTaskNotifyGiveFromISR(memoryTaskHandle, &xHigherPriorityTaskWoken);
   }
-  portEXIT_CRITICAL(&timerMux);
+  vTaskExitCritical(&timerMux);
 }
 
 void AudioPlayer::statusMonitorTask(void* funcParams){
