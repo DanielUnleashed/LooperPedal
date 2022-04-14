@@ -28,6 +28,8 @@ class AuxSPI{
         static void write(uint8_t chipSelect, uint8_t* data);
         static HOLDOUT_PACKET* writeAndReadFromISR(uint8_t chipSelect, uint8_t* dataOut, uint8_t* dataInBuff);
         static void writeAndRead(uint8_t chipSelect, uint8_t* dataOut, uint8_t* dataInBuff);
+        static void sendToLEDs(uint8_t chipSelect, uint8_t data);
+    
     private:
         static SPIClass* SPI2;
         static HOLDOUT_PACKET* holdPackets;
@@ -37,7 +39,5 @@ class AuxSPI{
 
         static void SPI2_Sender(void* funcParams);
 };
-
-//extern SPIClass SPI2;
 
 #endif

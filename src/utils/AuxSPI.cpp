@@ -6,6 +6,8 @@ volatile uint8_t AuxSPI::holdPacketCount = 0;
 bool AuxSPI::alreadyDefined = false;
 TaskHandle_t AuxSPI::SPI2_TaskHandler = NULL;
 
+void printRealFrequency();
+
 void AuxSPI::begin(){
     if(alreadyDefined) return;
     
@@ -23,7 +25,7 @@ void AuxSPI::SPI2_Sender(void* funcParams){
         portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
         vTaskEnterCritical(&timerMux);
         
-        printRealFrequency();
+        //printRealFrequency();
         
         //uint32_t start = micros();
         for(uint8_t i = 0; i < holdPacketCount; i++){
@@ -40,7 +42,7 @@ void AuxSPI::SPI2_Sender(void* funcParams){
 }
 
 
-uint32_t lastCall = 0;
+/*uint32_t lastCall = 0;
 uint32_t average = 0;
 uint16_t it = 0;
 uint32_t min = 0xFFFF;
@@ -57,7 +59,7 @@ void printRealFrequency(){
         min = 0xFFFF;
     }
     lastCall = now;
-}
+}*/
 
 HOLDOUT_PACKET* AuxSPI::writeFromISR(uint8_t chipSelect, uint8_t* data){
     // Search if a packet already exists.
@@ -99,6 +101,15 @@ void AuxSPI::write(uint8_t chipSelect, uint8_t* data){
     SPI2 -> beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
     digitalWrite(chipSelect, LOW);
     SPI2 -> writeBytes(data, sizeof(data));
-    digitalWrite(chipSelect, HIGH);
+    digitalWrite(chipSelect, HIGH);  
     SPI2 -> endTransaction();
+}
+
+void AuxSPI::sendToLEDs(uint8_t csPin, uint8_t data){
+    SPI2 -> beginTransaction(SPISettings(5000, MSBFIRST, SPI_MODE0));
+    SPI2 -> write(data);
+    SPI2 -> endTransaction();
+    digitalWrite(csPin, HIGH);
+    delayMicroseconds(500);
+    digitalWrite(csPin, LOW);  
 }
