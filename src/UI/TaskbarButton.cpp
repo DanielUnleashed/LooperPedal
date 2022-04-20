@@ -5,7 +5,4 @@ TaskbarButton::TaskbarButton(String n, uint8_t pos){
     position = pos;
 }
 
-void TaskbarButton::addPressedFunction(std::function<void(void)> func){
-    pressedFunction = func;
-}
 

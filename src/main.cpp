@@ -1,15 +1,12 @@
-#include "Metronome.h"
-
-Metronome met(4,180,4,4);
+#include "UI/DebounceButton.h"
 
 void setup() {
   Serial.begin(115200);
-  while(!Serial){}
+  pinMode(2, OUTPUT);
 
-  met.start();
+  DebounceButton::init();
+  DebounceButton::addInterrupt(0, []{digitalWrite(2, !digitalRead(2));});
 }
 
 void loop() {
-  met.update();
-  delay(10);
 }

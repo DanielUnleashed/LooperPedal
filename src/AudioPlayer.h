@@ -59,16 +59,6 @@ class AudioPlayer{
 
     static void IRAM_ATTR frequencyTimer();
 
-    static DebounceButton button1;
-    static DebounceButton button2;
-    static DebounceButton button3;
-    static DebounceButton button4;
-
-    static void IRAM_ATTR ISR_BUTTON_1();
-    static void IRAM_ATTR ISR_BUTTON_2();
-    static void IRAM_ATTR ISR_BUTTON_3();
-    static void IRAM_ATTR ISR_BUTTON_4();
-
     static RECAudioFile* getRECAudioFile(uint8_t index);
     static SDAudioFile* getSDAudioFile(uint8_t index);
 

@@ -1,5 +1,33 @@
 #include "DebounceButton.h"
 
+DebounceButton* DebounceButton::systemButtons[TOTAL_BUTTONS] = {new DebounceButton(PUSH_BUTTON_1), 
+                                                                new DebounceButton(PUSH_BUTTON_2), 
+                                                                new DebounceButton(PUSH_BUTTON_3), 
+                                                                new DebounceButton(PUSH_BUTTON_4)};
+std::function<void(void)> IRAM_ATTR DebounceButton::ISREvents[TOTAL_BUTTONS];
+
+// Maybe implement with a loop with https://stackoverflow.com/questions/11081573/passing-a-variable-as-a-template-argument
+void DebounceButton::init(){
+    attachInterrupt(systemButtons[0]->pin, &ISR_BUTTON<0>, CHANGE);
+    attachInterrupt(systemButtons[1]->pin, &ISR_BUTTON<1>, CHANGE);
+    attachInterrupt(systemButtons[2]->pin, &ISR_BUTTON<2>, CHANGE);
+    attachInterrupt(systemButtons[3]->pin, &ISR_BUTTON<3>, CHANGE);
+}
+
+template <int interrupt>
+void IRAM_ATTR DebounceButton::ISR_BUTTON(){
+    // Will check if the ISR has been added and 
+    if(ISREvents[interrupt] && systemButtons[interrupt] -> clicked()) ISREvents[interrupt](); 
+}
+
+void DebounceButton::addInterrupt(uint8_t buttonIndex, std::function<void(void)> func){
+    ISREvents[buttonIndex] = func;
+}
+
+void DebounceButton::removeInterrupt(uint8_t buttonIndex){
+    ISREvents[buttonIndex] = {};
+}
+
 DebounceButton::DebounceButton(uint8_t chipPin){
     pin = chipPin;
     pinMode(chipPin, INPUT);
