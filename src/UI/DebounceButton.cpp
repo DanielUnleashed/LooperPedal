@@ -1,13 +1,12 @@
 #include "DebounceButton.h"
 
-DebounceButton* DebounceButton::systemButtons[TOTAL_BUTTONS] = {new DebounceButton(PUSH_BUTTON_1), 
-                                                                new DebounceButton(PUSH_BUTTON_2), 
-                                                                new DebounceButton(PUSH_BUTTON_3), 
-                                                                new DebounceButton(PUSH_BUTTON_4)};
+DebounceButton* DebounceButton::systemButtons[TOTAL_BUTTONS];
 std::function<void(void)> IRAM_ATTR DebounceButton::ISREvents[TOTAL_BUTTONS];
 
 // Maybe implement with a loop with https://stackoverflow.com/questions/11081573/passing-a-variable-as-a-template-argument
 void DebounceButton::init(){
+    for(uint8_t i = 0; i < TOTAL_BUTTONS; i++) systemButtons[i] = new DebounceButton(PUSH_BUTTON[i]); 
+
     attachInterrupt(systemButtons[0]->pin, &ISR_BUTTON<0>, CHANGE);
     attachInterrupt(systemButtons[1]->pin, &ISR_BUTTON<1>, CHANGE);
     attachInterrupt(systemButtons[2]->pin, &ISR_BUTTON<2>, CHANGE);
@@ -20,12 +19,19 @@ void IRAM_ATTR DebounceButton::ISR_BUTTON(){
     if(ISREvents[interrupt] && systemButtons[interrupt] -> clicked()) ISREvents[interrupt](); 
 }
 
-void DebounceButton::addInterrupt(uint8_t buttonIndex, std::function<void(void)> func){
-    ISREvents[buttonIndex] = func;
+bool DebounceButton::addInterrupt(uint8_t buttonIndex, std::function<void(void)> func){
+    if(ISREvents[buttonIndex]){
+        Utilities::debug("Button %d is already in use\n", buttonIndex);
+        return false;
+    }else{
+        ISREvents[buttonIndex] = func;
+        return true;
+    }
 }
 
-void DebounceButton::removeInterrupt(uint8_t buttonIndex){
+bool DebounceButton::removeInterrupt(uint8_t buttonIndex){
     ISREvents[buttonIndex] = {};
+    return !ISREvents[buttonIndex];
 }
 
 DebounceButton::DebounceButton(uint8_t chipPin){

@@ -5,6 +5,8 @@
 #include "defines.h"
 #include <functional>
 
+#include "utils/Utilities.h"
+
 #define DEFAULT_DEBOUNCE_TIME 250 //ms
 #define DEFAULT_DOUBLE_CLICK_TIME 800 //ms
 
@@ -20,8 +22,8 @@ class DebounceButton{
         static std::function<void(void)> ISREvents[TOTAL_BUTTONS];
 
         static void init();
-        static void addInterrupt(uint8_t buttonIndex, std::function<void(void)> func);
-        static void removeInterrupt(uint8_t buttonIndex);
+        static bool addInterrupt(uint8_t buttonIndex, std::function<void(void)> func);
+        static bool removeInterrupt(uint8_t buttonIndex);
 
     private:
         volatile uint32_t lastTimePressed = 0;

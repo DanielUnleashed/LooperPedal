@@ -9,13 +9,10 @@
 
 #define PLAY_FREQUENCY 22050
 
-// Total input buttons. If more were to be added, add it to the static array in DebounceButton.cpp
-// Also add to the init() another call to attachInterrupt with num.
+// If more were to be added, add to the init() method inside DebounceButton.cpp
+// another call to attachInterrupt with the correspondant number.
 #define TOTAL_BUTTONS 4
-#define PUSH_BUTTON_1 34
-#define PUSH_BUTTON_2 35
-#define PUSH_BUTTON_3 36
-#define PUSH_BUTTON_4 39
+static const uint8_t PUSH_BUTTON[TOTAL_BUTTONS] = {34,35,36,39};
 
 #define CS_DAC 25
 #define CS_ADC 26

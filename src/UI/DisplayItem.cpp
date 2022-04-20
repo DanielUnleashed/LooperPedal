@@ -1,6 +1,7 @@
 #include "DisplayItem.h"
 
-DisplayItem::DisplayItem(uint8_t tx, uint8_t ty, uint8_t sx, uint8_t sy){
+DisplayItem::DisplayItem(String name, uint8_t tx, uint8_t ty, uint8_t sx, uint8_t sy){
+    itemName = name;
     tileX = tx;
     tileY = ty;
     sizeX = sx;
@@ -8,17 +9,14 @@ DisplayItem::DisplayItem(uint8_t tx, uint8_t ty, uint8_t sx, uint8_t sy){
 }
 
 DisplayItem::~DisplayItem(){
-    
+    DebounceButton::removeInterrupt(inputPin);
 }
-
 
 void DisplayItem::addPressEvent(uint8_t pin, std::function<void(void)> func){
     pressFunction = func;
-//    attachInterrupt(pin, pressEvent, CHANGE);
+    inputPin = pin;
+    if(!DebounceButton::addInterrupt(inputPin, pressFunction)) Utilities::debug("Failed to add ISR to %s\n", itemName.c_str());
 }
-void DisplayItem::addReleaseEvent(uint8_t pin, std::function<void(void)> func){
-    releasedFunction = func;
-}
-void DisplayItem::addLEDEvent(uint8_t LED_index, std::function<void(void)> func){
+void DisplayItem::addLEDTask(uint8_t LED_index, std::function<void(void)> func){
     LEDFunction = func;
 }
