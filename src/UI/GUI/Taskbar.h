@@ -3,23 +3,24 @@
 
 #include "DisplayItem.h"
 
-typedef struct TaskbarButton{
+struct TaskbarButton{
     bool isEnabled = false;
     String tagName;
-    uint8_t position;
 };
 
 
 class Taskbar : public DisplayItem{
 
-    const uint8_t sX = 4;
-    const uint8_t sY = 1;
-
     public:
     Taskbar(uint8_t tileX, uint8_t tileY);
+    void draw() override;
+
+    bool addButton(String tagName, uint8_t index);
+    bool removeButton(uint8_t index);
+
+    private: 
     TaskbarButton buttons[4];
 
-    void draw() override;
 };
 
 #endif

@@ -11,6 +11,10 @@
 #define TILES_X 5
 #define TILES_Y 4
 
+struct Point{
+    uint16_t x, y;
+};
+
 class DisplayItem {
 
     public:
@@ -31,6 +35,8 @@ class DisplayItem {
     //Events
     std::function<void(void)> pressFunction;
 
+    Point transformRelativePoint(uint8_t pX, uint8_t pY);
+
     protected:
     static TFT_eSPI tft;
     static uint16_t width, height;
@@ -39,11 +45,19 @@ class DisplayItem {
     String itemName;
     uint8_t sizeX, sizeY;
     uint8_t tileX, tileY;
+    uint16_t oX, oY;
     uint8_t inputPin;
 
     //General draw functions
     void drawTiles();
-
+    void drawRectangle(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t color);
+    void drawRoundRectangle(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t color);
+    void drawFilledRect(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t fillColor);
+    void drawFilledRect(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t colorA, uint8_t colorB, bool drawHorizontal);
+    void drawHLine(uint8_t pX, uint8_t pY, uint8_t length, uint16_t color);
+    void drawVLine(uint8_t pX, uint8_t pY, uint8_t length, uint16_t color);
+    void drawText(uint8_t pX, uint8_t pY, String text, uint16_t color);
+    void drawCentreText(uint8_t pX, uint8_t pY, String text, uint16_t color);
 };
 
 #endif
