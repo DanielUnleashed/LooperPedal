@@ -21,12 +21,7 @@ TaskHandle_t AudioPlayer::audioProcessingTaskHandle;
 TaskHandle_t AudioPlayer::statusMonitorTaskHandle;
 TaskHandle_t AudioPlayer::memoryTaskHandle;
 
-DebounceButton AudioPlayer::button1(PUSH_BUTTON_1);
-DebounceButton AudioPlayer::button2(PUSH_BUTTON_2);
-DebounceButton AudioPlayer::button3(PUSH_BUTTON_3);
-DebounceButton AudioPlayer::button4(PUSH_BUTTON_4);
-
-void IRAM_ATTR AudioPlayer::ISR_BUTTON_1(){
+/*void IRAM_ATTR AudioPlayer::ISR_BUTTON_1(){
   if(!button1.clicked()) return;
 
   if(isPlaying) pause();
@@ -52,14 +47,9 @@ void IRAM_ATTR AudioPlayer::ISR_BUTTON_3(){
     getRECAudioFile(i) -> undoRedoLastRecording();
 }
 
-void IRAM_ATTR AudioPlayer::ISR_BUTTON_4(){}
+void IRAM_ATTR AudioPlayer::ISR_BUTTON_4(){}*/
 
 void AudioPlayer::begin(){
-  attachInterrupt(PUSH_BUTTON_1, ISR_BUTTON_1, CHANGE);
-  attachInterrupt(PUSH_BUTTON_2, ISR_BUTTON_2, CHANGE);
-  attachInterrupt(PUSH_BUTTON_3, ISR_BUTTON_3, CHANGE);
-  attachInterrupt(PUSH_BUTTON_4, ISR_BUTTON_4, CHANGE);
-
   SDBoot();
   dac.begin();
   adc.begin();

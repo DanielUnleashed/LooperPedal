@@ -1,15 +1,16 @@
-#include "Metronome.h"
+#include "UI/MenuManager.h"
+#include "UI/GUI/Taskbar.h"
 
-Metronome met(4,180,4,4);
-
-void setup() {
+void setup(){
   Serial.begin(115200);
-  while(!Serial){}
 
-  met.start();
+  MenuManager::startMenuManager();
+  Taskbar taskbar(0,3);
+  taskbar.addButton("Chicken", 1);
+  taskbar.addButton("Strips", 3);
+  taskbar.draw();
 }
 
-void loop() {
-  met.update();
-  delay(10);
+void loop(){
+  delay(1);
 }
