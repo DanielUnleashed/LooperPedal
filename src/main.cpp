@@ -1,12 +1,15 @@
-#include "UI/DebounceButton.h"
+#include "UI/MenuManager.h"
+#include "UI/GUI/Taskbar.h"
 
-void setup() {
+Taskbar taskbar(1,1);
+
+void setup(){
   Serial.begin(115200);
-  pinMode(2, OUTPUT);
 
-  DebounceButton::init();
-  DebounceButton::addInterrupt(0, []{digitalWrite(2, !digitalRead(2));});
+  MenuManager::startMenuManager();
+  taskbar.draw();
 }
 
-void loop() {
+void loop(){
+
 }
