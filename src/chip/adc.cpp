@@ -42,15 +42,15 @@ uint16_t ADC::updateReadings(){
     lastReadings[1].put(chB);
     return ((uint32_t)(chA+chB))>>1;
 #else
-    uint16_t chA = readFromISR(0);
-    // This is so no popping occurs.
-    if(chA == 0) chA = 0x8000; // Dire situations need dire solutions...
-    lastReadings.put(chA);
-    return chA;
+    uint16_t reading = readValue;       
+    if(reading == 0) reading = 0x8000;  // This is so no popping occurs. Dire situations need dire solutions...
+    lastReadings.put(reading);
+    readFromISR(0);
+    return reading;
 #endif
 }
 
-uint16_t ADC::readFromISR(bool channel){
+void ADC::readFromISR(bool channel){
     uint8_t data[3] = {0x01u, 0xA0u | (channel << 6), 0x00};
 #ifdef USE_BOTH_ADC_CHANNELS
     readValue[channel] = ((readBuffer[channel][1] & 0x0F) << 8) | readBuffer[channel][2];
@@ -59,7 +59,6 @@ uint16_t ADC::readFromISR(bool channel){
 #else
     readValue = ((readBuffer[1] & 0x0F) << 8) | readBuffer[2];
     AuxSPI::writeAndReadFromISR(chipSelect, data, readBuffer);
-    return readValue;
 #endif
 }
 

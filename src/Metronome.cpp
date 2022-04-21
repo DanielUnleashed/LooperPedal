@@ -46,7 +46,7 @@ void Metronome::update(){
 /* Coverts the tempo progress decimals to [0,3] with desired timing.*/
 uint8_t Metronome::animationTiming(double tempo){
     double t = tempo - ((uint8_t) tempo); // Only gets the decimals.
-    double outF = 4.0*t*t*t*t;
+    double outF = 4.0*t*t;
     //Serial.printf("t:%f, y:%d\n",t, (uint8_t) outF);
     return (uint8_t) outF;
 }

@@ -15,8 +15,8 @@ class ADC{
         void begin();
 
         uint16_t updateReadings();
-        uint16_t getLastReading(bool channel);
-        uint16_t readFromISR(bool channel);
+        uint16_t getLastReading(bool channel = false);
+        void readFromISR(bool channel);
         uint16_t read(bool channel);
 
         void getLastReadings(bool channel, uint16_t* buff, uint16_t size);

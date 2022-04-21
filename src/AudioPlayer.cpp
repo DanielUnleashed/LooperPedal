@@ -66,11 +66,15 @@ void AudioPlayer::begin(){
   xTaskCreatePinnedToCore(memoryTask, "MemoryTask", 10000, NULL, 5, &memoryTaskHandle, 1);
   vTaskSuspend(memoryTaskHandle);
 
-  //Start frequency playback interrupt
-  /*With prescaler of 8, resolution of 0.1 us.*/
-  timer = timerBegin(0, 8, true);
-  timerAttachInterrupt(timer, frequencyTimer, true);
-  timerAlarmWrite(timer, 10000000/PLAY_FREQUENCY, true);
+  //TODO: Research this!
+  //xTaskCreatePinnedToCore([](void* params){
+    //Start frequency playback interrupt
+    /*With prescaler of 8, resolution of 0.1 us.*/
+    timer = timerBegin(0, 8, true);
+    timerAttachInterrupt(timer, frequencyTimer, true);
+    timerAlarmWrite(timer, 10000000/PLAY_FREQUENCY, true);
+  //  vTaskDelete(NULL);
+  //}, "LaunchTimer", 10000, NULL, 1, NULL, 0); // Timer interrupts will be happening in CORE0.
 
   isPlaying = false;
   longestChannel = 0;
@@ -141,11 +145,11 @@ void IRAM_ATTR AudioPlayer::frequencyTimer(){
 #ifdef PASS_AUDIO_INPUT_DURING_RECORDING
   uint16_t adcRead = adc.updateReadings();
   uint32_t mix;
-  if(isRecording) mix = (globalBuf.get() + adcRead)>>1;
-  else mix = globalBuf.get();
+  /*if(isRecording)*/ mix = (globalBuf.get() + adcRead)>>1;
+  //else mix = globalBuf.get();
   dac.writeFromISR(mix);
 #else
-  //adc.updateReadings();
+  adc.updateReadings();
   dac.writeFromISR(globalBuf.get());
 #endif
 

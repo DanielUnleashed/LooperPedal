@@ -29,6 +29,11 @@ class AuxSPI{
         static HOLDOUT_PACKET* writeAndReadFromISR(uint8_t chipSelect, uint8_t* dataOut, uint8_t* dataInBuff);
         static void writeAndRead(uint8_t chipSelect, uint8_t* dataOut, uint8_t* dataInBuff);
         static void sendToLEDs(uint8_t chipSelect, uint8_t data);
+
+        static void wakeSPI();
+
+        static void printRealFrequency(uint16_t sampleCount);
+        static void chrono(uint16_t sampleCount, uint32_t startTime);
     
     private:
         static SPIClass* SPI2;

@@ -5,9 +5,10 @@
 
 //#define USE_BOTH_ADC_CHANNELS
 
-//#define PASS_AUDIO_INPUT_DURING_RECORDING
+// Branch inside AudioPlayer.cpp
+#define PASS_AUDIO_INPUT_DURING_RECORDING
 
-#define PLAY_FREQUENCY 22050
+#define PLAY_FREQUENCY 16000
 
 // If more were to be added, add to the init() method inside DebounceButton.cpp
 // another call to attachInterrupt with the correspondant number.

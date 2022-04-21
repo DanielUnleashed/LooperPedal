@@ -1,6 +1,6 @@
 #include "Metronome.h"
 
-Metronome met(4,180,4,4);
+Metronome met(4,120,4,4);
 
 void setup() {
   Serial.begin(115200);
@@ -9,5 +9,5 @@ void setup() {
 
 void loop() {
   met.update();
-  delay(100);
+  delay(10);
 }

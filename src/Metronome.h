@@ -5,6 +5,8 @@
 #include "defines.h"
 #include "utils/AuxSPI.h"
 
+//TODO: Add wake-up method or waitXMillis till next animation method.
+
 class Metronome {
     public:
         Metronome(uint8_t tempoUnit, uint16_t tempo, uint8_t totalBeats, uint8_t beatUnit);
