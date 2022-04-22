@@ -44,9 +44,7 @@ void AuxSPI::wakeSPI(){
 
 HOLDOUT_PACKET* AuxSPI::writeFromISR(uint8_t chipSelect, uint8_t* data){
     // Search if a packet already exists.
-    //lastCall = micros();
-    uint8_t i = 0;
-    for(i = 0; i < holdPacketCount; i++){
+    for(uint8_t i = 0; i < holdPacketCount; i++){
         if(holdPackets[i].pin == chipSelect){
             holdPackets[i].dataOut = data;
             return &holdPackets[i]; //SPI2_Task will already be notified when it gets here.
@@ -70,13 +68,11 @@ HOLDOUT_PACKET* AuxSPI::writeAndReadFromISR(uint8_t chipSelect, uint8_t* dataOut
 }
 
 void AuxSPI::writeAndRead(uint8_t chipSelect, uint8_t* dataOut, uint8_t* dataInBuff){
-    uint32_t start = micros();
     SPI2 -> beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0)); //If substituted by sett, it implodes (doesn't work)
     digitalWrite(chipSelect, LOW);
     SPI2 -> transferBytes(dataOut, dataInBuff, sizeof(dataOut));
     digitalWrite(chipSelect, HIGH);
     SPI2 -> endTransaction();
-    chrono(0xFFFF, start);
 }
 
 void AuxSPI::write(uint8_t chipSelect, uint8_t* data){
@@ -97,7 +93,7 @@ void AuxSPI::sendToLEDs(uint8_t csPin, uint8_t data){
 }
 
 void AuxSPI::printRealFrequency(uint16_t sampleCount){
-    static uint32_t lastCall = 0;
+    static uint32_t lastCall = micros();
     static uint32_t average = 0;
     static uint16_t it = 0;
     static uint32_t min = 0xFFFF;

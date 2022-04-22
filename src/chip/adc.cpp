@@ -51,7 +51,7 @@ uint16_t ADC::updateReadings(){
 }
 
 void ADC::readFromISR(bool channel){
-    uint8_t data[3] = {0x01u, 0xA0u | (channel << 6), 0x00};
+    uint8_t data[3] = {0x01, 0xA0 | (channel << 6), 0x00};
 #ifdef USE_BOTH_ADC_CHANNELS
     readValue[channel] = ((readBuffer[channel][1] & 0x0F) << 8) | readBuffer[channel][2];
     AuxSPI::writeAndReadFromISR(chipSelect, data, readBuffer[channel]);
@@ -63,7 +63,7 @@ void ADC::readFromISR(bool channel){
 }
 
 uint16_t ADC::read(bool channel){
-    uint8_t data[3] = {0x01u, 0xA0u | (channel << 6), 0x00};
+    uint8_t data[3] = {0x01, 0xA0 | (channel << 6), 0x00};
 #ifdef USE_BOTH_ADC_CHANNELS
     AuxSPI::writeAndRead(chipSelect, data, readBuffer[channel]);
     readValue[channel] = ((readBuffer[channel][1] & 0x0F) << 8) | readBuffer[channel][2];
