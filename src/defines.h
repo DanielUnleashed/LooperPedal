@@ -16,6 +16,16 @@
 #define TOTAL_BUTTONS 4
 static const uint8_t PUSH_BUTTON[TOTAL_BUTTONS] = {34,35,36,39};
 
+// Same as before. If more were to be added, go to RotaryEncoder.cpp
+// It only differs that two interrupts have to be added, one for each
+// channel of the rotary encoder. 
+// If the rotatory encoder doesn't have button, fill with number 0xFF the
+// correspondent number inside ROTARY_BUTTONS array.
+#define TOTAL_ROTARY_ENCODERS 1
+#define TOTAL_ROTARY_BUTTONS 1
+static const uint8_t ROTARY_ENCODERS[TOTAL_ROTARY_ENCODERS<<1] = {};
+static const uint8_t ROTARY_BUTTONS[TOTAL_ROTARY_ENCODERS] = {};
+
 #define CS_DAC 25
 #define CS_ADC 26
 

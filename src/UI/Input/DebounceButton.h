@@ -13,13 +13,14 @@
 class DebounceButton{
     public:
         DebounceButton(uint8_t chipPin);
+        uint8_t pin;
 
         bool clicked();
         bool clicked(uint8_t timesPressed);
         bool doubleClicked();
 
         static DebounceButton* systemButtons[TOTAL_BUTTONS];
-        static std::function<void(void)> ISREvents[TOTAL_BUTTONS];
+        static IRAM_ATTR std::function<void(void)> ISREvents[TOTAL_BUTTONS];
 
         static void init();
         static bool addInterrupt(uint8_t buttonIndex, std::function<void(void)> func);
@@ -29,7 +30,6 @@ class DebounceButton{
         volatile uint32_t lastTimePressed = 0;
         volatile uint32_t doubleClickedTime;
         volatile bool lastState = LOW;
-        uint8_t pin;
 
         volatile bool buttonIsPressed = false;
         volatile uint8_t repeatedPressesCount = 0;

@@ -11,7 +11,7 @@
 #include "chip/DAC.h"
 #include "chip/ADC.h"
 
-#include "UI/DebounceButton.h"
+#include "UI/Input/DebounceButton.h"
 
 class AudioPlayer{
   public:
