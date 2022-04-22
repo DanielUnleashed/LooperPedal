@@ -202,7 +202,7 @@ void AudioPlayer::addSDAudioFile(char* filePath){
   SDAudioFile* audFile = new SDAudioFile;
   audioChannels[channelsUsed] = audFile;
   if(!audFile -> open(filePath)) error("Fatal fail opening file %s", filePath);
-  debug("File %s added at Channel %d", audioChannels[channelsUsed]->fileLoc.c_str(), channelsUsed);
+  debug("File %s added at Channel %d", audioChannels[channelsUsed]->getFileName().c_str(), channelsUsed);
   if(audioChannels[channelsUsed]->getFileSize() >= audioChannels[longestChannel]->getFileSize()){
     longestChannel = channelsUsed;
     debug(" (longest)");

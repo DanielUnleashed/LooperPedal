@@ -11,6 +11,8 @@
 class RECAudioFile : public AudioFile {
 
     public:
+        String recordingName;
+
         RECAudioFile();
         RECAudioFile(bool channel, ADC* inputADC);
 

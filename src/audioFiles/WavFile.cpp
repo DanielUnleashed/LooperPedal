@@ -81,16 +81,40 @@ void WavFile::processToWavFile(AudioFile* rawFile){
 
     String outFileDir = "/out";
     SD.mkdir(outFileDir);
-    String fileName  = rawFile->fileLoc.substring(0, rawFile->fileLoc.length()-4);
+    String fileName  = rawFile -> getFileName();
+    fileName = fileName.substring(0, fileName.length()-4);
     fileName.concat(".wav");
     outFileDir.concat(fileName);
 
     File outFile = SD.open(outFileDir, FILE_WRITE);
 
+    //Print the header to the file
     uint8_t* headerP = (uint8_t*)&wavHeader;
     outFile.write(headerP, 44);
 
+    File rawDataFile = SD.open(rawFile->getFileLocation(), FILE_READ);
+    //Print the audio data
+    uint32_t directionPointer = 0;
+    uint32_t rawByteSize = rawFile->getFileSize()>>1;
+    rawDataFile.seek(0);
+    while(directionPointer < rawByteSize){
+        //Fetch
+        uint8_t bufferSize = 128;
+        if(rawByteSize - directionPointer < bufferSize) bufferSize = rawByteSize - directionPointer;
+        uint16_t rawData[128];
+        rawDataFile.read((uint8_t*)&rawData, bufferSize<<1);
+
+        //Process
+        for(uint8_t i = 0; i < bufferSize; i++) rawData[i] -= 0x8000;
+
+        //Save
+        outFile.write((uint8_t*)&rawData, bufferSize<<1);
+
+        directionPointer+=bufferSize;
+    }
+
     outFile.close();
+    Utilities::debug("Saved to file %s\n", outFileDir.c_str());
 }
 
 void WavFile::getHeader(){

@@ -6,10 +6,13 @@ RECAudioFile::RECAudioFile(bool channel, ADC* inputADC){
     ID = REC_FILE_ID;
     adcChannel = channel;
     adc = inputADC;
-    fileLoc = "/r.raw";
+
+    recordingName = "ump";
+
+    generateFileName(recordingCount);
 
     SD.mkdir("/rec");
-    currentRecording = SD.open(generateFileName(recordingCount), FILE_WRITE);
+    currentRecording = SD.open(fileLoc, FILE_WRITE);
 }
 
 uint16_t RECAudioFile::getSample(){
@@ -149,16 +152,16 @@ void RECAudioFile::generateNewRECLayer(){
     
     currentRecording.close(); 
 
-    WavFile::processToWavFile(this);
-
-    /*recFiles[1] = recFiles[0];
-    recFiles[0] = SD.open(generateFileName(recordingCount), FILE_READ);
+    recFiles[1] = recFiles[0];
+    recFiles[0] = SD.open(fileLoc, FILE_READ);
     if(recordingCount == 0){
         fileSize = recFiles[0].size();
         Utilities::debug("REC size: %d\n", fileSize);
     }
     
-    recordingCount++;
+    WavFile::processToWavFile(this);
+
+    /*recordingCount++;
     currentRecording = SD.open(generateFileName(recordingCount), FILE_WRITE);
 
     if(recordingCount > 2){
@@ -171,8 +174,9 @@ void RECAudioFile::generateNewRECLayer(){
 
 String RECAudioFile::generateFileName(uint8_t number){
     char newFileName[30];
-    snprintf(newFileName, 30, "%s%s_%03d.raw", REC_FOLDER, fileLoc.c_str(), number);
-    return String(newFileName);
+    snprintf(newFileName, 30, "%s%s_%03d.raw", REC_FOLDER, recordingName.c_str(), number);
+    fileLoc = String(newFileName);
+    return fileLoc;
 }
 
 String RECAudioFile::generateFileName(uint8_t chA, uint8_t chB){

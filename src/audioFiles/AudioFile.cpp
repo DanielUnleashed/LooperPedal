@@ -32,3 +32,18 @@ AUDIO_FILE_INFO AudioFile::getAudioFileInfo(){
 bool AudioFile::is(uint8_t askID){
   return ID == askID;
 }
+
+String AudioFile::getFileName(){
+  uint16_t lastBarFound = 0; //Finds the last /
+  for(uint16_t i = fileLoc.length()-1; i > 0; i--){
+    if(fileLoc.charAt(i) == '/'){
+      lastBarFound = i;
+      break;
+    }
+  }
+  return fileLoc.substring(lastBarFound, fileLoc.length());
+}
+
+String AudioFile::getFileLocation(){
+  return fileLoc;
+}

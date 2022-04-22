@@ -28,7 +28,6 @@ class AudioFile{
       static const uint8_t FILE_PAUSED  = 3;
       static const uint8_t FILE_PLAYING = 4;
 
-      String fileLoc;
       uint8_t ID;
 
       virtual uint16_t getSample() = 0;
@@ -43,9 +42,13 @@ class AudioFile{
       AUDIO_FILE_INFO getAudioFileInfo();
       bool is(uint8_t askID);
 
+      String getFileName();
+      String getFileLocation();
+
   private:
 
   protected:
+      String fileLoc;
       uint8_t fileStatus = 0xFF;
       
       uint32_t fileDirectionToBuffer = 0;
