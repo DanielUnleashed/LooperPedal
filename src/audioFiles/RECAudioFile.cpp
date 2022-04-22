@@ -6,7 +6,7 @@ RECAudioFile::RECAudioFile(bool channel, ADC* inputADC){
     ID = REC_FILE_ID;
     adcChannel = channel;
     adc = inputADC;
-    fileName = "r";
+    fileLoc = "/r.raw";
 
     SD.mkdir("/rec");
     currentRecording = SD.open(generateFileName(recordingCount), FILE_WRITE);
@@ -149,7 +149,9 @@ void RECAudioFile::generateNewRECLayer(){
     
     currentRecording.close(); 
 
-    recFiles[1] = recFiles[0];
+    WavFile::processToWavFile(this);
+
+    /*recFiles[1] = recFiles[0];
     recFiles[0] = SD.open(generateFileName(recordingCount), FILE_READ);
     if(recordingCount == 0){
         fileSize = recFiles[0].size();
@@ -162,20 +164,20 @@ void RECAudioFile::generateNewRECLayer(){
     if(recordingCount > 2){
         tempMixingChannel = SD.open(generateFileName(recordingCount-2, recordingCount-1), FILE_WRITE);
         laterPrevHasBeenMixed = false;
-    } 
+    } */
     stopRecordingFlag = false;
     Serial.println("Stopped recording\n");
 }
 
 String RECAudioFile::generateFileName(uint8_t number){
     char newFileName[30];
-    snprintf(newFileName, 30, "%s%s_%03d.raw", REC_FOLDER, fileName.c_str(), number);
+    snprintf(newFileName, 30, "%s%s_%03d.raw", REC_FOLDER, fileLoc.c_str(), number);
     return String(newFileName);
 }
 
 String RECAudioFile::generateFileName(uint8_t chA, uint8_t chB){
     char newFileName[35];
-    snprintf(newFileName, 35, "%s%s_MIX_%03d-%03d.raw", REC_FOLDER, fileName.c_str(), chA, chB);
+    snprintf(newFileName, 35, "%s%s_MIX_%03d-%03d.raw", REC_FOLDER, fileLoc.c_str(), chA, chB);
     return String(newFileName);
 }
 

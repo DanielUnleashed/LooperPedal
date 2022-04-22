@@ -8,7 +8,7 @@ SDAudioFile::SDAudioFile(){
 
 bool SDAudioFile::open(char *filePath){
   fileStatus = FILE_OPENING;
-  fileName = String(filePath);
+  fileLoc = String(filePath);
 
   if(!fetchSDAudioFileData()) return false;
   refreshBuffer();
@@ -67,12 +67,12 @@ void SDAudioFile::refreshBuffer(){
 }
 
 bool SDAudioFile::fetchSDAudioFileData(){
-  if(fileName.endsWith(".wav")){
-    WavFile wavFile(fileName);
+  if(fileLoc.endsWith(".wav")){
+    WavFile wavFile(fileLoc);
     WAV_FILE_INFO wavInfo = wavFile.processToRawFile();
-    fileName = String(wavInfo.fileName);
+    fileLoc = String(wavInfo.fileName);
     //fileSize = wavInfo.dataSize;
-  } else if(fileName.endsWith(".raw")){
+  } else if(fileLoc.endsWith(".raw")){
     // Nothing at the moment.
   }else{
     error("Filetype not suported!");
@@ -80,18 +80,18 @@ bool SDAudioFile::fetchSDAudioFileData(){
   }
 
   // Must be sure it is a .raw file.
-  dataFile = SD.open(fileName, FILE_READ);
+  dataFile = SD.open(fileLoc, FILE_READ);
   fileSize = dataFile.size();
 
   if(fileSize == 0){
-    debug("File %s is empty!\n", fileName.c_str());
+    debug("File %s is empty!\n", fileLoc.c_str());
     return false;
   }
 
   fileDirectionToBuffer = 0;
   //Byte res. = audioRes/8 (+ 1 if audioRes%8 > 0)
   byteAudioResolution = (audioResolution>>3) + ((audioResolution & 0x07)>0);
-  debug("Loaded %s (size %d bytes) loaded! [AUDIO RESOLUTION: %d (%d bytes)]\n", fileName.c_str(), fileSize, audioResolution, byteAudioResolution);
+  debug("Loaded %s (size %d bytes) loaded! [AUDIO RESOLUTION: %d (%d bytes)]\n", fileLoc.c_str(), fileSize, audioResolution, byteAudioResolution);
   return true;
 }
 

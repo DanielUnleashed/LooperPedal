@@ -11,6 +11,8 @@
 #include "chip/DAC.h"
 #include "chip/ADC.h"
 
+#include "UI/DebounceButton.h"
+
 class AudioPlayer{
   public:
     static void play();

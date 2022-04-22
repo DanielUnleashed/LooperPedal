@@ -33,7 +33,6 @@ void Utilities::enterErrorState(){
 }
 
 void Utilities::errorTask(void *funcParams){
-  vTaskSuspendAll();
   for(;;){
     delay(1000);
     digitalWrite(ERROR_LED, 1);

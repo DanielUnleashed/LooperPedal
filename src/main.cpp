@@ -9,7 +9,7 @@ void setup() {
 
   AudioPlayer::begin();
   AudioPlayer::addRECAudioFile(0);
-  AudioPlayer::play();
+
 }
 
 void loop() {}

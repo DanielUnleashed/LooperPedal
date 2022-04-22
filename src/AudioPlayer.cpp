@@ -21,40 +21,33 @@ TaskHandle_t AudioPlayer::audioProcessingTaskHandle;
 TaskHandle_t AudioPlayer::statusMonitorTaskHandle;
 TaskHandle_t AudioPlayer::memoryTaskHandle;
 
-/*void IRAM_ATTR AudioPlayer::ISR_BUTTON_1(){
-  if(!button1.clicked()) return;
-
-  if(isPlaying) pause();
-  else play();
-}
-
-void IRAM_ATTR AudioPlayer::ISR_BUTTON_2(){
-  if(!button2.clicked()) return;
-
-  for(uint8_t i = 0; i < recChannelsUsed; i++){
-    RECAudioFile* currCh = getRECAudioFile(i);
-    if(isRecording) currCh -> stopRecording();
-    else currCh -> startRecording();
-  }
-  isRecording = !isRecording;
-  if(!isPlaying) play();
-}
-
-void IRAM_ATTR AudioPlayer::ISR_BUTTON_3(){
-  if(!button3.clicked()) return;
-
-  for(uint8_t i = 0; i < recChannelsUsed; i++)
-    getRECAudioFile(i) -> undoRedoLastRecording();
-}
-
-void IRAM_ATTR AudioPlayer::ISR_BUTTON_4(){}*/
-
 void AudioPlayer::begin(){
   SDBoot();
   dac.begin();
   adc.begin();
 
   delay(10);
+
+  DebounceButton::init();
+  DebounceButton::addInterrupt(0, []{
+    if(isPlaying) pause();
+    else play();
+  });
+
+  DebounceButton::addInterrupt(1, []{  
+    for(uint8_t i = 0; i < recChannelsUsed; i++){
+      RECAudioFile* currCh = getRECAudioFile(i);
+      if(isRecording) currCh -> stopRecording();
+      else currCh -> startRecording();
+    }
+    isRecording = !isRecording;
+    if(!isPlaying) play();
+  });
+
+  DebounceButton::addInterrupt(2, []{  
+    for(uint8_t i = 0; i < recChannelsUsed; i++)
+      getRECAudioFile(i) -> undoRedoLastRecording();
+  });
 
 #ifdef LAUNCH_CONSOLE
   // Audio processing and signal managing task running on core 0
@@ -66,15 +59,9 @@ void AudioPlayer::begin(){
   xTaskCreatePinnedToCore(memoryTask, "MemoryTask", 10000, NULL, 5, &memoryTaskHandle, 1);
   vTaskSuspend(memoryTaskHandle);
 
-  //TODO: Research this!
-  //xTaskCreatePinnedToCore([](void* params){
-    //Start frequency playback interrupt
-    /*With prescaler of 8, resolution of 0.1 us.*/
-    timer = timerBegin(0, 8, true);
-    timerAttachInterrupt(timer, frequencyTimer, true);
-    timerAlarmWrite(timer, 10000000/PLAY_FREQUENCY, true);
-  //  vTaskDelete(NULL);
-  //}, "LaunchTimer", 10000, NULL, 1, NULL, 0); // Timer interrupts will be happening in CORE0.
+  timer = timerBegin(0, 8, true);
+  timerAttachInterrupt(timer, frequencyTimer, true);
+  timerAlarmWrite(timer, 10000000/PLAY_FREQUENCY, true); //This timer will be called in CORE1.
 
   isPlaying = false;
   longestChannel = 0;
@@ -88,6 +75,7 @@ void AudioPlayer::play(){
 #endif
   setAllTo(SD_FILE_ID, AudioFile::FILE_PLAYING);
   timerAlarmEnable(timer);
+  Serial.println("Play");
 }
 
 void AudioPlayer::pause(){
@@ -95,6 +83,7 @@ void AudioPlayer::pause(){
   vTaskSuspend(memoryTaskHandle);
   isPlaying = false;
   setAllTo(SD_FILE_ID, AudioFile::FILE_PAUSED);
+  Serial.println("Pause");
 }
 
 void AudioPlayer::memoryTask(void* funcParams){ 
@@ -213,7 +202,7 @@ void AudioPlayer::addSDAudioFile(char* filePath){
   SDAudioFile* audFile = new SDAudioFile;
   audioChannels[channelsUsed] = audFile;
   if(!audFile -> open(filePath)) error("Fatal fail opening file %s", filePath);
-  debug("File %s added at Channel %d", audioChannels[channelsUsed]->fileName.c_str(), channelsUsed);
+  debug("File %s added at Channel %d", audioChannels[channelsUsed]->fileLoc.c_str(), channelsUsed);
   if(audioChannels[channelsUsed]->getFileSize() >= audioChannels[longestChannel]->getFileSize()){
     longestChannel = channelsUsed;
     debug(" (longest)");

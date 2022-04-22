@@ -8,6 +8,8 @@
 #include "defines.h"
 #include "utils/Utilities.h"
 
+#include "AudioFile.h"
+
 #define WAV_TRANSFORM_CHANNEL_NUM   1
 #define WAV_TRANSFORM_BITS          16
 #define DATA_COPY_BUFFER_SIZE       512
@@ -17,24 +19,26 @@ struct WAV_FILE_INFO {
     uint32_t dataSize;
 };
 
+#pragma pack(push, 1)
 struct  WAV_HEADER {
     // RIFF Chunk
-    uint8_t*        RIFF_ID;        // RIFF
-    uint32_t        RIFF_DataSize;    // RIFF Chunk data Size
-    uint8_t*        RIFF_TYPE_ID;    // WAVE
+    uint8_t     RIFF_ID[4];         // "RIFF"
+    uint32_t    RIFF_DataSize;      // RIFF Chunk data Size
+    uint8_t     RIFF_TYPE_ID[4];    // "WAVE"
     // format sub-chunk
-    uint8_t*        fmt_ID;       // fmt
-    uint32_t        fmt_DataSize;   // Size of the format chunk
-    uint16_t        fmt_FormatTag;         //  format_Tag 1=PCM
-    uint16_t        channelNum;       //  1=Mono 2=Stereo
-    uint32_t        sampleRate;        // Sampling Frequency in (44100)Hz
-    uint32_t        byteRate;          // Byte rate
-    uint16_t        blockAlign;        // 4
-    uint16_t        bitsPerSample;    // 16
+    uint8_t     fmt_ID[4];          // "fmt "
+    uint32_t    fmt_DataSize;       // Size of the format chunk
+    uint16_t    fmt_FormatTag;      // Format_Tag 1=PCM
+    uint16_t    channelNum;         // 1=Mono 2=Stereo
+    uint32_t    sampleRate;         // Sampling Frequency in Hz
+    uint32_t    byteRate;           // Byte rate = Chnls. * samples/sec * bits per sample/8
+    uint16_t    blockAlign;         // Chnls. * bits per sample/8
+    uint16_t    bitsPerSample;    
     /* "data" sub-chunk */
-    uint8_t*        data_ID;       // data
-    uint32_t        data_DataSize;   // Size of the audio data
+    uint8_t     data_ID[4];         // "data"
+    uint32_t    data_DataSize;      // Size of the audio data
 };
+#pragma pack(pop)
 
 class WavFile {
     public:
@@ -42,6 +46,7 @@ class WavFile {
 
         WavFile(String fileLoc);
         WAV_FILE_INFO processToRawFile();
+        static void processToWavFile(AudioFile* rawFile);
     private:
         WAV_HEADER wavInfo;
         uint32_t wavFileDataSize;
@@ -54,7 +59,7 @@ class WavFile {
         File wavFile; 
         uint16_t read16();
         uint32_t read32();
-        uint8_t* readBytes(uint8_t length);
+        uint8_t readByte();
 };
 
 #endif

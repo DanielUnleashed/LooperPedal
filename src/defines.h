@@ -9,6 +9,7 @@
 #define PASS_AUDIO_INPUT_DURING_RECORDING
 
 #define PLAY_FREQUENCY 16000
+#define BIT_RES 16
 
 // If more were to be added, add to the init() method inside DebounceButton.cpp
 // another call to attachInterrupt with the correspondant number.

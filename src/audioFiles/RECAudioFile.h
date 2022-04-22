@@ -2,6 +2,7 @@
 #define RECAudioFile_h
 
 #include "audioFiles/AudioFile.h"
+#include "audioFiles/WavFile.h"
 
 #include "chip/adc.h"
 

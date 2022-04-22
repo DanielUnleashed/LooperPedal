@@ -5,30 +5,27 @@ WavFile::WavFile(String fileLoc){
 
     if(!SD.exists(fileLoc)){
         Utilities::error("File '%s' doesn't exist!\n", fileLoc.c_str());
-        return;
     }
 
     wavFile = SD.open(fileLoc, FILE_READ);
     if (!wavFile) {
         Utilities::error("Failed to open file '%s' for reading/writing\n", fileLoc.c_str());
-        return;
     }
 
     wavFileDataSize = wavFile.size();
     if(wavFileDataSize == 0){
         Utilities::error("File %s is empty!\n", fileLoc.c_str());
-        return;
     }
     
     getHeader();
 }
 
 WAV_FILE_INFO WavFile::processToRawFile(){
-    SD.mkdir("/proc");
+    String procFolder = "/proc";
+    SD.mkdir(procFolder);
     String fileName  = wavLoc.substring(0, wavLoc.length()-4);
     fileName.concat(PLAY_FREQUENCY);
     fileName.concat(".raw");
-    String procFolder = "/proc";
     procFolder.concat(fileName);
     
     String procFile = String(procFolder);
@@ -60,23 +57,57 @@ WAV_FILE_INFO WavFile::processToRawFile(){
     return ret;
 }
 
+void WavFile::processToWavFile(AudioFile* rawFile){
+    const char* riff_tag = "RIFF";
+    const char* wave_tag = "WAVE";
+    const char* fmt_tag = "fmt ";
+    const char* data_tag = "data";
+
+    WAV_HEADER wavHeader;
+    for(uint8_t i = 0; i < 4; i++) wavHeader.RIFF_ID[i] = riff_tag[i];
+    for(uint8_t i = 0; i < 4; i++) wavHeader.RIFF_TYPE_ID[i] = wave_tag[i];
+    for(uint8_t i = 0; i < 4; i++) wavHeader.fmt_ID[i] = fmt_tag[i];
+    wavHeader.fmt_DataSize =  16;
+    wavHeader.fmt_FormatTag = 1;
+    wavHeader.channelNum = 1;
+    wavHeader.sampleRate = PLAY_FREQUENCY;
+    wavHeader.byteRate = PLAY_FREQUENCY*BIT_RES/8;
+    wavHeader.blockAlign = BIT_RES/8;
+    wavHeader.bitsPerSample = BIT_RES;
+    for(uint8_t i = 0; i < 4; i++) wavHeader.data_ID[i] = data_tag[i];
+
+    wavHeader.RIFF_DataSize = rawFile->getFileSize();
+    wavHeader.data_DataSize = wavHeader.RIFF_DataSize + 36;
+
+    String outFileDir = "/out";
+    SD.mkdir(outFileDir);
+    String fileName  = rawFile->fileLoc.substring(0, rawFile->fileLoc.length()-4);
+    fileName.concat(".wav");
+    outFileDir.concat(fileName);
+
+    File outFile = SD.open(outFileDir, FILE_WRITE);
+
+    uint8_t* headerP = (uint8_t*)&wavHeader;
+    outFile.write(headerP, 44);
+
+    outFile.close();
+}
+
 void WavFile::getHeader(){
-    WAV_HEADER wavHeader = {
-        //TODO: This could be done better...
-        .RIFF_ID = readBytes(4),
-        .RIFF_DataSize = read32(),
-        .RIFF_TYPE_ID = readBytes(4),
-        .fmt_ID = readBytes(4),
-        .fmt_DataSize = read32(),
-        .fmt_FormatTag = read16(),
-        .channelNum = read16(),
-        .sampleRate = read32(),
-        .byteRate = read32(),
-        .blockAlign = read16(),
-        .bitsPerSample = read16(),
-        .data_ID = readBytes(4),
-        .data_DataSize = read32(),
-    };
+    WAV_HEADER wavHeader;
+    for(uint8_t i = 0; i < 4; i++) wavHeader.RIFF_ID[i] = readByte();
+    wavHeader.RIFF_DataSize = read32();
+    for(uint8_t i = 0; i < 4; i++) wavHeader.RIFF_TYPE_ID[i] = readByte();
+    for(uint8_t i = 0; i < 4; i++) wavHeader.fmt_ID[i] = readByte();
+    wavHeader.fmt_DataSize = read32();
+    wavHeader.fmt_FormatTag = read16();
+    wavHeader.channelNum = read16();
+    wavHeader.sampleRate = read32();
+    wavHeader.byteRate = read32();
+    wavHeader.blockAlign = read16();
+    wavHeader.bitsPerSample = read16();
+    for(uint8_t i = 0; i < 4; i++) wavHeader.data_ID[i] = readByte();
+    wavHeader.data_DataSize = read32();
     wavInfo = wavHeader;
 }
 
@@ -221,10 +252,9 @@ void WavFile::printHeader(File outFile){
     outFile.close();
 }
 
-uint8_t* WavFile::readBytes(uint8_t length){
-    uint8_t* ret;
-    ret = (uint8_t*) malloc(4);
-    wavFile.read(ret, 4);
+uint8_t WavFile::readByte(){
+    uint8_t ret;
+    wavFile.read(&ret, 1);
     return ret;
 }
 

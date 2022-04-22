@@ -18,7 +18,7 @@ uint32_t AudioFile::getCurrentFileDirection(){
 
 AUDIO_FILE_INFO AudioFile::getAudioFileInfo(){
   AUDIO_FILE_INFO ret = {
-    .fileName = fileName.c_str(),
+    .fileName = fileLoc.c_str(),
     .currentFileDirection = fileDirectionToBuffer,
     .size = fileSize,
     .progress = 0,
