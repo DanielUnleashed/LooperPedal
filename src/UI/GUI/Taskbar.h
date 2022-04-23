@@ -8,7 +8,6 @@ struct TaskbarButton{
     String tagName;
 };
 
-
 class Taskbar : public DisplayItem{
 
     public:

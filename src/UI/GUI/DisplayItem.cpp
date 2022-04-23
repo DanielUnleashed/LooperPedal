@@ -13,6 +13,10 @@ DisplayItem::DisplayItem(String name, uint8_t tx, uint8_t ty, uint8_t sx, uint8_
     oY = tileH*tileY;
 }
 
+DisplayItem::DisplayItem(String n){
+    itemName = n;
+}
+
 DisplayItem::~DisplayItem(){
     if(pressFunction) DebounceButton::removeInterrupt(inputPin);
 }

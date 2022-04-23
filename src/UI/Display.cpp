@@ -5,7 +5,6 @@ Display::Display(String n){
 }
 
 void Display::drawDisplay(){
-    Serial.println("dip");
     for(DisplayItem* it : itemList){
         if(it -> needsToRedraw()) it -> draw();
     }
