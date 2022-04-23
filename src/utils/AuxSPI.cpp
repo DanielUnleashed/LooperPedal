@@ -78,6 +78,7 @@ HOLDOUT_PACKET* AuxSPI::writeAndReadFromISR(uint8_t chipSelect, uint8_t* dataOut
 }
 
 void AuxSPI::writeAndRead(uint8_t chipSelect, uint8_t* dataOut, uint8_t* dataInBuff){
+    if(dataOut == NULL) return;
     SPI2 -> beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0)); //If substituted by sett, it implodes (doesn't work)
     digitalWrite(chipSelect, LOW);
     SPI2 -> transferBytes(dataOut, dataInBuff, sizeof(dataOut));
@@ -86,6 +87,7 @@ void AuxSPI::writeAndRead(uint8_t chipSelect, uint8_t* dataOut, uint8_t* dataInB
 }
 
 void AuxSPI::write(uint8_t chipSelect, uint8_t* data){
+    if(data == NULL) return;
     SPI2 -> beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
     digitalWrite(chipSelect, LOW);
     SPI2 -> writeBytes(data, sizeof(data));

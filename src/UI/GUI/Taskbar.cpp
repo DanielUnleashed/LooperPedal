@@ -3,6 +3,7 @@
 Taskbar::Taskbar(uint8_t tileX, uint8_t tileY) : DisplayItem("Taskbar", tileX, tileY, 5, 1){}
 
 void Taskbar::draw(){
+    drawGrid();
     drawFilledRect(0,0,100,100, 0x190A);
     for(uint8_t i = 0; i < 4; i++){
         if(!buttons[i].isEnabled) continue;

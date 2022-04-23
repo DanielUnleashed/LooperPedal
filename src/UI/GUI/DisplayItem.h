@@ -49,7 +49,7 @@ class DisplayItem {
     uint8_t inputPin;
 
     //General draw functions
-    void drawTiles();
+    void drawGrid();
     void drawRectangle(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t color);
     void drawRoundRectangle(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t color);
     void drawFilledRect(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t fillColor);

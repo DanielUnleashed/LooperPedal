@@ -17,9 +17,8 @@ DisplayItem::~DisplayItem(){
     if(pressFunction) DebounceButton::removeInterrupt(inputPin);
 }
 
-
 // ***** DRAW FUNCTIONS *****
-void DisplayItem::drawTiles(){
+void DisplayItem::drawGrid(){
   // Draw tile squares.
   tft->drawRect(0,0,width,height, TFT_WHITE);
 

@@ -159,7 +159,7 @@ void RECAudioFile::generateNewRECLayer(){
         Utilities::debug("REC size: %d\n", fileSize);
     }
     
-    WavFile::processToWavFile(this);
+    //WavFile::processToWavFile(this);
 
     /*recordingCount++;
     currentRecording = SD.open(generateFileName(recordingCount), FILE_WRITE);
@@ -167,7 +167,7 @@ void RECAudioFile::generateNewRECLayer(){
     if(recordingCount > 2){
         tempMixingChannel = SD.open(generateFileName(recordingCount-2, recordingCount-1), FILE_WRITE);
         laterPrevHasBeenMixed = false;
-    } */
+    }*/
     stopRecordingFlag = false;
     Serial.println("Stopped recording\n");
 }

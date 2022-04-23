@@ -16,6 +16,7 @@ void setup() {
   taskbar.draw();
 
   AudioPlayer::begin();
+  //AudioPlayer::addSDAudioFile("/tereza.wav");
   AudioPlayer::addRECAudioFile(0);
 }
 

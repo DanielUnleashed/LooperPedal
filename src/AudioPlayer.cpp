@@ -95,8 +95,6 @@ void AudioPlayer::memoryTask(void* funcParams){
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     if(!isPlaying || channelsUsed == 0) continue;
 
-    //uint32_t start = micros();
-
     for(uint8_t i = 0; i < channelsUsed; i++) audioChannels[i]->refreshBuffer();
 
     uint16_t totalIt = globalBuf.getFreeSpace();
@@ -112,35 +110,24 @@ void AudioPlayer::memoryTask(void* funcParams){
         setAllTo(SD_FILE_ID, AudioFile::FILE_PLAYING);
       }
     }
-    /*uint32_t ellapsed = micros() - start;
-    average += ellapsed;
-    it++;
-    if(ellapsed > max) max = ellapsed;
-    else if(ellapsed < min) min = ellapsed;
-    if(it == 0xFF){
-      average = average>>8;
-      Serial.printf("\nAv: %d, min: %d, max: %d\n", average, min, max);
-      average = 0;
-      it = 0;
-      min = 0xFFFF;
-      max = 0;
-    }*/
   }
   vTaskDelete(NULL);
 }
 
 void IRAM_ATTR AudioPlayer::frequencyTimer(){
+  if(!isPlaying) return;
+
   vTaskEnterCritical(&timerMux);
-#ifdef PASS_AUDIO_INPUT_DURING_RECORDING
-  uint16_t adcRead = adc.updateReadings();
-  uint32_t mix;
-  /*if(isRecording)*/ mix = (globalBuf.get() + adcRead)>>1;
-  //else mix = globalBuf.get();
-  dac.writeFromISR(mix);
-#else
-  adc.updateReadings();
-  dac.writeFromISR(globalBuf.get());
-#endif
+  #ifdef PASS_AUDIO_INPUT_DURING_RECORDING
+    uint16_t adcRead = adc.updateReadings();
+    uint32_t mix;
+    /*if(isRecording)*/ mix = (globalBuf.get() + adcRead)>>1;
+    //else mix = globalBuf.get();
+    dac.writeFromISR(mix);
+  #else
+    adc.updateReadings();
+    dac.writeFromISR(globalBuf.get());
+  #endif
 
   if(globalBuf.getFreeSpace() > BUFFER_REFRESH){
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
