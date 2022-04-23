@@ -15,9 +15,9 @@ void setup() {
   taskbar.addButton("Strips", 3);
   taskbar.draw();
 
-  AudioPlayer::begin();
+  /*AudioPlayer::begin();
   //AudioPlayer::addSDAudioFile("/tereza.wav");
-  AudioPlayer::addRECAudioFile(0);
+  AudioPlayer::addRECAudioFile(0);*/
 }
 
 void loop() {}

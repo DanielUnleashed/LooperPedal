@@ -9,6 +9,13 @@ void MenuManager::startMenuManager(){
     DisplayItem::startDisplayItems(&tft, width, height, tileW, tileH);
 }
 
+void MenuManager::drawTask(void* funcParams){
+    for(;;){
+        
+        delay(10);
+    }
+}
+
 void MenuManager::startTFT(){
     SPIClass* spi2 = tft.init();
     AuxSPI::begin(spi2);

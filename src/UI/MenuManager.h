@@ -16,6 +16,7 @@ class MenuManager {
     static uint16_t tileW, tileH;
 
     static void startTFT();
+    static void drawTask(void* funcParams);
     
 };
 
