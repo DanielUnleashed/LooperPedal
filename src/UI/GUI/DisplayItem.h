@@ -4,7 +4,7 @@
 #include "Arduino.h"
 #include <functional>
 
-#include "UI/DebounceButton.h"
+#include "UI/Input/DebounceButton.h"
 
 #include <TFT_eSPI.h>
 
