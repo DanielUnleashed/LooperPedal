@@ -4,16 +4,36 @@ TFT_eSPI MenuManager::tft;
 uint16_t MenuManager::width, MenuManager::height;
 uint16_t MenuManager::tileW, MenuManager::tileH;
 
-void MenuManager::startMenuManager(){
+std::list<Display> MenuManager::displayList;
+
+TaskHandle_t MenuManager::drawTaskhandle = NULL;
+
+void MenuManager::init(){
     startTFT();
     DisplayItem::startDisplayItems(&tft, width, height, tileW, tileH);
 }
 
+void MenuManager::launch(){
+    xTaskCreatePinnedToCore(drawTask, "DrawTask", 10000, NULL, 5, &drawTaskhandle, 0);
+}
+
 void MenuManager::drawTask(void* funcParams){
     for(;;){
-        
-        delay(10);
+        for(Display d : displayList){
+            d.drawDisplay();
+        }
+        delay(DRAW_MS);
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     }
+}
+
+void MenuManager::addDisplay(Display d){
+    displayList.push_back(d);
+    d.addRedrawHandle(drawTaskhandle);
+}
+
+void MenuManager::removeDisplay(Display d){
+    //displayList.remove(d); <- Gives error whoops!
 }
 
 void MenuManager::startTFT(){

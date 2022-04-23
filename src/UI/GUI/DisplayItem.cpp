@@ -114,3 +114,16 @@ void DisplayItem::startDisplayItems(TFT_eSPI* tft_ref, uint16_t w, uint16_t h, u
     tileW = tW;
     tileH = tH;
 }
+
+void DisplayItem::attachRedrawHandler(TaskHandle_t h){
+    redrawHandle = h;
+}
+
+void DisplayItem::redraw(){
+    needsUpdate = true;
+    if(redrawHandle != NULL) xTaskNotifyGive(redrawHandle);
+}
+
+bool DisplayItem::needsToRedraw(){
+    return needsUpdate;
+}

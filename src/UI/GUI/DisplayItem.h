@@ -31,6 +31,11 @@ class DisplayItem {
     void addPressEvent(uint8_t pin, std::function<void(void)> func);
     // A released event could be implemented but it may be unnecessary.
 
+    String itemName;
+    bool needsUpdate = true; // CURRENTLY needs update.
+    void attachRedrawHandler(TaskHandle_t h);
+    bool needsToRedraw();
+
     private:
     //Events
     std::function<void(void)> pressFunction;
@@ -42,11 +47,13 @@ class DisplayItem {
     static uint16_t width, height;
     static uint16_t tileW, tileH;
 
-    String itemName;
     uint8_t sizeX, sizeY;
     uint8_t tileX, tileY;
     uint16_t oX, oY;
     uint8_t inputPin;
+
+    TaskHandle_t redrawHandle;
+    void redraw();
 
     //General draw functions
     void drawGrid();

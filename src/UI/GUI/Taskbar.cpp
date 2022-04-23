@@ -3,7 +3,8 @@
 Taskbar::Taskbar(uint8_t tileX, uint8_t tileY) : DisplayItem("Taskbar", tileX, tileY, 5, 1){}
 
 void Taskbar::draw(){
-    uint8_t barWidth = 10;
+    Serial.println("here!");
+    /*uint8_t barWidth = 10;
     for(uint8_t t = 0; t < width; t++){
         for(int i = 0; i < height; i+=barWidth*2-1){
             for(int j = 0; j < barWidth; j++){
@@ -13,10 +14,9 @@ void Taskbar::draw(){
                 tft->drawFastHLine(t, i+barWidth*2-j, j, TFT_YELLOW);
             }
         }
-        delay(5);
-    }
+    }*/
     
-    /*drawGrid();
+    drawGrid();
     drawFilledRect(0,0,100,100, 0x190A);
     for(uint8_t i = 0; i < 4; i++){
         if(!buttons[i].isEnabled) continue;
@@ -25,7 +25,9 @@ void Taskbar::draw(){
         drawCentreText(i*25+13, 50, buttons[i].tagName, TFT_WHITE);
         drawVLine(i*25, 20, 90, TFT_WHITE);
         drawVLine((i+1)*25, 20, 90, TFT_WHITE);
-    }*/
+    }
+
+    needsUpdate = false;
 }
 
 bool Taskbar::addButton(String tagName, uint8_t index){

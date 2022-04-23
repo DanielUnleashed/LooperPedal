@@ -87,10 +87,6 @@ void AudioPlayer::pause(){
 }
 
 void AudioPlayer::memoryTask(void* funcParams){ 
-  /*uint32_t average = 0;
-  uint16_t it = 0;
-  uint32_t min = 0xFF;
-  uint32_t max = 0;*/
   for(;;){
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     if(!isPlaying || channelsUsed == 0) continue;
