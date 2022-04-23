@@ -24,6 +24,7 @@ struct HOLDOUT_PACKET{
 class AuxSPI{
     public:
         static void begin();
+        static void begin(SPIClass* ref);
         static HOLDOUT_PACKET* writeFromISR(uint8_t chipSelect, uint8_t* data);
         static void write(uint8_t chipSelect, uint8_t* data);
         static HOLDOUT_PACKET* writeAndReadFromISR(uint8_t chipSelect, uint8_t* dataOut, uint8_t* dataInBuff);

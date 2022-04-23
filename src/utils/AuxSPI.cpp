@@ -18,6 +18,16 @@ void AuxSPI::begin(){
     alreadyDefined = true;
 }
 
+/* This method is used with a passed reference. In this case, if the tft is used, it will instantiate
+*  a SPIClass attached to VSPI which cannot be instantiated twice. */
+void AuxSPI::begin(SPIClass* spiref){
+    if(alreadyDefined) return;
+    SPI2 = spiref;
+    holdPackets = (HOLDOUT_PACKET*) malloc(MAX_HOLDOUT_PACKETS*sizeof(HOLDOUT_PACKET));
+    xTaskCreatePinnedToCore(SPI2_Sender, "AuxSPISender", 10000, NULL, 10, &SPI2_TaskHandler, 0);
+    alreadyDefined = true;
+}
+
 void AuxSPI::SPI2_Sender(void* funcParams){
     for(;;){
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);

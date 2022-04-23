@@ -9,15 +9,14 @@ void setup() {
   Utilities::debug("*********************************************\n");
   delay(100);
 
-  AudioPlayer::begin();
-  AudioPlayer::addRECAudioFile(0);
-
   MenuManager::startMenuManager();
   Taskbar taskbar(0,3);
   taskbar.addButton("Chicken", 1);
   taskbar.addButton("Strips", 3);
   taskbar.draw();
 
+  AudioPlayer::begin();
+  AudioPlayer::addRECAudioFile(0);
 }
 
 void loop() {}

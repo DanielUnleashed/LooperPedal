@@ -22,7 +22,7 @@ class DisplayItem {
     ~DisplayItem();
     virtual void draw() = 0;
 
-    static void startTFT();
+    static void startDisplayItems(TFT_eSPI* tft, uint16_t width, uint16_t height, uint16_t tileW, uint16_t tileH);
 
     std::function<void(void)> LEDFunction;
     void addLEDTask(uint8_t LED_index, std::function<void(void)> func);
@@ -38,7 +38,7 @@ class DisplayItem {
     Point transformRelativePoint(uint8_t pX, uint8_t pY);
 
     protected:
-    static TFT_eSPI tft;
+    static TFT_eSPI *tft;
     static uint16_t width, height;
     static uint16_t tileW, tileH;
 
