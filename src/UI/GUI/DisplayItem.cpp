@@ -145,5 +145,5 @@ void DisplayItem::forceRedraw(){
 }
 
 uint32_t DisplayItem::getTickTime(){
-    return (micros() - startAnimationTime)*FPS_DESIGN/SCREEN_FPS/10000UL;
+    return (micros() - startAnimationTime)*FPS_DESIGN/SCREEN_FPS/10000.0;
 }

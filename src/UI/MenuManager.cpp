@@ -62,9 +62,9 @@ void MenuManager::removeDisplay(Display d){
 
 void MenuManager::transitionToDisplay(String displayName, uint8_t trans){
     if(trans>>7){
-        const uint8_t anim[2] = {DisplayOverlay::ANIM_SWEEP_IN, DisplayOverlay::ANIM_SWEEP_OUT};
-        std::vector<uint8_t> v(std::begin(anim), std::end(anim));
-        dispOverlay.drawMultipleAnimation(v);
+        const std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN, DisplayOverlay::ANIM_TRIANGLE, DisplayOverlay::ANIM_SWEEP_OUT};
+        const std::vector<uint16_t> c{TFT_RED, TFT_WHITE, TFT_BLACK};
+        dispOverlay.drawMultipleAnimation(v, c);
         getDisplayByName(displayName).forceDraw();
     }else{
         launchOverlay(trans);

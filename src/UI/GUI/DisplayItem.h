@@ -12,7 +12,7 @@
 #define TILES_Y 4
 
 // The FPS whomst value was used to design the animation speeds.
-#define FPS_DESIGN 50
+#define FPS_DESIGN 50.0
 
 struct Point{
     uint16_t x, y;

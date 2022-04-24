@@ -11,7 +11,7 @@
 #define PLAY_FREQUENCY 16000
 #define BIT_RES 16
 
-#define SCREEN_FPS 50
+#define SCREEN_FPS 50.0
 #define DTFT_WIDTH 160
 #define DTFT_HEIGHT 128
 

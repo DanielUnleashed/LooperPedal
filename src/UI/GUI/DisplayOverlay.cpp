@@ -33,6 +33,23 @@ void DisplayOverlay::draw(){
         tft->fillCircle(width/2, height/2, t, animationColor);
         animationEnded = t > diagonalRadius;
     }
+    else if(animationID == ANIM_CIRCUMFERENCE){
+        double theta = getTickTime()/1000.0*TWO_PI * circumferenceSpeed;
+        tft->fillCircle(width/2 + circumferenceRadius*cos(theta + startAngle), height/2 + circumferenceRadius*sin(theta + startAngle),
+                         pincelStroke, animationColor);
+        animationEnded = theta >= TWO_PI;
+    }else if(animationID == ANIM_TRIANGLE){
+        double theta = getTickTime()/1000.0*TWO_PI * circumferenceSpeed;
+        double n = 5;
+        
+        double y = TWO_PI/n;
+        double theta_rot = theta + rotAngle;
+        double mod = y*(theta_rot/y - floor(theta_rot/y));
+        double r = cos(PI/n)/cos(mod - PI/n)*circumferenceRadius;
+        tft->fillCircle(width/2 + r*cos(theta + startAngle), height/2 + r*sin(theta + startAngle),
+                         pincelStroke, animationColor);
+        animationEnded = theta >= TWO_PI;
+    }
 
     if(animationEnded){
         if(hasMultipleAnimation){
@@ -47,6 +64,8 @@ void DisplayOverlay::draw(){
         }
         endAnimation();
         tft->setRotation(1);
+        animationQueue.clear();
+        animationQueuePalette.clear();
         if(redrawHandle != NULL) xTaskNotifyGive(redrawHandle);
     }else redraw();
 }
@@ -67,7 +86,20 @@ void DisplayOverlay::drawMultipleAnimation(std::vector<uint8_t> q){
     startAnimation();
 }
 
+void DisplayOverlay::drawMultipleAnimation(std::vector<uint8_t> q, std::vector<uint16_t> colors){
+    hasMultipleAnimation = true;
+    animationQueue = q;
+    animationQueuePalette = colors;
+    animationID = animationQueue[0];
+    currentAnimationIndex = 0;
+    setPalette();
+    startAnimation();
+}
+
 void DisplayOverlay::setPalette(){
-    if(animationID == ANIM_SWEEP_OUT) animationColor = TFT_BLACK;
-    else animationColor = TFT_YELLOW; 
+    if(animationQueuePalette.size() > 0) animationColor = animationQueuePalette[currentAnimationIndex];
+    else{ //DEFAULT Values
+        if(animationID == ANIM_SWEEP_OUT) animationColor = TFT_BLACK;
+        else animationColor = TFT_YELLOW;
+    } 
 }
