@@ -10,6 +10,13 @@ void Display::drawDisplay(){
     }
 }
 
+void Display::forceDraw(){
+    for(DisplayItem* it : itemList){
+        it -> forceRedraw();
+    }
+    if(redrawHandle != NULL) xTaskNotifyGive(redrawHandle);
+}
+
 void Display::addItem(DisplayItem *item){
     itemList.push_back(item);
     if(redrawHandle != NULL) item -> attachRedrawHandler(redrawHandle);

@@ -15,6 +15,7 @@ class Display {
     void removeItem(DisplayItem *item);
 
     void drawDisplay();
+    void forceDraw();
     void addRedrawHandle(TaskHandle_t h);
 
     private:

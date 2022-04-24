@@ -13,6 +13,15 @@ TaskHandle_t MenuManager::drawTaskhandle = NULL;
 void MenuManager::init(){
     startTFT();
     DisplayItem::startDisplayItems(&tft, width, height, tileW, tileH);
+    DebounceButton::init();
+
+    DebounceButton::addInterrupt(0, []{
+        transitionToDisplay("Main", DisplayOverlay::ANIM_CIRCLE);
+    });
+
+    DebounceButton::addInterrupt(1, []{
+        transitionToDisplay("Main", DisplayOverlay::ANIM_SWEEP);
+    });
 }
 
 void MenuManager::launch(){
@@ -41,6 +50,18 @@ void MenuManager::addDisplay(Display d){
 void MenuManager::removeDisplay(Display d){
     //displayList.remove(d); <- Gives error whoops!
     // Maybe I shall define a == statement, but... neh!
+}
+
+void MenuManager::transitionToDisplay(String displayName, uint8_t trans){
+    launchOverlay(trans);
+    getDisplayByName(displayName).forceDraw();
+}
+
+Display MenuManager::getDisplayByName(String name){
+    for(Display d : displayList){
+        if(d.name.equals(name)) return d;
+    }
+    Utilities::error("Could not find display %s\n", name.c_str());
 }
 
 void MenuManager::launchOverlay(uint8_t overlayIndex){

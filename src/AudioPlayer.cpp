@@ -28,7 +28,6 @@ void AudioPlayer::begin(){
 
   delay(10);
 
-  DebounceButton::init();
   DebounceButton::addInterrupt(0, []{
     if(isPlaying) pause();
     else play();

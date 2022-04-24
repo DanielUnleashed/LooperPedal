@@ -39,6 +39,7 @@ class DisplayItem {
     bool needsUpdate = true; // CURRENTLY needs update.
     void attachRedrawHandler(TaskHandle_t h);
     bool needsToRedraw();
+    void forceRedraw();
 
     private:
     //Events

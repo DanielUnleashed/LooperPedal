@@ -141,6 +141,12 @@ bool DisplayItem::needsToRedraw(){
     return needsUpdate;
 }
 
+void DisplayItem::forceRedraw(){
+    needsUpdate = true;
+}
+
 uint32_t DisplayItem::getTickTime(){
-    return (micros() - startAnimationTime)*FPS_DESIGN/SCREEN_FPS/10000UL;
+    uint32_t t = (micros() - startAnimationTime)*FPS_DESIGN/SCREEN_FPS/10000UL;
+    Serial.println(t);
+    return t;
 }

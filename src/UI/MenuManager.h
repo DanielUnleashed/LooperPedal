@@ -21,6 +21,7 @@ class MenuManager {
     static void addDisplay(Display);
     static void removeDisplay(Display);
 
+    static void transitionToDisplay(String dispName, uint8_t transitionAnim);
     static void launchOverlay(uint8_t animationIndex);
     
     private:
@@ -36,6 +37,7 @@ class MenuManager {
 
     static TaskHandle_t drawTaskhandle;
     static void drawTask(void* funcParams);
+    static Display getDisplayByName(String name);
     
 };
 
