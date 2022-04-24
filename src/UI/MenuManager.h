@@ -15,6 +15,7 @@
 #define DRAW_MS 1000/SCREEN_FPS 
 
 class MenuManager {
+
     public: 
     static void init();
     static void launch();
@@ -22,7 +23,7 @@ class MenuManager {
     static void removeDisplay(Display);
 
     static void transitionToDisplay(String dispName, uint8_t transitionAnim);
-    static void launchOverlay(uint8_t animationIndex);
+    static void launchOverlay(uint8_t animationID);
     
     private:
     static TFT_eSPI tft;

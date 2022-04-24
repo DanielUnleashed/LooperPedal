@@ -20,7 +20,15 @@ void MenuManager::init(){
     });
 
     DebounceButton::addInterrupt(1, []{
-        transitionToDisplay("Main", DisplayOverlay::ANIM_SWEEP);
+        transitionToDisplay("Main", DisplayOverlay::ANIM_SWEEP_IN);
+    });
+
+    DebounceButton::addInterrupt(2, []{
+        transitionToDisplay("Main", DisplayOverlay::ANIM_SWEEP_OUT);
+    });
+
+    DebounceButton::addInterrupt(3, []{
+        transitionToDisplay("Main", DisplayOverlay::ANIM_SWEEP_IN_OUT);
     });
 }
 
@@ -53,8 +61,15 @@ void MenuManager::removeDisplay(Display d){
 }
 
 void MenuManager::transitionToDisplay(String displayName, uint8_t trans){
-    launchOverlay(trans);
-    getDisplayByName(displayName).forceDraw();
+    if(trans>>7){
+        const uint8_t anim[2] = {DisplayOverlay::ANIM_SWEEP_IN, DisplayOverlay::ANIM_SWEEP_OUT};
+        std::vector<uint8_t> v(std::begin(anim), std::end(anim));
+        dispOverlay.drawMultipleAnimation(v);
+        getDisplayByName(displayName).forceDraw();
+    }else{
+        launchOverlay(trans);
+        getDisplayByName(displayName).forceDraw();
+    }
 }
 
 Display MenuManager::getDisplayByName(String name){
@@ -62,6 +77,7 @@ Display MenuManager::getDisplayByName(String name){
         if(d.name.equals(name)) return d;
     }
     Utilities::error("Could not find display %s\n", name.c_str());
+    throw std::runtime_error("MenuManager error!");
 }
 
 void MenuManager::launchOverlay(uint8_t overlayIndex){

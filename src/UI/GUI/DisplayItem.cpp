@@ -25,7 +25,6 @@ DisplayItem::~DisplayItem(){
 void DisplayItem::drawGrid(){
   // Draw tile squares.
   tft->drawRect(0,0,width,height, TFT_WHITE);
-
   //Line 0 has already been drawn.
   for(uint8_t i = 1; i < TILES_X; i++)
     tft->drawFastVLine(i*tileW, 0, height, TFT_WHITE);
@@ -146,7 +145,5 @@ void DisplayItem::forceRedraw(){
 }
 
 uint32_t DisplayItem::getTickTime(){
-    uint32_t t = (micros() - startAnimationTime)*FPS_DESIGN/SCREEN_FPS/10000UL;
-    Serial.println(t);
-    return t;
+    return (micros() - startAnimationTime)*FPS_DESIGN/SCREEN_FPS/10000UL;
 }

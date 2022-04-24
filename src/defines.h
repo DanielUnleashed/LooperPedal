@@ -12,6 +12,8 @@
 #define BIT_RES 16
 
 #define SCREEN_FPS 50
+#define DTFT_WIDTH 160
+#define DTFT_HEIGHT 128
 
 // If more were to be added, add to the init() method inside DebounceButton.cpp
 // another call to attachInterrupt with the correspondant number.
