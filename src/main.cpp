@@ -22,6 +22,9 @@ void setup() {
 
   MenuManager::launch();
 
+  delay(1000);
+
+  MenuManager::launchOverlay(DisplayOverlay::ANIM_SWEEP);
   /*AudioPlayer::begin();
   //AudioPlayer::addSDAudioFile("/tereza.wav");
   AudioPlayer::addRECAudioFile(0);*/

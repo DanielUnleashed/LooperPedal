@@ -128,6 +128,10 @@ void DisplayItem::redraw(){
     if(redrawHandle != NULL) xTaskNotifyGive(redrawHandle);
 }
 
+void DisplayItem::endAnimation(){
+    needsUpdate = false;
+}
+
 bool DisplayItem::needsToRedraw(){
     return needsUpdate;
 }

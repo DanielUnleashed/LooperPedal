@@ -7,6 +7,7 @@
 #include "utils/AuxSPI.h"
 
 #include "UI/Display.h"
+#include "UI/GUI/DisplayOverlay.h"
 #include <list>
 
 #include "defines.h"
@@ -19,6 +20,8 @@ class MenuManager {
     static void launch();
     static void addDisplay(Display);
     static void removeDisplay(Display);
+
+    static void launchOverlay(uint8_t animationIndex);
     
     private:
     static TFT_eSPI tft;
@@ -26,6 +29,8 @@ class MenuManager {
     static uint16_t tileW, tileH;
 
     static std::list<Display> displayList;
+
+    static DisplayOverlay dispOverlay;
 
     static void startTFT();
 

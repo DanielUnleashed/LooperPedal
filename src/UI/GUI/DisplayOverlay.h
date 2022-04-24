@@ -6,8 +6,10 @@
 class DisplayOverlay : public DisplayItem{
 
     public:
-    static const uint8_t NONE_ANIMATION = 0;
-    static const uint8_t SWEEP_ANIMATION = 1;
+    static const uint8_t ANIM_NONE = 0;
+    static const uint8_t ANIM_SWEEP = 1;
+        static const uint8_t barWidth = 10;
+        static const uint8_t sweepSpeed = 100;
 
     DisplayOverlay();
     void draw() override;

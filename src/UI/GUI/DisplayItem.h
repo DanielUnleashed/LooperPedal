@@ -55,6 +55,8 @@ class DisplayItem {
 
     TaskHandle_t redrawHandle;
     void redraw();
+    void endAnimation();
+    uint32_t startAnimationTime;
 
     //General draw functions
     void drawGrid();

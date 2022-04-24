@@ -11,7 +11,7 @@
 #define PLAY_FREQUENCY 16000
 #define BIT_RES 16
 
-#define SCREEN_FPS 30
+#define SCREEN_FPS 50
 
 // If more were to be added, add to the init() method inside DebounceButton.cpp
 // another call to attachInterrupt with the correspondant number.

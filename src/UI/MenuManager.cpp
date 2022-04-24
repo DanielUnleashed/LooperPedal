@@ -6,6 +6,8 @@ uint16_t MenuManager::tileW, MenuManager::tileH;
 
 std::list<Display> MenuManager::displayList;
 
+DisplayOverlay MenuManager::dispOverlay;
+
 TaskHandle_t MenuManager::drawTaskhandle = NULL;
 
 void MenuManager::init(){
@@ -15,12 +17,15 @@ void MenuManager::init(){
 
 void MenuManager::launch(){
     xTaskCreatePinnedToCore(drawTask, "DrawTask", 10000, NULL, 5, &drawTaskhandle, 0);
+    dispOverlay.attachRedrawHandler(drawTaskhandle);
 }
 
 void MenuManager::drawTask(void* funcParams){
     for(;;){
-        for(Display d : displayList){
-            d.drawDisplay();
+        // Block the display if an overlay is launched.
+        if(dispOverlay.needsToRedraw()) dispOverlay.draw();
+        else{
+            for(Display d : displayList) d.drawDisplay();
         }
         delay(DRAW_MS);
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
@@ -34,6 +39,11 @@ void MenuManager::addDisplay(Display d){
 
 void MenuManager::removeDisplay(Display d){
     //displayList.remove(d); <- Gives error whoops!
+    // Maybe I shall define a == statement, but... neh!
+}
+
+void MenuManager::launchOverlay(uint8_t overlayIndex){
+    dispOverlay.drawAnimation(overlayIndex);
 }
 
 void MenuManager::startTFT(){
