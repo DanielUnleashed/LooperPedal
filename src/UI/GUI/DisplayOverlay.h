@@ -9,13 +9,17 @@ class DisplayOverlay : public DisplayItem{
     static const uint8_t ANIM_NONE = 0;
     static const uint8_t ANIM_SWEEP = 1;
         static const uint8_t barWidth = 10;
-        static const uint8_t sweepSpeed = 100;
+        static constexpr double sweepSpeed = 2;
+    static const uint8_t ANIM_CIRCLE = 2;
+        static constexpr double circleSpeed = 2.5;
 
     DisplayOverlay();
     void draw() override;
 
     uint8_t animationIndex = 0;
     void drawAnimation(uint8_t animationIndex);
+
+    uint16_t diagonalRadius;
 };
 
 #endif

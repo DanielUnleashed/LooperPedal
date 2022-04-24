@@ -11,6 +11,9 @@
 #define TILES_X 5
 #define TILES_Y 4
 
+// The FPS whomst value was used to design the animation speeds.
+#define FPS_DESIGN 50
+
 struct Point{
     uint16_t x, y;
 };
@@ -54,9 +57,12 @@ class DisplayItem {
     uint8_t inputPin;
 
     TaskHandle_t redrawHandle;
+    void startAnimation();
     void redraw();
     void endAnimation();
     uint32_t startAnimationTime;
+
+    uint32_t getTickTime();
 
     //General draw functions
     void drawGrid();

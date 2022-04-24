@@ -123,6 +123,11 @@ void DisplayItem::attachRedrawHandler(TaskHandle_t h){
     redrawHandle = h;
 }
 
+void DisplayItem::startAnimation(){
+    startAnimationTime = micros();
+    redraw();
+}
+
 void DisplayItem::redraw(){
     needsUpdate = true;
     if(redrawHandle != NULL) xTaskNotifyGive(redrawHandle);
@@ -134,4 +139,8 @@ void DisplayItem::endAnimation(){
 
 bool DisplayItem::needsToRedraw(){
     return needsUpdate;
+}
+
+uint32_t DisplayItem::getTickTime(){
+    return (micros() - startAnimationTime)*FPS_DESIGN/SCREEN_FPS/10000UL;
 }

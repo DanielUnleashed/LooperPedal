@@ -5,9 +5,10 @@ DisplayOverlay::DisplayOverlay() : DisplayItem("DisplayOverlay") {
 }
 
 void DisplayOverlay::draw(){
+    bool animationEnded = false;
     if(animationIndex == ANIM_NONE) endAnimation();
     else if(animationIndex == ANIM_SWEEP){
-        uint32_t t = sweepSpeed*(millis() - startAnimationTime)/1000;
+        uint32_t t = sweepSpeed*getTickTime();
         for(int i = 0; i < height; i+=barWidth*2-1){
             for(int j = 0; j < barWidth; j++){
                 tft->drawFastHLine(t,i+j, j, TFT_YELLOW);
@@ -15,17 +16,20 @@ void DisplayOverlay::draw(){
             for(int j = barWidth; j > 0; j--){
                 tft->drawFastHLine(t, i+barWidth*2-j, j, TFT_YELLOW);
             }
-            tft->fillRect(t-4,0, 4, height, TFT_YELLOW);
+            tft->fillRect(t-5,0, 5,height, TFT_YELLOW);
         }
-        if(t < width) redraw();
-        else endAnimation();
+        animationEnded = t>width;
+    }else if(animationIndex == ANIM_CIRCLE){
+        uint32_t t = circleSpeed*getTickTime();
+        tft->fillCircle(width/2, height/2, t, TFT_YELLOW);
+        animationEnded = t > diagonalRadius;
     }
 
+    if(animationEnded) endAnimation();
+    else redraw();
 }
 
 void DisplayOverlay::drawAnimation(uint8_t animation){
-    Serial.println("anim");
     animationIndex = animation;
-    startAnimationTime = millis();
-    redraw();
+    startAnimation();
 }

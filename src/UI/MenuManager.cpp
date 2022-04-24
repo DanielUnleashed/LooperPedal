@@ -18,6 +18,7 @@ void MenuManager::init(){
 void MenuManager::launch(){
     xTaskCreatePinnedToCore(drawTask, "DrawTask", 10000, NULL, 5, &drawTaskhandle, 0);
     dispOverlay.attachRedrawHandler(drawTaskhandle);
+    dispOverlay.diagonalRadius = sqrt(width*width + height*height);
 }
 
 void MenuManager::drawTask(void* funcParams){
