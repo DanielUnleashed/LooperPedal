@@ -33,11 +33,21 @@ void MenuManager::init(){
     });
 
     DebounceButton::addInterrupt(2, []{
-        transitionToDisplay("Main", DisplayOverlay::ANIM_SWEEP_IN_OUT | DisplayOverlay::ANIM_POLYGON | 5);
+        std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN, 
+            DisplayOverlay::ANIM_SWEEP_IN_OUT | DisplayOverlay::ANIM_POLYGON | 6, 
+            DisplayOverlay::ANIM_EXCLAMATION, 
+            DisplayOverlay::ANIM_TEXT,
+            DisplayOverlay::ANIM_WAIT,
+            DisplayOverlay::ANIM_SWEEP_OUT};
+        const std::vector<uint16_t> c{TFT_RED, TFT_WHITE, TFT_BLACK, TFT_BLACK, 0, TFT_BLACK};
+        dispOverlay.drawMultipleAnimation(v, c);
+        dispOverlay.setAnimationText("Hello!");
+
+        getDisplayByName("Main").forceDraw();         
     });
 
     DebounceButton::addInterrupt(3, []{
-        transitionToDisplay("Main", DisplayOverlay::ANIM_SWEEP_IN_OUT | DisplayOverlay::ANIM_POLYGON | 6);
+        transitionToDisplay("Main", DisplayOverlay::ANIM_SWEEP_IN_OUT | DisplayOverlay::ANIM_POLYGON | 7);
     });
 }
 
