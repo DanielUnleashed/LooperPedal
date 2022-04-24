@@ -32,23 +32,18 @@ void DisplayOverlay::draw(){
         t *= circleSpeed; 
         tft->fillCircle(width/2, height/2, t, animationColor);
         animationEnded = t > diagonalRadius;
-    }
-    else if(animationID == ANIM_CIRCUMFERENCE){
-        double theta = getTickTime()/1000.0*TWO_PI * circumferenceSpeed;
-        tft->fillCircle(width/2 + circumferenceRadius*cos(theta + startAngle), height/2 + circumferenceRadius*sin(theta + startAngle),
-                         pincelStroke, animationColor);
+    }else if(animationID == ANIM_CIRCUMFERENCE){
+        double theta = getTickTime()/1000.0*TWO_PI * plottingSpeed;
+        tft->fillCircle(width/2 + plottingRadius*cos(theta + HALF_PI), height/2 + plottingRadius*sin(theta + HALF_PI),
+                         outerPincelStroke, animationColor);
         animationEnded = theta >= TWO_PI;
-    }else if(animationID == ANIM_TRIANGLE){
-        double theta = getTickTime()/1000.0*TWO_PI * circumferenceSpeed;
-        double n = 5;
-        
-        double y = TWO_PI/n;
-        double theta_rot = theta + rotAngle;
-        double mod = y*(theta_rot/y - floor(theta_rot/y));
-        double r = cos(PI/n)/cos(mod - PI/n)*circumferenceRadius;
-        tft->fillCircle(width/2 + r*cos(theta + startAngle), height/2 + r*sin(theta + startAngle),
-                         pincelStroke, animationColor);
-        animationEnded = theta >= TWO_PI;
+    }else if((animationID&0x40) == ANIM_POLYGON){
+        uint8_t shape = animationID&0x0F;
+        double startAngle = 0, rotAngle = 0;
+        if(shape == 4) rotAngle = 0.785;
+        if(shape == 5) rotAngle = 0.941;
+        if(shape == 7) rotAngle = 2.231;
+        animationEnded = drawNGon(shape, rotAngle, startAngle);
     }
 
     if(animationEnded){
@@ -56,7 +51,6 @@ void DisplayOverlay::draw(){
             currentAnimationIndex++;
             if(currentAnimationIndex != animationQueue.size()){
                 animationID = animationQueue[currentAnimationIndex];
-                Serial.println(animationID);
                 setPalette();
                 startAnimation();
                 return;
@@ -68,6 +62,26 @@ void DisplayOverlay::draw(){
         animationQueuePalette.clear();
         if(redrawHandle != NULL) xTaskNotifyGive(redrawHandle);
     }else redraw();
+}
+
+bool DisplayOverlay::drawNGon(uint8_t sides, double rotAngle, double startAngle){
+    double theta = getTickTime()/1000.0*TWO_PI * plottingSpeed;
+    double y = TWO_PI/sides;
+    double theta_rot = theta + rotAngle;
+    if(theta < TWO_PI){
+        double mod = y*(theta_rot/y - floor(theta_rot/y));
+        double r = cos(PI/sides)/cos(mod - PI/sides)*plottingRadius;
+        tft->fillCircle(width/2 + r*cos(theta + startAngle), height/2 + r*sin(theta + startAngle),
+                            outerPincelStroke, animationColor);
+    }else{
+        theta_rot -= TWO_PI;
+        double mod = y*(theta_rot/y - floor(theta_rot/y));
+        double r = cos(PI/sides)/cos(mod - PI/sides)*plottingRadius * theta_rot / (4.0*PI);
+        tft->fillCircle(width/2 + r*cos(theta + startAngle), height/2 + r*sin(theta + startAngle),
+                            innerPlincelStroke, animationColor);
+    }
+
+    return theta >= 6.0*PI;
 }
 
 void DisplayOverlay::drawAnimation(uint8_t animation){

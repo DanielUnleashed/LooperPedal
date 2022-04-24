@@ -4,7 +4,8 @@ TFT_eSPI MenuManager::tft;
 uint16_t MenuManager::width, MenuManager::height;
 uint16_t MenuManager::tileW, MenuManager::tileH;
 
-std::list<Display> MenuManager::displayList;
+std::vector<Display> MenuManager::displayList;
+Display* MenuManager::currentDisplay;
 
 DisplayOverlay MenuManager::dispOverlay;
 
@@ -16,19 +17,27 @@ void MenuManager::init(){
     DebounceButton::init();
 
     DebounceButton::addInterrupt(0, []{
-        transitionToDisplay("Main", DisplayOverlay::ANIM_CIRCLE);
+        //Play animation
+        std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN, DisplayOverlay::ANIM_SWEEP_IN_OUT | DisplayOverlay::ANIM_POLYGON | 3, DisplayOverlay::ANIM_SWEEP_OUT};
+        const std::vector<uint16_t> c{TFT_GREEN, TFT_WHITE, TFT_BLACK};
+        dispOverlay.drawMultipleAnimation(v, c);
+        getDisplayByName("Main").forceDraw();    
     });
 
     DebounceButton::addInterrupt(1, []{
-        transitionToDisplay("Main", DisplayOverlay::ANIM_SWEEP_IN);
+        //Stop animation
+        std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN, DisplayOverlay::ANIM_SWEEP_IN_OUT | DisplayOverlay::ANIM_POLYGON | 4, DisplayOverlay::ANIM_SWEEP_OUT};
+        const std::vector<uint16_t> c{TFT_RED, TFT_WHITE, TFT_BLACK};
+        dispOverlay.drawMultipleAnimation(v, c);
+        getDisplayByName("Main").forceDraw();        
     });
 
     DebounceButton::addInterrupt(2, []{
-        transitionToDisplay("Main", DisplayOverlay::ANIM_SWEEP_OUT);
+        transitionToDisplay("Main", DisplayOverlay::ANIM_SWEEP_IN_OUT | DisplayOverlay::ANIM_POLYGON | 5);
     });
 
     DebounceButton::addInterrupt(3, []{
-        transitionToDisplay("Main", DisplayOverlay::ANIM_SWEEP_IN_OUT);
+        transitionToDisplay("Main", DisplayOverlay::ANIM_SWEEP_IN_OUT | DisplayOverlay::ANIM_POLYGON | 6);
     });
 }
 
@@ -36,6 +45,7 @@ void MenuManager::launch(){
     xTaskCreatePinnedToCore(drawTask, "DrawTask", 10000, NULL, 5, &drawTaskhandle, 0);
     dispOverlay.attachRedrawHandler(drawTaskhandle);
     dispOverlay.diagonalRadius = sqrt(width*width + height*height);
+    currentDisplay = &displayList[0];
 }
 
 void MenuManager::drawTask(void* funcParams){
@@ -61,8 +71,9 @@ void MenuManager::removeDisplay(Display d){
 }
 
 void MenuManager::transitionToDisplay(String displayName, uint8_t trans){
+    Serial.println(trans, HEX);
     if(trans>>7){
-        const std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN, DisplayOverlay::ANIM_TRIANGLE, DisplayOverlay::ANIM_SWEEP_OUT};
+        std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN, trans, DisplayOverlay::ANIM_SWEEP_OUT};
         const std::vector<uint16_t> c{TFT_RED, TFT_WHITE, TFT_BLACK};
         dispOverlay.drawMultipleAnimation(v, c);
         getDisplayByName(displayName).forceDraw();
