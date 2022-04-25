@@ -17,37 +17,18 @@ void MenuManager::init(){
     DebounceButton::init();
 
     DebounceButton::addInterrupt(0, []{
-        //Play animation
-        std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN, DisplayOverlay::ANIM_SWEEP_IN_OUT | DisplayOverlay::ANIM_POLYGON | 3, DisplayOverlay::ANIM_SWEEP_OUT};
-        const std::vector<uint16_t> c{TFT_GREEN, TFT_WHITE, TFT_BLACK};
-        dispOverlay.drawMultipleAnimation(v, c);
-        getDisplayByName("Main").forceDraw();    
+        launchPlayAnimation();
     });
 
     DebounceButton::addInterrupt(1, []{
-        //Stop animation
-        std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN, DisplayOverlay::ANIM_SWEEP_IN_OUT | DisplayOverlay::ANIM_POLYGON | 4, DisplayOverlay::ANIM_SWEEP_OUT};
-        const std::vector<uint16_t> c{TFT_RED, TFT_WHITE, TFT_BLACK};
-        dispOverlay.drawMultipleAnimation(v, c);
-        getDisplayByName("Main").forceDraw();        
+        launchStopAnimation();
     });
 
     DebounceButton::addInterrupt(2, []{
-        std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN, 
-            DisplayOverlay::ANIM_SWEEP_IN_OUT | DisplayOverlay::ANIM_POLYGON | 6, 
-            DisplayOverlay::ANIM_EXCLAMATION, 
-            DisplayOverlay::ANIM_TEXT,
-            DisplayOverlay::ANIM_WAIT,
-            DisplayOverlay::ANIM_SWEEP_OUT};
-        const std::vector<uint16_t> c{TFT_RED, TFT_WHITE, TFT_BLACK, TFT_BLACK, 0, TFT_BLACK};
-        dispOverlay.drawMultipleAnimation(v, c);
-        dispOverlay.setAnimationText("Hello!");
-
-        getDisplayByName("Main").forceDraw();         
     });
 
     DebounceButton::addInterrupt(3, []{
-        transitionToDisplay("Main", DisplayOverlay::ANIM_SWEEP_IN_OUT | DisplayOverlay::ANIM_POLYGON | 7);
+
     });
 }
 
@@ -118,4 +99,53 @@ void MenuManager::startTFT(){
     tileH = tft.height()/TILES_Y;
 
     Serial.printf("TFT(%dx%d tiles). w=%d  h=%d\n", TILES_X, TILES_Y, width, height);
+}
+
+void MenuManager::launchPlayAnimation(){
+    const std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN, 
+                        DisplayOverlay::ANIM_PLAY_TRIANGLE, 
+                        DisplayOverlay::ANIM_SWEEP_OUT};
+    const std::vector<uint16_t> c{TFT_GREEN, TFT_WHITE, TFT_BLACK};
+    dispOverlay.drawMultipleAnimation(v, c);
+    currentDisplay -> forceDraw();   
+}
+
+void MenuManager::launchStopAnimation(){
+    const std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN, 
+                        DisplayOverlay::ANIM_POLYGON | 4, 
+                        DisplayOverlay::ANIM_SWEEP_OUT};
+    const std::vector<uint16_t> c{TFT_RED, TFT_WHITE, TFT_BLACK};
+    dispOverlay.drawMultipleAnimation(v, c);
+    currentDisplay -> forceDraw();   
+}
+
+void MenuManager::launchPauseAnimation(){
+}
+
+void MenuManager::launchWarningAnimation(String text){
+    std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN, 
+                        DisplayOverlay::ANIM_POLYGON | 3, 
+                        DisplayOverlay::ANIM_EXCLAMATION, 
+                        DisplayOverlay::ANIM_TEXT,
+                        DisplayOverlay::ANIM_WAIT,
+                        DisplayOverlay::ANIM_SWEEP_OUT};
+    const std::vector<uint16_t> c{TFT_YELLOW, TFT_RED, TFT_BLACK, TFT_BLACK, 0, TFT_BLACK};
+    dispOverlay.drawMultipleAnimation(v, c);
+    dispOverlay.setAnimationText(text);
+
+    currentDisplay -> forceDraw();   
+}
+
+void MenuManager::launchErrorAnimation(String text){
+    const std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN, 
+                                DisplayOverlay::ANIM_POLYGON | 6, 
+                                DisplayOverlay::ANIM_EXCLAMATION, 
+                                DisplayOverlay::ANIM_TEXT,
+                                DisplayOverlay::ANIM_WAIT,
+                                DisplayOverlay::ANIM_SWEEP_OUT};
+    const std::vector<uint16_t> c{TFT_RED, TFT_WHITE, TFT_BLACK, TFT_BLACK, 0, TFT_BLACK};
+    dispOverlay.drawMultipleAnimation(v, c);
+    dispOverlay.setAnimationText(text);
+
+    currentDisplay -> forceDraw();    
 }

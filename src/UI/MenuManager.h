@@ -40,6 +40,12 @@ class MenuManager {
     static TaskHandle_t drawTaskhandle;
     static void drawTask(void* funcParams);
     static Display getDisplayByName(String name);
+
+    static void launchPlayAnimation();
+    static void launchStopAnimation();
+    static void launchPauseAnimation();
+    static void launchWarningAnimation(String text);
+    static void launchErrorAnimation(String text);
     
 };
 

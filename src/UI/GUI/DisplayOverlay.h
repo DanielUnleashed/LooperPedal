@@ -10,7 +10,6 @@ class DisplayOverlay : public DisplayItem{
         static const uint16_t waitTime = 250;
     static const uint8_t ANIM_SWEEP_IN = 1;
     static const uint8_t ANIM_SWEEP_OUT = 2;
-    static const uint8_t ANIM_SWEEP_IN_OUT = 0x80;
         static const uint8_t barWidth = 10;
         static constexpr double sweepSpeed = 2;
     
@@ -19,12 +18,13 @@ class DisplayOverlay : public DisplayItem{
 
     // POLAR PLOTS CONSTANTS
     static const uint8_t outerPincelStroke = 5;
-    static const uint8_t innerPlincelStroke = 3;
+    static const uint8_t innerPincelStroke = 3;
     static constexpr double plottingSpeed = 15;
     static const uint8_t plottingRadius = 40;
 
     static const uint8_t ANIM_CIRCUMFERENCE = 5;
     static const uint8_t ANIM_EXCLAMATION = 6;
+    static const uint8_t ANIM_PLAY_TRIANGLE = 7;
     // ANIM_POLYGON | Nsides
     static const uint8_t ANIM_POLYGON = 0x40;
 
@@ -51,7 +51,7 @@ class DisplayOverlay : public DisplayItem{
     std::vector<uint16_t> animationQueuePalette;
     uint8_t currentAnimationIndex = 0;
 
-    bool drawNGon(uint8_t sides, double rotAngle, double startAngle);
+    bool drawNGon(uint8_t sides, double rotAngle);
 
 };
 
