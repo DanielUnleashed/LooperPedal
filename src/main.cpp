@@ -20,7 +20,7 @@ void setup() {
 
   for(;;){
     sp.draw();
-    delay(100);
+    delay(20);
   }
 
 /*  static Display disp1("Main");
