@@ -11,11 +11,13 @@ void DebounceButton::init(){
     attachInterrupt(systemButtons[1]->pin, &ISR_BUTTON<1>, CHANGE);
     attachInterrupt(systemButtons[2]->pin, &ISR_BUTTON<2>, CHANGE);
     attachInterrupt(systemButtons[3]->pin, &ISR_BUTTON<3>, CHANGE);
+    attachInterrupt(systemButtons[4]->pin, &ISR_BUTTON<4>, CHANGE);
+    attachInterrupt(systemButtons[5]->pin, &ISR_BUTTON<5>, CHANGE);
 }
 
 template <int interrupt>
 void IRAM_ATTR DebounceButton::ISR_BUTTON(){
-    // Will check if the ISR has been added and 
+    // Will check if the ISR has been added and if the button was clicked
     if(ISREvents[interrupt] && systemButtons[interrupt] -> clicked()) ISREvents[interrupt](); 
 }
 

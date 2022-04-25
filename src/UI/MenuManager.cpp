@@ -29,7 +29,15 @@ void MenuManager::init(){
     });
 
     DebounceButton::addInterrupt(3, []{
+        launchWarningAnimation("AAAAAAAH!");
+    });
 
+    DebounceButton::addInterrupt(4, []{
+        launchErrorAnimation("Shiiit!");
+    });
+
+    DebounceButton::addInterrupt(5, []{
+        launchWarningAnimation("wowo!");
     });
 }
 
@@ -129,14 +137,23 @@ void MenuManager::launchPauseAnimation(){
     currentDisplay -> forceDraw();   
 }
 
+void MenuManager::launchRecordAnimation(){
+    const std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN, 
+                    DisplayOverlay::ANIM_CIRCLE, 
+                    DisplayOverlay::ANIM_SWEEP_OUT};
+    const std::vector<uint16_t> c{TFT_RED, TFT_WHITE, TFT_BLACK};
+    dispOverlay.drawMultipleAnimation(v, c);
+    currentDisplay -> forceDraw();  
+}
+
 void MenuManager::launchWarningAnimation(String text){
     std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN, 
-                        DisplayOverlay::ANIM_POLYGON | 3, 
+                        DisplayOverlay::ANIM_CIRCUMFERENCE, 
                         DisplayOverlay::ANIM_EXCLAMATION, 
                         DisplayOverlay::ANIM_TEXT,
                         DisplayOverlay::ANIM_WAIT,
                         DisplayOverlay::ANIM_SWEEP_OUT};
-    const std::vector<uint16_t> c{TFT_YELLOW, TFT_RED, TFT_BLACK, TFT_BLACK, 0, TFT_BLACK};
+    const std::vector<uint16_t> c{TFT_ORANGE, TFT_GREENYELLOW, TFT_RED, TFT_BLACK, 0, TFT_BLACK};
     dispOverlay.drawMultipleAnimation(v, c);
     dispOverlay.setAnimationText(text);
 

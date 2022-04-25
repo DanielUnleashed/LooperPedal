@@ -25,7 +25,7 @@ class DisplayOverlay : public DisplayItem{
     static const uint8_t ANIM_CIRCUMFERENCE = 5;
     static const uint8_t ANIM_EXCLAMATION = 6;
     static const uint8_t ANIM_PLAY_TRIANGLE = 7;
-    static const uint8_t ANIM_PAUSE = 8;
+    static const uint8_t  ANIM_PAUSE = 8;
     // ANIM_POLYGON | Nsides
     static const uint8_t ANIM_POLYGON = 0x40;
 
@@ -52,7 +52,7 @@ class DisplayOverlay : public DisplayItem{
     std::vector<uint16_t> animationQueuePalette;
     uint8_t currentAnimationIndex = 0;
 
-    bool drawNGon(uint8_t sides, double rotAngle);
+    bool drawNGon(uint8_t sides, double rotAngle, double sizeTweak);
 
 };
 

@@ -38,7 +38,7 @@ void DisplayOverlay::draw(){
         double theta = getTickTime()/1000.0*TWO_PI * plottingSpeed;
         tft->fillCircle(width/2 + plottingRadius*cos(theta + HALF_PI), height/2 + plottingRadius*sin(theta + HALF_PI),
                          outerPincelStroke, animationColor);
-        double r = plottingRadius*theta;
+        double r = plottingRadius*theta/TWO_PI;
         tft->fillCircle(width/2 + r*cos(theta + HALF_PI), height/2 + r*sin(theta + HALF_PI),
                          innerPincelStroke, animationColor);
         animationEnded = theta >= TWO_PI;
@@ -57,7 +57,7 @@ void DisplayOverlay::draw(){
                             outerPincelStroke, animationColor);
         }
     }else if(animationID == ANIM_PLAY_TRIANGLE){
-        animationEnded = drawNGon(3, 0);
+        animationEnded = drawNGon(3, 0, 0);
     }else if(animationID == ANIM_PAUSE){
         double theta = getTickTime()/1000.0*TWO_PI* plottingSpeed;
         double k = 10, n = 4, a = 0.5, b = 2;
@@ -70,11 +70,14 @@ void DisplayOverlay::draw(){
     }else if((animationID&0x40) == ANIM_POLYGON){
         uint8_t shape = animationID&0x0F;
         double rotAngle = 0;
-        if(shape == 3) rotAngle = -0.524;
-        if(shape == 4) rotAngle = 0.785;
-        if(shape == 5) rotAngle = 0.315;
-        if(shape == 7) rotAngle = -0.224; 
-        animationEnded = drawNGon(shape, rotAngle);
+        double sizeTweak = 0;
+        if(shape == 3){
+            rotAngle = -0.524;
+            sizeTweak = 10;
+        }else if(shape == 4) rotAngle = 0.785;
+        else if(shape == 5) rotAngle = 0.315;
+        else if(shape == 7) rotAngle = -0.224; 
+        animationEnded = drawNGon(shape, rotAngle, sizeTweak);
     }else if(animationID == ANIM_TEXT){
         tft->setTextColor(animationColor);
         tft->setTextDatum(MC_DATUM);
@@ -101,19 +104,19 @@ void DisplayOverlay::draw(){
 }
 // Idea "leased" from https://www.geogebra.org/m/cXXGKUQk
 // Since TFT screen's coords are Y flipped, take that in mind during the dessign!
-bool DisplayOverlay::drawNGon(uint8_t sides, double rotAngle){
+bool DisplayOverlay::drawNGon(uint8_t sides, double rotAngle, double sizeTweak){
     double theta = getTickTime()/1000.0*TWO_PI * plottingSpeed;
     double y = TWO_PI/sides;
     double theta_rot = theta + rotAngle;
 
     if(theta < TWO_PI){
         double mod = y*(theta_rot/y - floor(theta_rot/y));
-        double r = cos(PI/sides)/cos(mod - PI/sides)*plottingRadius;
+        double r = cos(PI/sides)/cos(mod - PI/sides)*(plottingRadius+sizeTweak);
         tft->fillCircle(width/2 + r*cos(theta), height/2 + r*sin(theta),
                         outerPincelStroke, animationColor);
     }
     double mod = y*(theta_rot/y - floor(theta_rot/y));
-    double r = cos(PI/sides)/cos(mod - PI/sides)*plottingRadius * theta_rot / (4.0*PI);
+    double r = cos(PI/sides)/cos(mod - PI/sides)*(plottingRadius+sizeTweak) * theta_rot / (4.0*PI);
     tft->fillCircle(width/2 + r*cos(theta), height/2 + r*sin(theta),
                         innerPincelStroke, animationColor);
 

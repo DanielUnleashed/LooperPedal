@@ -44,6 +44,7 @@ class MenuManager {
     static void launchPlayAnimation();
     static void launchStopAnimation();
     static void launchPauseAnimation();
+    static void launchRecordAnimation();
     static void launchWarningAnimation(String text);
     static void launchErrorAnimation(String text);
     
