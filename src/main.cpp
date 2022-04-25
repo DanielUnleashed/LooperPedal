@@ -1,6 +1,7 @@
 #include "AudioPlayer.h"
 #include "UI/MenuManager.h"
 #include "UI/GUI/Taskbar.h"
+#include "UI/GUI/SplashScreen.h"
 #include "UI/Display.h"
 
 void setup() {
@@ -11,16 +12,23 @@ void setup() {
   delay(100);
 
   MenuManager::init();
-  static Taskbar taskbar(0,3);
+  /*static Taskbar taskbar(0,3);
   taskbar.addButton("Chicken", 1);
-  taskbar.addButton("Strips", 3);
+  taskbar.addButton("Strips", 3);*/
 
-  static Display disp1("Main");
-  disp1.addItem(&taskbar);
+  SplashScreen sp;
+
+  for(;;){
+    sp.draw();
+    delay(100);
+  }
+
+/*  static Display disp1("Main");
+  disp1.addItem(&sp);
 
   MenuManager::addDisplay(disp1);
 
-  MenuManager::launch();
+  MenuManager::launch();*/
 
   /*AudioPlayer::begin();
   //AudioPlayer::addSDAudioFile("/tereza.wav");
