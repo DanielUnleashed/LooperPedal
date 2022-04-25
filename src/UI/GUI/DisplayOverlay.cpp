@@ -58,6 +58,15 @@ void DisplayOverlay::draw(){
         }
     }else if(animationID == ANIM_PLAY_TRIANGLE){
         animationEnded = drawNGon(3, 0);
+    }else if(animationID == ANIM_PAUSE){
+        double theta = getTickTime()/1000.0*TWO_PI* plottingSpeed;
+        double k = 10, n = 4, a = 0.5, b = 2;
+        double r = k*a*b/pow(pow(b*cos(theta), n) + pow(a*sin(theta), n), 1/n);
+        tft->fillCircle(7.0*width/18.0 + r*cos(theta), height/2 + r*sin(theta),
+                    outerPincelStroke, animationColor);
+        tft->fillCircle(11.0*width/18.0 + r*cos(theta), height/2 + r*sin(theta),
+                    outerPincelStroke, animationColor);
+        animationEnded = theta >= TWO_PI;
     }else if((animationID&0x40) == ANIM_POLYGON){
         uint8_t shape = animationID&0x0F;
         double rotAngle = 0;

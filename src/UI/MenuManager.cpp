@@ -25,6 +25,7 @@ void MenuManager::init(){
     });
 
     DebounceButton::addInterrupt(2, []{
+        launchPauseAnimation();
     });
 
     DebounceButton::addInterrupt(3, []{
@@ -120,6 +121,12 @@ void MenuManager::launchStopAnimation(){
 }
 
 void MenuManager::launchPauseAnimation(){
+    const std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN, 
+                    DisplayOverlay::ANIM_PAUSE, 
+                    DisplayOverlay::ANIM_SWEEP_OUT};
+    const std::vector<uint16_t> c{TFT_BLUE, TFT_WHITE, TFT_BLACK};
+    dispOverlay.drawMultipleAnimation(v, c);
+    currentDisplay -> forceDraw();   
 }
 
 void MenuManager::launchWarningAnimation(String text){

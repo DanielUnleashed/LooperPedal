@@ -25,6 +25,7 @@ class DisplayOverlay : public DisplayItem{
     static const uint8_t ANIM_CIRCUMFERENCE = 5;
     static const uint8_t ANIM_EXCLAMATION = 6;
     static const uint8_t ANIM_PLAY_TRIANGLE = 7;
+    static const uint8_t ANIM_PAUSE = 8;
     // ANIM_POLYGON | Nsides
     static const uint8_t ANIM_POLYGON = 0x40;
 
