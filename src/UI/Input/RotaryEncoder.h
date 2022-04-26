@@ -8,14 +8,23 @@
 #include "utils/Utilities.h"
 #include "DebounceButton.h"
 
+#define DEFAULT_ROTARY_DEBOUNCE 200
+
 class RotaryEncoder{
     public:
+        const int8_t ROTATION_DIRECTION[16] = {
+            0,  -1,   1,  0,
+            1,   0,   0, -1,
+           -1,   0,   0,  1,
+            0,   1,  -1,  0};
+
         RotaryEncoder(uint8_t chA, uint8_t chB);
         void addButton(uint8_t buttonPin);
 
         bool clicked();
         bool clicked(uint8_t timesPressed);
         bool doubleClicked();
+        bool hasIncreased();
 
         static RotaryEncoder* systemEncoders[TOTAL_ROTARY_ENCODERS];
         static DebounceButton* systemButtons[TOTAL_ROTARY_BUTTONS];
@@ -31,13 +40,13 @@ class RotaryEncoder{
     private:
         volatile uint32_t lastTimeChange = 0;
         volatile uint8_t lastState = 0;
-        uint8_t chA, chB;
+        volatile int8_t increment = 0;
+        uint8_t chA, chB; //Pins
 
         DebounceButton* butt;
         bool hasButton = false;
 
         bool updateState();
-        bool hasIncreased();
 
         template <int interrupt>
         static void IRAM_ATTR ISR_ROTARY();

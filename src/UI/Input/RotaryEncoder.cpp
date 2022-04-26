@@ -25,8 +25,9 @@ void RotaryEncoder::init(){
 
 template <int interrupt>
 void IRAM_ATTR RotaryEncoder::ISR_ROTARY(){
-    // Will check if the ISR has been added and 
-    if(ISREvents[interrupt]) ISREvents[interrupt](systemEncoders[interrupt] -> hasIncreased()); 
+    // Will check if the ISR has been added and the encoder input.
+    if(ISREvents[interrupt] && systemEncoders[interrupt] -> updateState())
+        ISREvents[interrupt](systemEncoders[interrupt] -> hasIncreased()); 
 }
 
 template <int interrupt>
@@ -70,6 +71,7 @@ RotaryEncoder::RotaryEncoder(uint8_t a, uint8_t b){
     chB = b;
     pinMode(chA, INPUT);
     pinMode(chB, INPUT);
+    lastState = digitalRead(chA) | (digitalRead(chB) << 1);
 }
 
 void RotaryEncoder::addButton(uint8_t buttonPin){
@@ -78,7 +80,21 @@ void RotaryEncoder::addButton(uint8_t buttonPin){
 }
 
 bool RotaryEncoder::updateState(){
- //TODO
+    uint8_t currentPinState = digitalRead(chA) | (digitalRead(chB) << 1);
+    uint32_t currentTime = millis();
+    if(currentPinState != lastState){
+        if((currentTime - lastTimeChange) > DEFAULT_ROTARY_DEBOUNCE){
+            lastTimeChange = currentTime;
+            increment = ROTATION_DIRECTION[currentPinState | (lastState << 2)];
+            return true;
+        }
+        lastState = currentPinState;
+    }
+    return false;
+}
+
+bool RotaryEncoder::hasIncreased(){
+    return increment == 1;
 }
 
 bool RotaryEncoder::clicked(){

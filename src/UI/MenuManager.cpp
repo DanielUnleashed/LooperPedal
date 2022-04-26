@@ -15,6 +15,7 @@ void MenuManager::init(){
     startTFT();
     DisplayItem::startDisplayItems(&tft, width, height, tileW, tileH);
     DebounceButton::init();
+    RotaryEncoder::init();
 
     DebounceButton::addInterrupt(0, []{
         launchPlayAnimation();
@@ -38,6 +39,18 @@ void MenuManager::init(){
 
     DebounceButton::addInterrupt(5, []{
         launchWarningAnimation("wowo!");
+    });
+
+    RotaryEncoder::addInterrupt(0, [](bool in){
+        if(in){
+            Serial.println("up!");
+        }else{
+            Serial.println("down!");
+        }
+    });
+
+    RotaryEncoder::addButtonInterrupt(0, []{
+        Serial.println("foo");
     });
 }
 

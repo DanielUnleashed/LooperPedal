@@ -27,8 +27,8 @@ static const uint8_t PUSH_BUTTON[TOTAL_BUTTONS] = {34,35,36,39, 33,4};
 // correspondent number inside ROTARY_BUTTONS array.
 #define TOTAL_ROTARY_ENCODERS 1
 #define TOTAL_ROTARY_BUTTONS 1
-static const uint8_t ROTARY_ENCODERS[TOTAL_ROTARY_ENCODERS<<1] = {};
-static const uint8_t ROTARY_BUTTONS[TOTAL_ROTARY_ENCODERS] = {};
+static const uint8_t ROTARY_ENCODERS[TOTAL_ROTARY_ENCODERS<<1] = {16,21};
+static const uint8_t ROTARY_BUTTONS[TOTAL_ROTARY_ENCODERS] = {22};
 
 #define CS_DAC 25
 #define CS_ADC 26

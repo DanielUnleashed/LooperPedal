@@ -3,13 +3,14 @@
 
 #include "Arduino.h"
 
-#include "GUI/DisplayItem.h"
 #include "utils/AuxSPI.h"
 
+#include "GUI/DisplayItem.h"
 #include "UI/Display.h"
 #include "UI/GUI/DisplayOverlay.h"
 #include "UI/GUI/SplashScreen.h"
-#include <list>
+#include "UI/Input/RotaryEncoder.h"
+#include "UI/Input/DebounceButton.h"
 
 #include "defines.h"
 
