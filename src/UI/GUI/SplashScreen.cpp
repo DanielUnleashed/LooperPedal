@@ -83,37 +83,11 @@ void SplashScreen::startParameters(TFT_eSprite &spr){
     projMatrix[3][2] = -2 * f * n / (f - n); 
     projMatrix[3][3] = 0; 
 
-    static double lastInputVariable = 0;
     static double th = 0; //Theta, the angle to be rotated
-    static double paramA, paramB, paramC;
-    static uint32_t startTime = 0;
-    static double tf; //Finish time of rotation
 
     static double omega = angularVelocity;
     if(inputVariable != 0){
-        if(inputVariable != lastInputVariable){
-            n = 0;
-            double startAngle = th;
-            startTime = millis();
-            double endAngle = th + (inputVariable-lastInputVariable);
-
-            tf = abs((endAngle - startAngle)/transitionAngularVelocity);
-
-            paramB = 6.0*(endAngle - angularVelocity*tf - startAngle)/tf/tf;
-            paramA = -paramB/tf;
-            paramC = omega;
-
-            lastInputVariable = inputVariable;
-        }
-
-        static double n;
-        n = (millis() - startTime)/1000.0;
-        omega = paramA*n*n + paramB*n + paramC;
-
-        if(n > tf){
-            inputVariable = 0;
-            lastInputVariable = 0;
-        }
+        smoothRotation(th, omega);
     }
 
     double nowT = millis()/1000.0;
@@ -267,6 +241,37 @@ void SplashScreen::startParameters(TFT_eSprite &spr){
         uint16_t y1 = projectedPoints[edge[1]-1][1];
         uint16_t realColor = tft -> color565(color[0], color[1], color[2]);
         spr.drawLine(x0, y0, x1, y1, realColor);
+    }
+}
+
+void SplashScreen::smoothRotation(double th, double &omega){
+    static double lastInputVariable = 0;
+    static double paramA, paramB, paramC;
+    static uint32_t startTime = 0;
+    static double tf; //Finish time of rotation
+    if(inputVariable != lastInputVariable){
+        double startAngle = th;
+        startTime = millis();
+        double endAngle = th + (inputVariable-lastInputVariable);
+
+        tf = abs((endAngle - startAngle)/transitionAngularVelocity);
+
+        double K1 = (angularVelocity - omega) / tf;
+        double K2 = (endAngle - startAngle - omega*tf)*6.0/tf/tf;
+
+        paramA = (3*K1-K2)/tf;
+        paramB = (K2 - 2*K1);
+        paramC = omega;
+
+        lastInputVariable = inputVariable;
+    }
+
+    double t = (millis() - startTime)/1000.0;
+    omega = paramA*t*t + paramB*t + paramC;
+
+    if(t > tf){ 
+        inputVariable = 0;
+        lastInputVariable = 0;
     }
 }
 
