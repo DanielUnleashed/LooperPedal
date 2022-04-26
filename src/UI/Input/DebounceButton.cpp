@@ -58,7 +58,7 @@ bool DebounceButton::updateState(){
                 }else{
                     repeatedPressesCount = 1;
                 }
-                buttonIsPressed = true;;
+                buttonIsPressed = true;
                 doubleClickedTime = currentTime;
                 return true;
             }

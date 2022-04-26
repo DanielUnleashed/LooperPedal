@@ -22,7 +22,8 @@ class SplashScreen : public DisplayItem{
     volatile bool fillPolygons = true;
     const double angularVelocity = HALF_PI;
     const double transitionAngularVelocity = PI;
-    volatile uint8_t color[3] = {69,91,181};
+    volatile uint8_t color[3] = {128,128,128};
+    volatile uint16_t backColor = TFT_BLACK;
 
     //Draw canvas height and width
     static const uint16_t w = 128, h = 128;

@@ -9,9 +9,17 @@ SplashScreen::SplashScreen() : DisplayItem("Splashscreen"){
         this->fillPolygons = !this->fillPolygons;
     });
 
+    DebounceButton::addInterrupt(4, [this]{
+        uint8_t c[3];
+        for(uint8_t i = 0; i < 3; i++){
+            c[i] = random(0,0x7F);
+        }
+        this -> backColor = this -> tft -> color565(c[0],c[1],c[2]);
+    });
+
     DebounceButton::addInterrupt(5, [this]{
         for(uint8_t i = 0; i < 3; i++){
-            color[i] = (random(0,0xFF) + 0xFF)/2;
+            this -> color[i] = (random(0,0xFF) + 0xA0)/2;
         }
     });
 
@@ -42,9 +50,14 @@ SplashScreen::SplashScreen() : DisplayItem("Splashscreen"){
 }
 
 void SplashScreen::draw(){
+    static uint16_t lastBackColor = backColor;
+    if(backColor != lastBackColor){
+        tft -> fillScreen(backColor);
+        lastBackColor = backColor;
+    }
     TFT_eSprite spr = TFT_eSprite(tft);
     spr.createSprite(w, h);
-    spr.fillSprite(TFT_BLACK);
+    spr.fillSprite(backColor);
     startParameters(spr);
     spr.pushSprite((width-w)/2, 0);
 }
@@ -244,6 +257,13 @@ void SplashScreen::startParameters(TFT_eSprite &spr){
     }
 }
 
+/*  This basically creates a 2nd degree polynomial, which represents the angular velocity,
+*   omega, of the rotating object. This polynomial came from the next restraints:
+*       - w(0)      = omega
+*       - w(tf)     = angularVelocity (default from the header)
+*       - theta(0)  = th
+*       - average_w = transitiorAngularVelocity (default from the header)
+*/
 void SplashScreen::smoothRotation(double th, double &omega){
     static double lastInputVariable = 0;
     static double paramA, paramB, paramC;
@@ -254,8 +274,10 @@ void SplashScreen::smoothRotation(double th, double &omega){
         startTime = millis();
         double endAngle = th + (inputVariable-lastInputVariable);
 
+        // This has to be absolute so that the object can rotate in both directions.
         tf = abs((endAngle - startAngle)/transitionAngularVelocity);
 
+        //Auxiliar variables
         double K1 = (angularVelocity - omega) / tf;
         double K2 = (endAngle - startAngle - omega*tf)*6.0/tf/tf;
 

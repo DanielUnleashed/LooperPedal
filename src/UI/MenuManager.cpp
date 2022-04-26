@@ -35,10 +35,6 @@ void MenuManager::init(){
         launchWarningAnimation("AAAAAAAH!");
     });
 
-    DebounceButton::addInterrupt(4, []{
-        launchErrorAnimation("Shiiit!");
-    });
-
 }
 
 void MenuManager::launch(){
