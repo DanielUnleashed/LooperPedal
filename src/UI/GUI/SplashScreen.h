@@ -14,10 +14,18 @@ class SplashScreen : public DisplayItem{
     std::vector<std::array<uint16_t, 2>> edges;
 
     SplashScreen();
+    bool fillPolygons = true;
 
     void draw() override;
-    void startParameters();
+    void startParameters(TFT_eSprite&);
     void multMatrix(double in[4], double matrix[4][4], double out[4]);
+    void multMatrix(double matrixA[4][4], double matrixB[4][4], double outMatrix[4][4]);
+
+    void multMatrixHomogeneous(double in[4], double matrix[4][4], double out[4]);
+
+
+    static const uint16_t w = 128, h = 128;
+    double sun[3] = {1,-1,-1};
 
 };
 

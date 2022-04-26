@@ -8,6 +8,7 @@
 
 #include "UI/Display.h"
 #include "UI/GUI/DisplayOverlay.h"
+#include "UI/GUI/SplashScreen.h"
 #include <list>
 
 #include "defines.h"
