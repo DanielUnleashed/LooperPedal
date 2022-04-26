@@ -81,3 +81,7 @@ bool DebounceButton::clicked(uint8_t timesPressed){
 bool DebounceButton::doubleClicked(){
     return updateState() && (buttonIsPressed || (repeatedPressesCount > 1));
 }
+
+bool DebounceButton::twoButtonsClicked(uint8_t otherButton){
+    return (millis()-systemButtons[otherButton]->lastTimePressed) < DEFAULT_DEBOUNCE_TIME;
+}

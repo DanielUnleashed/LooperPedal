@@ -7,7 +7,7 @@
 
 #include "utils/Utilities.h"
 
-#define DEFAULT_DEBOUNCE_TIME 250 //ms
+#define DEFAULT_DEBOUNCE_TIME 200 //ms
 #define DEFAULT_DOUBLE_CLICK_TIME 800 //ms
 
 class DebounceButton{
@@ -18,6 +18,7 @@ class DebounceButton{
         bool clicked();
         bool clicked(uint8_t timesPressed);
         bool doubleClicked();
+        static bool twoButtonsClicked(uint8_t otherButton);
 
         static DebounceButton* systemButtons[TOTAL_BUTTONS];
         static IRAM_ATTR std::function<void(void)> ISREvents[TOTAL_BUTTONS];

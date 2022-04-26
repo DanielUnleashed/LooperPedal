@@ -5,7 +5,7 @@ uint16_t MenuManager::width, MenuManager::height;
 uint16_t MenuManager::tileW, MenuManager::tileH;
 
 std::vector<Display> MenuManager::displayList;
-Display* MenuManager::currentDisplay;
+uint8_t MenuManager::currentDisplay = 0;
 
 DisplayOverlay MenuManager::dispOverlay;
 
@@ -16,32 +16,16 @@ void MenuManager::init(){
     DisplayItem::startDisplayItems(&tft, width, height, tileW, tileH);
     DebounceButton::init();
     RotaryEncoder::init();
-
-    //This shouldn't be here! Move to the display or widget, maybe!
-    //It would be better in a widget
-    DebounceButton::addInterrupt(0, []{
-        launchPlayAnimation();
-    });
-
-    DebounceButton::addInterrupt(1, []{
-        launchStopAnimation();
-    });
-
-    DebounceButton::addInterrupt(2, []{
-        launchPauseAnimation();
-    });
-
-    DebounceButton::addInterrupt(3, []{
-        launchWarningAnimation("AAAAAAAH!");
-    });
-
 }
 
 void MenuManager::launch(){
     xTaskCreatePinnedToCore(drawTask, "DrawTask", 10000, NULL, 5, &drawTaskhandle, 0);
     dispOverlay.attachRedrawHandler(drawTaskhandle);
     dispOverlay.diagonalRadius = sqrt(width*width + height*height);
-    currentDisplay = &displayList[0];
+
+    for(Display d : displayList){
+        d.addRedrawHandle(drawTaskhandle);
+    }
 }
 
 void MenuManager::drawTask(void* funcParams){
@@ -49,7 +33,7 @@ void MenuManager::drawTask(void* funcParams){
         // Block the display if an overlay is launched.
         if(dispOverlay.needsToRedraw()) dispOverlay.draw();
         else{
-            for(Display d : displayList) d.drawDisplay();
+            displayList[currentDisplay].drawDisplay();
         }
         delay(DRAW_MS);
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
@@ -58,7 +42,6 @@ void MenuManager::drawTask(void* funcParams){
 
 void MenuManager::addDisplay(Display d){
     displayList.push_back(d);
-    d.addRedrawHandle(drawTaskhandle);
 }
 
 void MenuManager::removeDisplay(Display d){
@@ -112,7 +95,7 @@ void MenuManager::launchPlayAnimation(){
                         DisplayOverlay::ANIM_SWEEP_OUT};
     const std::vector<uint16_t> c{TFT_GREEN, TFT_WHITE, TFT_BLACK};
     dispOverlay.drawMultipleAnimation(v, c);
-    currentDisplay -> forceDraw();   
+    displayList[currentDisplay].forceDraw();   
 }
 
 void MenuManager::launchStopAnimation(){
@@ -121,7 +104,7 @@ void MenuManager::launchStopAnimation(){
                         DisplayOverlay::ANIM_SWEEP_OUT};
     const std::vector<uint16_t> c{TFT_RED, TFT_WHITE, TFT_BLACK};
     dispOverlay.drawMultipleAnimation(v, c);
-    currentDisplay -> forceDraw();   
+    displayList[currentDisplay].forceDraw();     
 }
 
 void MenuManager::launchPauseAnimation(){
@@ -130,7 +113,7 @@ void MenuManager::launchPauseAnimation(){
                     DisplayOverlay::ANIM_SWEEP_OUT};
     const std::vector<uint16_t> c{TFT_BLUE, TFT_WHITE, TFT_BLACK};
     dispOverlay.drawMultipleAnimation(v, c);
-    currentDisplay -> forceDraw();   
+    displayList[currentDisplay].forceDraw();  
 }
 
 void MenuManager::launchRecordAnimation(){
@@ -139,7 +122,7 @@ void MenuManager::launchRecordAnimation(){
                     DisplayOverlay::ANIM_SWEEP_OUT};
     const std::vector<uint16_t> c{TFT_RED, TFT_WHITE, TFT_BLACK};
     dispOverlay.drawMultipleAnimation(v, c);
-    currentDisplay -> forceDraw();  
+    displayList[currentDisplay].forceDraw();  
 }
 
 void MenuManager::launchWarningAnimation(String text){
@@ -153,7 +136,7 @@ void MenuManager::launchWarningAnimation(String text){
     dispOverlay.drawMultipleAnimation(v, c);
     dispOverlay.setAnimationText(text);
 
-    currentDisplay -> forceDraw();   
+    displayList[currentDisplay].forceDraw();  
 }
 
 void MenuManager::launchErrorAnimation(String text){
@@ -167,5 +150,5 @@ void MenuManager::launchErrorAnimation(String text){
     dispOverlay.drawMultipleAnimation(v, c);
     dispOverlay.setAnimationText(text);
 
-    currentDisplay -> forceDraw();    
+    displayList[currentDisplay].forceDraw();  
 }

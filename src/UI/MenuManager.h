@@ -33,7 +33,7 @@ class MenuManager {
     static uint16_t tileW, tileH;
 
     static std::vector<Display> displayList;
-    static Display* currentDisplay;
+    static uint8_t currentDisplay;
 
     static DisplayOverlay dispOverlay;
 

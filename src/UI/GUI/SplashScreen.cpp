@@ -10,6 +10,14 @@ SplashScreen::SplashScreen() : DisplayItem("Splashscreen"){
     });
 
     DebounceButton::addInterrupt(4, [this]{
+        if(DebounceButton::twoButtonsClicked(5)){
+            this->backColor = TFT_BLACK;
+            this->color[0] = 128;   
+            this->color[1] = 128;
+            this->color[2] = 128;
+            return;    
+        }
+
         uint8_t c[3];
         for(uint8_t i = 0; i < 3; i++){
             c[i] = random(0,0x7F);
@@ -18,6 +26,13 @@ SplashScreen::SplashScreen() : DisplayItem("Splashscreen"){
     });
 
     DebounceButton::addInterrupt(5, [this]{
+        if(DebounceButton::twoButtonsClicked(4)){
+            this->backColor = TFT_BLACK;
+            this->color[0] = 128;   
+            this->color[1] = 128;
+            this->color[2] = 128;
+            return;    
+        }
         for(uint8_t i = 0; i < 3; i++){
             this -> color[i] = (random(0,0xFF) + 0xA0)/2;
         }
@@ -60,6 +75,7 @@ void SplashScreen::draw(){
     spr.fillSprite(backColor);
     startParameters(spr);
     spr.pushSprite((width-w)/2, 0);
+    redraw();
 }
 
 void SplashScreen::startParameters(TFT_eSprite &spr){

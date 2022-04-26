@@ -97,9 +97,6 @@ void DisplayItem::addPressEvent(uint8_t pin, std::function<void(void)> func){
     inputPin = pin;
     if(!DebounceButton::addInterrupt(inputPin, pressFunction)) Utilities::debug("Failed to add ISR to %s\n", itemName.c_str());
 }
-void DisplayItem::addLEDTask(uint8_t LED_index, std::function<void(void)> func){
-    LEDFunction = func;
-}
 
 Point DisplayItem::transformRelativePoint(uint8_t pX, uint8_t pY){
     Point ret;
@@ -130,6 +127,7 @@ void DisplayItem::startAnimation(){
 void DisplayItem::redraw(){
     needsUpdate = true;
     if(redrawHandle != NULL) xTaskNotifyGive(redrawHandle);
+    else Utilities::error("RedrawHandle is null in %s!\n", itemName.c_str());
 }
 
 void DisplayItem::endAnimation(){

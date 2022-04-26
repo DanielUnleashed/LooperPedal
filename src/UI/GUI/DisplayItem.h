@@ -28,9 +28,6 @@ class DisplayItem {
 
     static void startDisplayItems(TFT_eSPI* tft, uint16_t width, uint16_t height, uint16_t tileW, uint16_t tileH);
 
-    std::function<void(void)> LEDFunction;
-    void addLEDTask(uint8_t LED_index, std::function<void(void)> func);
-
     //Events
     void addPressEvent(uint8_t pin, std::function<void(void)> func);
     // A released event could be implemented but it may be unnecessary.
