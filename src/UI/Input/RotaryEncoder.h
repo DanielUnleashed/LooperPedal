@@ -8,7 +8,7 @@
 #include "utils/Utilities.h"
 #include "DebounceButton.h"
 
-#define DEFAULT_ROTARY_DEBOUNCE 200
+#define DEFAULT_ROTARY_DEBOUNCE 150
 
 class RotaryEncoder{
     public:

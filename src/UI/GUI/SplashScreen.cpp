@@ -1,7 +1,20 @@
 #include "SplashScreen.h"
 
 SplashScreen::SplashScreen() : DisplayItem("Splashscreen"){
-    if(fillPolygons) return;
+    RotaryEncoder::addInterrupt(0, [this](bool in){
+        this -> inputVariable += (in ? 1.0 : -1.0)*TWO_PI;
+    });
+
+    RotaryEncoder::addButtonInterrupt(0, [this]{
+        this->fillPolygons = !this->fillPolygons;
+    });
+
+    DebounceButton::addInterrupt(5, [this]{
+        for(uint8_t i = 0; i < 3; i++){
+            color[i] = (random(0,0xFF) + 0xFF)/2;
+        }
+    });
+
     // First fill the edges vector. It makes sure that the edges aren't repeated.
     uint16_t faceCount = sizeof(faces)/sizeof(faces[0]);
     for(uint16_t i = 0; i < faceCount; i++){
@@ -70,18 +83,56 @@ void SplashScreen::startParameters(TFT_eSprite &spr){
     projMatrix[3][2] = -2 * f * n / (f - n); 
     projMatrix[3][3] = 0; 
 
-    double th = millis()/1000.0;
+    static double lastInputVariable = 0;
+    static double th = 0; //Theta, the angle to be rotated
+    static double paramA, paramB, paramC;
+    static uint32_t startTime = 0;
+    static double tf; //Finish time of rotation
+
+    static double omega = angularVelocity;
+    if(inputVariable != 0){
+        if(inputVariable != lastInputVariable){
+            n = 0;
+            double startAngle = th;
+            startTime = millis();
+            double endAngle = th + (inputVariable-lastInputVariable);
+
+            tf = abs((endAngle - startAngle)/transitionAngularVelocity);
+
+            paramB = 6.0*(endAngle - angularVelocity*tf - startAngle)/tf/tf;
+            paramA = -paramB/tf;
+            paramC = omega;
+
+            lastInputVariable = inputVariable;
+        }
+
+        static double n;
+        n = (millis() - startTime)/1000.0;
+        omega = paramA*n*n + paramB*n + paramC;
+
+        if(n > tf){
+            inputVariable = 0;
+            lastInputVariable = 0;
+        }
+    }
+
+    double nowT = millis()/1000.0;
+    static double lastTime = nowT;
+    double deltaT = nowT - lastTime;
+    th += omega*deltaT; //Cool way to integrate (discrete integration)
+    lastTime = nowT;
+
     // Rotate around the Y axis.
-    double rotMatrix1[4][4] = {{cos(th), 0, sin(th), 0},
+    double rotMatrix[4][4] = {{cos(th), 0, sin(th), 0},
                                 {0, 1, 0, 0},
                                 {-sin(th), 0, cos(th), 0},
                                 {0, 0, 0, 1}};
-    double rotMatrix2[4][4] = {{cos(th), sin(th), 0, 0},
+    /*double rotMatrix2[4][4] = {{cos(th), sin(th), 0, 0},
                             {-sin(th), cos(th), 0, 0},
                             {0,0,1,0},
                             {0, 0, 0, 1}};
     double rotMatrix[4][4];
-    multMatrix(rotMatrix1, rotMatrix2, rotMatrix);
+    multMatrix(rotMatrix1, rotMatrix2, rotMatrix);*/
 
     double scaleMatrix[4][4] = {{5, 0, 0, 0},
                                 {0, 5, 0, 0},
@@ -152,8 +203,8 @@ void SplashScreen::startParameters(TFT_eSprite &spr){
                 uint16_t vert2x = projectedPoints[ind2][0];
                 uint16_t vert2y = projectedPoints[ind2][1];
                 
-                uint16_t color = tft -> color565(128*shadowFactor, 128*shadowFactor, 128*shadowFactor);
-                spr.fillTriangle(vert0x, vert0y, vert1x, vert1y, vert2x, vert2y, color);
+                uint16_t realColor = tft -> color565(color[0]*shadowFactor, color[1]*shadowFactor, color[2]*shadowFactor);
+                spr.fillTriangle(vert0x, vert0y, vert1x, vert1y, vert2x, vert2y, realColor);
             }
         }else{
             //If visible, assign the sides to also be visible.
@@ -214,7 +265,8 @@ void SplashScreen::startParameters(TFT_eSprite &spr){
         uint16_t y0 = projectedPoints[edge[0]-1][1];
         uint16_t x1 = projectedPoints[edge[1]-1][0];
         uint16_t y1 = projectedPoints[edge[1]-1][1];
-        spr.drawLine(x0, y0, x1, y1, TFT_WHITE);
+        uint16_t realColor = tft -> color565(color[0], color[1], color[2]);
+        spr.drawLine(x0, y0, x1, y1, realColor);
     }
 }
 

@@ -17,6 +17,8 @@ void MenuManager::init(){
     DebounceButton::init();
     RotaryEncoder::init();
 
+    //This shouldn't be here! Move to the display or widget, maybe!
+    //It would be better in a widget
     DebounceButton::addInterrupt(0, []{
         launchPlayAnimation();
     });
@@ -37,21 +39,6 @@ void MenuManager::init(){
         launchErrorAnimation("Shiiit!");
     });
 
-    DebounceButton::addInterrupt(5, []{
-        launchWarningAnimation("wowo!");
-    });
-
-    RotaryEncoder::addInterrupt(0, [](bool in){
-        if(in){
-            Serial.println("up!");
-        }else{
-            Serial.println("down!");
-        }
-    });
-
-    RotaryEncoder::addButtonInterrupt(0, []{
-        Serial.println("foo");
-    });
 }
 
 void MenuManager::launch(){
