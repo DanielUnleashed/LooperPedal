@@ -2,7 +2,6 @@
 
 TFT_eSPI MenuManager::tft;
 uint16_t MenuManager::width, MenuManager::height;
-uint16_t MenuManager::tileW, MenuManager::tileH;
 
 std::vector<Display> MenuManager::displayList;
 uint8_t MenuManager::currentDisplay = 0;
@@ -13,7 +12,7 @@ TaskHandle_t MenuManager::drawTaskhandle = NULL;
 
 void MenuManager::init(){
     startTFT();
-    DisplayItem::startDisplayItems(&tft, width, height, tileW, tileH);
+    DisplayItem::startDisplayItems(width, height);
     DebounceButton::init();
     RotaryEncoder::init();
 
@@ -36,12 +35,19 @@ void MenuManager::launch(){
 }
 
 void MenuManager::drawTask(void* funcParams){
+    static TFT_eSprite canvas = TFT_eSprite(&tft);
+    canvas.createSprite(width, height);
+    canvas.fillSprite(TFT_BLACK);
     for(;;){
         // Block the display if an overlay is launched.
-        if(dispOverlay.needsToRedraw()) dispOverlay.draw();
+        if(dispOverlay.needsToRedraw()) dispOverlay.render(canvas);
         else{
-            displayList[currentDisplay].drawDisplay();
+            canvas.fillSprite(TFT_BLACK);
+            displayList[currentDisplay].drawDisplay(canvas);
         }
+
+        canvas.pushSprite(0, 0);
+
         delay(DRAW_MS);
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     }
@@ -98,8 +104,6 @@ void MenuManager::startTFT(){
 
     width = tft.width();
     height = tft.height();
-    tileW = tft.width()/TILES_X;
-    tileH = tft.height()/TILES_Y;
 
     Serial.printf("TFT(%dx%d tiles). w=%d  h=%d\n", TILES_X, TILES_Y, width, height);
 }

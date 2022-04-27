@@ -8,14 +8,16 @@
 // Branch inside AudioPlayer.cpp
 #define PASS_AUDIO_INPUT_DURING_RECORDING
 
-#define LAUNCH_SPLASHSCREEN_AT_BOOT_UP
+//#define LAUNCH_SPLASHSCREEN_AT_BOOT_UP
 
 #define PLAY_FREQUENCY 16000
 #define BIT_RES 16
 
 #define SCREEN_FPS 50.0
-#define DTFT_WIDTH 160
-#define DTFT_HEIGHT 128
+
+#define TILES_X 6
+#define TILES_Y 4
+#define TASKBAR_HEIGHT 20
 
 // If more were to be added, add to the init() method inside DebounceButton.cpp
 // another call to attachInterrupt with the correspondant number.

@@ -29,7 +29,7 @@ SplashScreen::SplashScreen() : DisplayItem("Splashscreen"){
         for(uint8_t i = 0; i < 3; i++){
             c[i] = random(0,0x7F);
         }
-        this -> backColor = this -> tft -> color565(c[0],c[1],c[2]);
+        this -> backColor = this -> canvas-> color565(c[0],c[1],c[2]);
     });
 
     DebounceButton::addInterrupt(5, [this]{
@@ -74,18 +74,19 @@ SplashScreen::SplashScreen() : DisplayItem("Splashscreen"){
 void SplashScreen::draw(){
     static uint16_t lastBackColor = backColor;
     if(backColor != lastBackColor){
-        tft -> fillScreen(backColor);
+        canvas-> fillScreen(backColor);
         lastBackColor = backColor;
     }
-    TFT_eSprite spr = TFT_eSprite(tft);
-    spr.createSprite(w, h);
-    spr.fillSprite(backColor);
-    startParameters(spr);
-    spr.pushSprite((width-w)/2, 0);
+    /*TFT_eSprite spr = TFT_eSprite(canvas);
+    spr->createSprite(w, h);*/
+    canvas -> fillSprite(backColor);
+    startParameters(canvas);
+
+    //pushSprite(spr, (width-w)/2, 0);
     redraw();
 }
 
-void SplashScreen::startParameters(TFT_eSprite &spr){
+void SplashScreen::startParameters(TFT_eSprite *spr){
     //Field of view in degrees.
     double fov = 60.0;
     // Near and far values
@@ -213,8 +214,8 @@ void SplashScreen::startParameters(TFT_eSprite &spr){
                 uint16_t vert2x = projectedPoints[ind2][0];
                 uint16_t vert2y = projectedPoints[ind2][1];
                 
-                uint16_t realColor = tft -> color565(color[0]*shadowFactor, color[1]*shadowFactor, color[2]*shadowFactor);
-                spr.fillTriangle(vert0x, vert0y, vert1x, vert1y, vert2x, vert2y, realColor);
+                uint16_t realColor = canvas-> color565(color[0]*shadowFactor, color[1]*shadowFactor, color[2]*shadowFactor);
+                spr->fillTriangle(vert0x, vert0y, vert1x, vert1y, vert2x, vert2y, realColor);
             }
         }else{
             //If visible, assign the sides to also be visible.
@@ -260,7 +261,7 @@ void SplashScreen::startParameters(TFT_eSprite &spr){
             double newY0 = y0 + deltaY*i;
             double newX1 = x0 + deltaX*(i+0.111);
             double newY1 = y0 + deltaY*(i+0.111);
-            spr.drawLine(newX0, newY0, newX1, newY1, 0x4A69);
+            spr->drawLine(newX0, newY0, newX1, newY1, 0x4A69);
         }
     }
 
@@ -275,8 +276,8 @@ void SplashScreen::startParameters(TFT_eSprite &spr){
         uint16_t y0 = projectedPoints[edge[0]-1][1];
         uint16_t x1 = projectedPoints[edge[1]-1][0];
         uint16_t y1 = projectedPoints[edge[1]-1][1];
-        uint16_t realColor = tft -> color565(color[0], color[1], color[2]);
-        spr.drawLine(x0, y0, x1, y1, realColor);
+        uint16_t realColor = canvas-> color565(color[0], color[1], color[2]);
+        spr->drawLine(x0, y0, x1, y1, realColor);
     }
 }
 

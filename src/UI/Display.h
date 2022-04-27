@@ -12,7 +12,7 @@ class Display {
     void addItem(DisplayItem *item);
     void removeItem(DisplayItem *item);
 
-    void drawDisplay();
+    void drawDisplay(TFT_eSprite &canvas);
     void forceDraw();
     void addRedrawHandle(TaskHandle_t h);
 

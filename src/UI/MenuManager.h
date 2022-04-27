@@ -31,7 +31,6 @@ class MenuManager {
     private:
     static TFT_eSPI tft;
     static uint16_t width, height;
-    static uint16_t tileW, tileH;
 
     static std::vector<Display> displayList;
     static uint8_t currentDisplay;

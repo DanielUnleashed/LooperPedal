@@ -4,16 +4,14 @@ Display::Display(String n){
     name = n;
 }
 
-void Display::drawDisplay(){
-    for(DisplayItem* it : itemList){
-        if(it -> needsToRedraw()) it -> draw();
-    }
+void Display::drawDisplay(TFT_eSprite &canvas){
+    for(DisplayItem* it : itemList)
+        if(it -> needsToRedraw()) it -> render(canvas);
 }
 
 void Display::forceDraw(){
-    for(DisplayItem* it : itemList){
+    for(DisplayItem* it : itemList)
         it -> forceRedraw();
-    }
     if(redrawHandle != NULL) xTaskNotifyGive(redrawHandle);
 }
 

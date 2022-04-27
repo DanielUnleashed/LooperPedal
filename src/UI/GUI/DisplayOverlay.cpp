@@ -13,33 +13,34 @@ void DisplayOverlay::draw(){
         long t = getTickTime();
         t = t*t*t/10000; //Ease in, faster out
         t *= sweepSpeed;
-        t -= barWidth;  // So that the animation start from  
+        t -= barWidth;  // So that the animation start behind the screen limits.
         for(int i = 0; i < height; i+=barWidth*2-1){
             for(int j = 0; j < barWidth; j++){
-                tft->drawFastHLine(t,i+j, j, animationColor);
+                canvas->drawFastHLine(t,i+j, j, animationColor);
             }
             for(int j = barWidth; j > 0; j--){
-                tft->drawFastHLine(t, i+barWidth*2-j, j, animationColor);
+                canvas->drawFastHLine(t, i+barWidth*2-j, j, animationColor);
             }
-            tft->fillRect(t-15,0, 15,height, animationColor);
+            canvas->fillRect(t-20,0, 20,height, animationColor);
         }
-        animationEnded = t>width;
+
+        animationEnded = t>(width+barWidth+2);
     }else if(animationID == ANIM_SWEEP_OUT){
-        tft->setRotation(3); // This is what I like to call a little trickery!
+        //canvas->setRotation(3); // This is what I like to call a little trickery!
         animationID = ANIM_SWEEP_IN;
         draw();
     }else if(animationID == ANIM_CIRCLE){
         uint32_t t = getTickTime();
         t = t*t*t/10000; //Ease in, faster out
         t *= circleSpeed; 
-        tft->fillCircle(width/2, height/2, t, animationColor);
+        canvas->fillCircle(width/2, height/2, t, animationColor);
         animationEnded = t > diagonalRadius;
     }else if(animationID == ANIM_CIRCUMFERENCE){
         double theta = getTickTime()/1000.0*TWO_PI * plottingSpeed;
-        tft->fillCircle(width/2 + plottingRadius*cos(theta + HALF_PI), height/2 + plottingRadius*sin(theta + HALF_PI),
+        canvas->fillCircle(width/2 + plottingRadius*cos(theta + HALF_PI), height/2 + plottingRadius*sin(theta + HALF_PI),
                          outerPincelStroke, animationColor);
         double r = plottingRadius*theta/TWO_PI;
-        tft->fillCircle(width/2 + r*cos(theta + HALF_PI), height/2 + r*sin(theta + HALF_PI),
+        canvas->fillCircle(width/2 + r*cos(theta + HALF_PI), height/2 + r*sin(theta + HALF_PI),
                          innerPincelStroke, animationColor);
         animationEnded = theta >= TWO_PI;
     }else if(animationID == ANIM_EXCLAMATION){
@@ -48,12 +49,12 @@ void DisplayOverlay::draw(){
         double r = -7.0*plottingRadius*cos(8.0*theta)/8.0;
         double c1 = height/2 + 7.0*plottingRadius/32.0;
         //This is part of a rose of 8 pethals. Is the bar of the exclamation.
-        tft->fillCircle(width/2 + r*cos(theta), c1 + r*sin(theta),
+        canvas->fillCircle(width/2 + r*cos(theta), c1 + r*sin(theta),
                             innerPincelStroke, animationColor);
         animationEnded = theta >= 9.0*PI/16.0;
         if(animationEnded){
             //Exclamation dot
-            tft -> fillCircle(width/2, height/2 + 4.0*plottingRadius/7.0,
+            canvas -> fillCircle(width/2, height/2 + 4.0*plottingRadius/7.0,
                             outerPincelStroke, animationColor);
         }
     }else if(animationID == ANIM_PLAY_TRIANGLE){
@@ -62,9 +63,9 @@ void DisplayOverlay::draw(){
         double theta = getTickTime()/1000.0*TWO_PI* plottingSpeed;
         double k = 10, n = 4, a = 0.5, b = 2;
         double r = k*a*b/pow(pow(b*cos(theta), n) + pow(a*sin(theta), n), 1/n);
-        tft->fillCircle(7.0*width/18.0 + r*cos(theta), height/2 + r*sin(theta),
+        canvas->fillCircle(7.0*width/18.0 + r*cos(theta), height/2 + r*sin(theta),
                     outerPincelStroke, animationColor);
-        tft->fillCircle(11.0*width/18.0 + r*cos(theta), height/2 + r*sin(theta),
+        canvas->fillCircle(11.0*width/18.0 + r*cos(theta), height/2 + r*sin(theta),
                     outerPincelStroke, animationColor);
         animationEnded = theta >= TWO_PI;
     }else if((animationID&0x40) == ANIM_POLYGON){
@@ -79,9 +80,9 @@ void DisplayOverlay::draw(){
         else if(shape == 7) rotAngle = -0.224; 
         animationEnded = drawNGon(shape, rotAngle, sizeTweak);
     }else if(animationID == ANIM_TEXT){
-        tft->setTextColor(animationColor);
-        tft->setTextDatum(MC_DATUM);
-        tft->drawString(animationText, width/2, 0.5*(plottingRadius+3.0*height/2.0));
+        canvas->setTextColor(animationColor);
+        canvas->setTextDatum(MC_DATUM);
+        canvas->drawString(animationText, width/2, 0.5*(plottingRadius+3.0*height/2.0));
         animationEnded = true;
     }
 
@@ -94,9 +95,9 @@ void DisplayOverlay::draw(){
                 startAnimation();
                 return;
             }
+            //else: reached the end of the animation queue
         }
         endAnimation();
-        tft->setRotation(1);
         animationQueue.clear();
         animationQueuePalette.clear();
         if(redrawHandle != NULL) xTaskNotifyGive(redrawHandle);
@@ -112,12 +113,12 @@ bool DisplayOverlay::drawNGon(uint8_t sides, double rotAngle, double sizeTweak){
     if(theta < TWO_PI){
         double mod = y*(theta_rot/y - floor(theta_rot/y));
         double r = cos(PI/sides)/cos(mod - PI/sides)*(plottingRadius+sizeTweak);
-        tft->fillCircle(width/2 + r*cos(theta), height/2 + r*sin(theta),
+        canvas->fillCircle(width/2 + r*cos(theta), height/2 + r*sin(theta),
                         outerPincelStroke, animationColor);
     }
     double mod = y*(theta_rot/y - floor(theta_rot/y));
     double r = cos(PI/sides)/cos(mod - PI/sides)*(plottingRadius+sizeTweak) * theta_rot / (4.0*PI);
-    tft->fillCircle(width/2 + r*cos(theta), height/2 + r*sin(theta),
+    canvas->fillCircle(width/2 + r*cos(theta), height/2 + r*sin(theta),
                         innerPincelStroke, animationColor);
 
     return theta >= 3.75*PI;

@@ -1,17 +1,21 @@
 #include "Taskbar.h"
 
-Taskbar::Taskbar(uint8_t tileX, uint8_t tileY) : DisplayItem("Taskbar", tileX, tileY, 5, 1){}
+Taskbar::Taskbar(uint8_t tileX, uint8_t tileY) : DisplayItem("Taskbar"){}
 
 void Taskbar::draw(){
     drawGrid();
-    drawFilledRect(0,0,100,100, 0x190A);
+    //canvas -> fillRoundRect(0,height-TASKBAR_HEIGHT, width,TASKBAR_HEIGHT, 2, 0x190A);
     for(uint8_t i = 0; i < 4; i++){
         if(!buttons[i].isEnabled) continue;
 
-        drawFilledRect(i*25,0, 25,100, 0xEFBE, 0xB63C, true);
-        drawCentreText(i*25+13, 50, buttons[i].tagName, TFT_WHITE);
-        drawVLine(i*25, 20, 90, TFT_WHITE);
-        drawVLine((i+1)*25, 20, 90, TFT_WHITE);
+        //This doesn't work with sprites, dunno why...
+        //drawFilledRect(i*25,0, 25,100, 0xEFBE, 0xB63C, true);
+        canvas -> fillRoundRect(width*i/4, height-TASKBAR_HEIGHT, width/4,TASKBAR_HEIGHT, 2, 0x2AAF);
+        canvas -> setTextColor(TFT_WHITE);
+        canvas -> setTextDatum(MC_DATUM); //Medium center datum
+        canvas -> drawString(buttons[i].tagName, width*(2*i+1)/8, height-(TASKBAR_HEIGHT/2), 2);
+        canvas -> drawFastVLine(width*i/4, height-(TASKBAR_HEIGHT*3/4), TASKBAR_HEIGHT, TFT_WHITE);
+        canvas -> drawFastVLine(width*(i+1)/4, height-(TASKBAR_HEIGHT*3/4), TASKBAR_HEIGHT, TFT_WHITE);
     }
 
     needsUpdate = false;
@@ -22,6 +26,9 @@ bool Taskbar::addButton(String tagName, uint8_t index){
     if(buttons[index].isEnabled) return false;
     
     buttons[index].isEnabled = true;
+    if(tagName.length() > 5){
+        tagName = tagName.substring(0,5);
+    }
     buttons[index].tagName = tagName;
     return true;
 }

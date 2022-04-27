@@ -25,14 +25,14 @@ class SplashScreen : public DisplayItem{
     volatile uint8_t color[3] = {200,200,200};
     volatile uint16_t backColor = TFT_BLACK;
 
-    //Draw canvas height and width
-    static const uint16_t w = 128, h = 128;
+    //Camera plane height and width
+    static const uint16_t w = 160, h = 128;
     //Remember, this vector must be normalized!
     const double sun[3] = {0.5774,-0.5774,-0.5774};
 
     volatile double inputVariable = 0;
 
-    void startParameters(TFT_eSprite&);
+    void startParameters(TFT_eSprite*);
     void smoothRotation(double th, double &omega);
     void multMatrix(double in[4], double matrix[4][4], double out[4]);
     void multMatrix(double matrixA[4][4], double matrixB[4][4], double outMatrix[4][4]);
