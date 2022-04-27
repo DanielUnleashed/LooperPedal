@@ -23,7 +23,12 @@ void Display::addItem(DisplayItem *item){
 }
 
 void Display::removeItem(DisplayItem *item){
-    itemList.remove(item);
+    for(uint8_t i = 0; i < itemList.size(); i++){
+        if(item == itemList[i]){
+            itemList.erase(itemList.begin()+i);
+            return;
+        }
+    }
 }
 
 void Display::addRedrawHandle(TaskHandle_t h){

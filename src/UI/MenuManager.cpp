@@ -16,6 +16,13 @@ void MenuManager::init(){
     DisplayItem::startDisplayItems(&tft, width, height, tileW, tileH);
     DebounceButton::init();
     RotaryEncoder::init();
+
+#ifdef LAUNCH_SPLASHSCREEN_AT_BOOT_UP
+    static SplashScreen sp;
+    static Display introDisplay("Intro");
+    introDisplay.addItem(&sp);
+    MenuManager::addDisplay(introDisplay);
+#endif
 }
 
 void MenuManager::launch(){
@@ -44,22 +51,30 @@ void MenuManager::addDisplay(Display d){
     displayList.push_back(d);
 }
 
-void MenuManager::removeDisplay(Display d){
-    //displayList.remove(d); <- Gives error whoops!
-    // Maybe I shall define a == statement, but... neh!
+void MenuManager::removeDisplay(String displayName){
+    for(uint8_t i = 0; i < displayList.size(); i++){
+        if(displayList[i].name.equals(displayName));
+    }
 }
 
-void MenuManager::transitionToDisplay(String displayName, uint8_t trans){
-    Serial.println(trans, HEX);
-    if(trans>>7){
-        std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN, trans, DisplayOverlay::ANIM_SWEEP_OUT};
-        const std::vector<uint16_t> c{TFT_RED, TFT_WHITE, TFT_BLACK};
-        dispOverlay.drawMultipleAnimation(v, c);
-        getDisplayByName(displayName).forceDraw();
-    }else{
-        launchOverlay(trans);
-        getDisplayByName(displayName).forceDraw();
+bool MenuManager::changeScreen(String displayName){
+    std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN, DisplayOverlay::ANIM_SWEEP_OUT};
+    const std::vector<uint16_t> c{TFT_GOLD, TFT_BLACK};
+    dispOverlay.drawMultipleAnimation(v, c);
+    bool hasBeenFound = false;
+
+    uint8_t clearArray[4];
+    for(uint8_t i = 0; i < 4; i++) clearArray[i] = i;
+    DebounceButton::clearMultipleInterrupt(clearArray);
+    for(uint8_t i = 0; i < displayList.size(); i++){
+        if(displayList[i].name.equals(displayName)){
+            getDisplayByName(displayName).forceDraw();
+            currentDisplay = i;
+            hasBeenFound = true;
+        }
     }
+    if(!hasBeenFound) Utilities::debug("Display %s couldn't be found\n", displayName.c_str());
+    return hasBeenFound;
 }
 
 Display MenuManager::getDisplayByName(String name){

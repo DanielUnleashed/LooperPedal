@@ -3,30 +3,31 @@
 
 #include "Arduino.h"
 
-#include "utils/AuxSPI.h"
+#include <TFT_eSPI.h>
 
-#include "GUI/DisplayItem.h"
-#include "UI/Display.h"
-#include "UI/GUI/DisplayOverlay.h"
-#include "UI/GUI/SplashScreen.h"
+#include "utils/AuxSPI.h"
 #include "UI/Input/RotaryEncoder.h"
 #include "UI/Input/DebounceButton.h"
+
+#include "UI/Display.h"
+#include "UI/GUI/DisplayOverlay.h"
+
+#include "UI/GUI/SplashScreen.h"
 
 #include "defines.h"
 
 #define DRAW_MS 1000/SCREEN_FPS 
 
 class MenuManager {
-
     public: 
     static void init();
     static void launch();
     static void addDisplay(Display);
-    static void removeDisplay(Display);
+    static void removeDisplay(String);
 
-    static void transitionToDisplay(String dispName, uint8_t transitionAnim);
+    static bool changeScreen(String screenName);
     static void launchOverlay(uint8_t animationID);
-    
+
     private:
     static TFT_eSPI tft;
     static uint16_t width, height;

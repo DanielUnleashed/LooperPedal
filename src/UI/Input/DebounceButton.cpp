@@ -5,7 +5,10 @@ std::function<void(void)> IRAM_ATTR DebounceButton::ISREvents[TOTAL_BUTTONS];
 
 // Maybe implement with a loop with https://stackoverflow.com/questions/11081573/passing-a-variable-as-a-template-argument
 void DebounceButton::init(){
-    for(uint8_t i = 0; i < TOTAL_BUTTONS; i++) systemButtons[i] = new DebounceButton(PUSH_BUTTON[i]); 
+    for(uint8_t i = 0; i < TOTAL_BUTTONS; i++){
+        systemButtons[i] = new DebounceButton(PUSH_BUTTON[i]); 
+        ISREvents[i] = {};
+    }
 
     attachInterrupt(systemButtons[0]->pin, &ISR_BUTTON<0>, CHANGE);
     attachInterrupt(systemButtons[1]->pin, &ISR_BUTTON<1>, CHANGE);
@@ -21,7 +24,32 @@ void IRAM_ATTR DebounceButton::ISR_BUTTON(){
     if(ISREvents[interrupt] && systemButtons[interrupt] -> clicked()) ISREvents[interrupt](); 
 }
 
+bool DebounceButton::addMultipleInterrupt(uint8_t* buttonIndexes, std::function<void(void)> func){
+    if(sizeof(buttonIndexes) == 0) Utilities::debug("There are no buttons to add\n");
+    bool allSet = true;
+    for(uint8_t i = 0; i < sizeof(buttonIndexes); i++){
+        if(!addInterrupt(buttonIndexes[i], func)){
+            allSet = false;
+            Utilities::debug("Button %d couldn't add its interrupt!\n", i);
+        } 
+    }
+    return allSet;
+}
+
+bool DebounceButton::clearMultipleInterrupt(uint8_t* buttonIndexes){
+    if(sizeof(buttonIndexes) == 0) Utilities::debug("There are no button to clear\n");
+    bool allSet = true;
+    for(uint8_t i = 0; i < sizeof(buttonIndexes); i++){
+        if(!removeInterrupt(buttonIndexes[i])){
+            allSet = false;
+            Utilities::debug("Button %d couldn't remove its interrupt!\n", i);
+        } 
+    }
+    return allSet;
+}
+
 bool DebounceButton::addInterrupt(uint8_t buttonIndex, std::function<void(void)> func){
+    if(buttonIndex > TOTAL_BUTTONS) Utilities::debug("Button %d is out of the array!\n", buttonIndex);
     if(ISREvents[buttonIndex]){
         Utilities::debug("Button %d is already in use\n", buttonIndex);
         return false;

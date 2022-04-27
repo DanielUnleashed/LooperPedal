@@ -1,4 +1,5 @@
 #include "SplashScreen.h"
+#include "UI/MenuManager.h" 
 
 SplashScreen::SplashScreen() : DisplayItem("Splashscreen"){
     RotaryEncoder::addInterrupt(0, [this](bool in){
@@ -9,12 +10,18 @@ SplashScreen::SplashScreen() : DisplayItem("Splashscreen"){
         this->fillPolygons = !this->fillPolygons;
     });
 
+    uint8_t returnPins[4];
+    for(uint8_t i = 0; i < 4; i++) returnPins[i] = i;
+    DebounceButton::addMultipleInterrupt(returnPins, [this]{
+        MenuManager::changeScreen("Main");
+    });
+
     DebounceButton::addInterrupt(4, [this]{
         if(DebounceButton::twoButtonsClicked(5)){
             this->backColor = TFT_BLACK;
-            this->color[0] = 128;   
-            this->color[1] = 128;
-            this->color[2] = 128;
+            this->color[0] = 200;   
+            this->color[1] = 200;
+            this->color[2] = 200;
             return;    
         }
 
@@ -28,9 +35,9 @@ SplashScreen::SplashScreen() : DisplayItem("Splashscreen"){
     DebounceButton::addInterrupt(5, [this]{
         if(DebounceButton::twoButtonsClicked(4)){
             this->backColor = TFT_BLACK;
-            this->color[0] = 128;   
-            this->color[1] = 128;
-            this->color[2] = 128;
+            this->color[0] = 200;   
+            this->color[1] = 200;
+            this->color[2] = 200;
             return;    
         }
         for(uint8_t i = 0; i < 3; i++){

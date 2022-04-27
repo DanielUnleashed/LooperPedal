@@ -4,8 +4,6 @@
 #include "Arduino.h"
 #include "UI/GUI/DisplayItem.h"
 
-#include <list>
-
 class Display {
     public:
     String name;
@@ -19,9 +17,8 @@ class Display {
     void addRedrawHandle(TaskHandle_t h);
 
     private:
-    std::list<DisplayItem*> itemList;
+    std::vector<DisplayItem*> itemList;
     TaskHandle_t redrawHandle;
-
 };
 
 #endif

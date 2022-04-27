@@ -25,6 +25,8 @@ class DebounceButton{
 
         static void init();
         static bool addInterrupt(uint8_t buttonIndex, std::function<void(void)> func);
+        static bool addMultipleInterrupt(uint8_t* buttonIndexes, std::function<void(void)> func);
+        static bool clearMultipleInterrupt(uint8_t* buttonIndexes);
         static bool removeInterrupt(uint8_t buttonIndex);
 
     private:
