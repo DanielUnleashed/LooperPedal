@@ -15,7 +15,7 @@ void Taskbar::draw(){
         canvas -> setTextDatum(MC_DATUM); //Medium center datum
         canvas -> drawString(buttons[i].tagName, width*(2*i+1)/8, height-(TASKBAR_HEIGHT/2), 2);
         canvas -> drawFastVLine(width*i/4, height-(TASKBAR_HEIGHT*3/4), TASKBAR_HEIGHT, TFT_WHITE);
-        canvas -> drawFastVLine(width*(i+1)/4, height-(TASKBAR_HEIGHT*3/4), TASKBAR_HEIGHT, TFT_WHITE);
+        canvas -> drawFastVLine(width*(i+1)/4-1, height-(TASKBAR_HEIGHT*3/4), TASKBAR_HEIGHT, TFT_WHITE);
     }
 
     needsUpdate = false;

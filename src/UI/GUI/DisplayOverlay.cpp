@@ -11,24 +11,40 @@ void DisplayOverlay::draw(){
         animationEnded = t > waitTime;
     }else if(animationID == ANIM_SWEEP_IN){
         long t = getTickTime();
-        t = t*t*t/10000; //Ease in, faster out
+        t = t*t/100; //Ease in, faster out
         t *= sweepSpeed;
         t -= barWidth;  // So that the animation start behind the screen limits.
+        // Draws the pointy triangles
         for(int i = 0; i < height; i+=barWidth*2-1){
-            for(int j = 0; j < barWidth; j++){
-                canvas->drawFastHLine(t,i+j, j, animationColor);
-            }
-            for(int j = barWidth; j > 0; j--){
+            for(int j = 0; j <= barWidth; j++){
+                canvas->drawFastHLine(t, i+j, j, animationColor);
                 canvas->drawFastHLine(t, i+barWidth*2-j, j, animationColor);
             }
             canvas->fillRect(t-20,0, 20,height, animationColor);
         }
 
         animationEnded = t>(width+barWidth+2);
+
     }else if(animationID == ANIM_SWEEP_OUT){
-        //canvas->setRotation(3); // This is what I like to call a little trickery!
+        // Won't work with sprites
+        /*canvas->setRotation(3); // This is what I like to call a little trickery!
         animationID = ANIM_SWEEP_IN;
-        draw();
+        draw();*/
+
+        long t = getTickTime();
+        t = t*t/100; //Ease in, faster out
+        t *= sweepSpeed;
+        t -= barWidth;  // So that the animation start behind the screen limits.
+        for(int i = barWidth; i < height+barWidth; i+=barWidth*2){
+            for(int j = 0; j <= barWidth; j++){
+                canvas->drawFastHLine(width-t+j, i+j, barWidth, animationColor);
+                canvas->drawFastHLine(width-t+j, i-j, barWidth, animationColor);
+            }
+            canvas->fillRect(width-t+barWidth, 0, 20,height, animationColor);
+        }
+
+        animationEnded = t>(width+barWidth+2);
+
     }else if(animationID == ANIM_CIRCLE){
         uint32_t t = getTickTime();
         t = t*t*t/10000; //Ease in, faster out
@@ -43,6 +59,7 @@ void DisplayOverlay::draw(){
         canvas->fillCircle(width/2 + r*cos(theta + HALF_PI), height/2 + r*sin(theta + HALF_PI),
                          innerPincelStroke, animationColor);
         animationEnded = theta >= TWO_PI;
+
     }else if(animationID == ANIM_EXCLAMATION){
         double theta = getTickTime()/1000.0*TWO_PI;
         theta += 7.0*PI/16.0;
@@ -57,6 +74,7 @@ void DisplayOverlay::draw(){
             canvas -> fillCircle(width/2, height/2 + 4.0*plottingRadius/7.0,
                             outerPincelStroke, animationColor);
         }
+
     }else if(animationID == ANIM_PLAY_TRIANGLE){
         animationEnded = drawNGon(3, 0, 0);
     }else if(animationID == ANIM_PAUSE){
@@ -68,6 +86,7 @@ void DisplayOverlay::draw(){
         canvas->fillCircle(11.0*width/18.0 + r*cos(theta), height/2 + r*sin(theta),
                     outerPincelStroke, animationColor);
         animationEnded = theta >= TWO_PI;
+
     }else if((animationID&0x40) == ANIM_POLYGON){
         uint8_t shape = animationID&0x0F;
         double rotAngle = 0;
@@ -79,6 +98,7 @@ void DisplayOverlay::draw(){
         else if(shape == 5) rotAngle = 0.315;
         else if(shape == 7) rotAngle = -0.224; 
         animationEnded = drawNGon(shape, rotAngle, sizeTweak);
+        
     }else if(animationID == ANIM_TEXT){
         canvas->setTextColor(animationColor);
         canvas->setTextDatum(MC_DATUM);
@@ -97,6 +117,7 @@ void DisplayOverlay::draw(){
             }
             //else: reached the end of the animation queue
         }
+        //canvas->setRotation(1);
         endAnimation();
         animationQueue.clear();
         animationQueuePalette.clear();
