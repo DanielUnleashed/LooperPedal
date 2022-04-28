@@ -9,7 +9,7 @@ void DisplayOverlay::draw(){
     if(animationID == ANIM_WAIT){
         long t = getTickTime();
         animationEnded = t > waitTime;
-    }else if(animationID == ANIM_SWEEP_IN){
+    }else if(animationID == ANIM_SWEEP_IN_LEFT){
         long t = getTickTime();
         t = t*t/100; //Ease in, faster out
         t *= sweepSpeed;
@@ -20,12 +20,28 @@ void DisplayOverlay::draw(){
                 canvas->drawFastHLine(t, i+j, j, animationColor);
                 canvas->drawFastHLine(t, i+barWidth*2-j, j, animationColor);
             }
-            canvas->fillRect(t-20,0, 20,height, animationColor);
+            canvas->fillRect(0,0, t,height, animationColor);
         }
 
         animationEnded = t>(width+barWidth+2);
 
-    }else if(animationID == ANIM_SWEEP_OUT){
+    }else if(animationID == ANIM_SWEEP_OUT_LEFT){
+        long t = getTickTime();
+        t = t*t/100; //Ease in, faster out
+        t *= sweepSpeed;
+        t -= barWidth;  // So that the animation start behind the screen limits.
+        // Draws the pointy triangles
+        for(int i = 0; i < height; i+=barWidth*2-1){
+            for(int j = 0; j <= barWidth; j++){
+                canvas->drawFastHLine(width-t, i+j, j, animationColor);
+                canvas->drawFastHLine(width-t, i+barWidth*2-j, j, animationColor);
+            }
+            canvas->fillRect(0,0, width-t,height, animationColor);
+        }
+
+        animationEnded = t>(width+barWidth+2);
+
+    }else if(animationID == ANIM_SWEEP_IN_RIGHT){
         // Won't work with sprites
         /*canvas->setRotation(3); // This is what I like to call a little trickery!
         animationID = ANIM_SWEEP_IN;
@@ -180,7 +196,7 @@ void DisplayOverlay::setPalette(){
         if(currentAnimationIndex >= animationQueuePalette.size()) animationColor = TFT_PINK;
         else animationColor = animationQueuePalette[currentAnimationIndex];
     }else{ //DEFAULT Values
-        if(animationID == ANIM_SWEEP_OUT) animationColor = TFT_BLACK;
+        if(animationID == ANIM_SWEEP_OUT_LEFT) animationColor = TFT_BLACK;
         else animationColor = TFT_YELLOW;
     } 
 }

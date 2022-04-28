@@ -3,6 +3,7 @@
 Taskbar::Taskbar(uint8_t tileX, uint8_t tileY) : DisplayItem("Taskbar"){}
 
 void Taskbar::draw(){
+    canvas -> fillSprite(TFT_BLACK);
     drawGrid();
     //canvas -> fillRoundRect(0,height-TASKBAR_HEIGHT, width,TASKBAR_HEIGHT, 2, 0x190A);
     for(uint8_t i = 0; i < 4; i++){

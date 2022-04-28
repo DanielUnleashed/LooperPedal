@@ -8,7 +8,7 @@
 // Branch inside AudioPlayer.cpp
 #define PASS_AUDIO_INPUT_DURING_RECORDING
 
-//#define LAUNCH_SPLASHSCREEN_AT_BOOT_UP
+#define LAUNCH_SPLASHSCREEN_AT_BOOT_UP
 
 #define PLAY_FREQUENCY 16000
 #define BIT_RES 16

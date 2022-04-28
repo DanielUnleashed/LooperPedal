@@ -8,8 +8,9 @@ class DisplayOverlay : public DisplayItem{
     public:
     static const uint8_t ANIM_WAIT = 0;
         static const uint16_t waitTime = 250;
-    static const uint8_t ANIM_SWEEP_IN = 1;
-    static const uint8_t ANIM_SWEEP_OUT = 2;
+    static const uint8_t ANIM_SWEEP_IN_LEFT = 1;
+    static const uint8_t ANIM_SWEEP_OUT_LEFT = 2;
+    static const uint8_t ANIM_SWEEP_IN_RIGHT = 3;
         static const uint8_t barWidth = 10;
         static constexpr double sweepSpeed = 2;
     
@@ -40,9 +41,9 @@ class DisplayOverlay : public DisplayItem{
     void setAnimationText(String str);
 
     uint16_t diagonalRadius;
+    uint8_t animationID = 0;
 
     private:
-    uint8_t animationID = 0;
     uint16_t animationColor;
     void setPalette();
     String animationText = "You forgot to set the string :3";

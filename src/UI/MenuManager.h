@@ -41,7 +41,10 @@ class MenuManager {
 
     static TaskHandle_t drawTaskhandle;
     static void drawTask(void* funcParams);
-    static Display getDisplayByName(String name);
+    static uint8_t getDisplayByName(String name);
+
+    static uint8_t nextDisplay;
+    static bool isInTransition;
 
     static void launchPlayAnimation();
     static void launchStopAnimation();
