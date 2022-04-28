@@ -2,21 +2,21 @@
 #include "UI/MenuManager.h" 
 
 SplashScreen::SplashScreen() : DisplayItem("Splashscreen"){
-    RotaryEncoder::addInterrupt(0, [this](bool in){
+    addRotaryEvent(0, [this](bool in){
         this -> inputVariable += (in ? 1.0 : -1.0)*TWO_PI;
     });
 
-    RotaryEncoder::addButtonInterrupt(0, [this]{
+    addRotaryButtonEvent(0, [this]{
         this->fillPolygons = !this->fillPolygons;
     });
 
-    uint8_t returnPins[4];
-    for(uint8_t i = 0; i < 4; i++) returnPins[i] = i;
-    DebounceButton::addMultipleInterrupt(returnPins, [this]{
-        MenuManager::changeScreen("Main");
-    });
+    for(uint8_t i = 0; i < 4; i++){
+        addButtonEvent(i,[this]{
+            MenuManager::changeScreen("Main");
+        });
+    }
 
-    DebounceButton::addInterrupt(4, [this]{
+    addButtonEvent(4, [this]{
         if(DebounceButton::twoButtonsClicked(5)){
             this->backColor = TFT_BLACK;
             this->color[0] = 200;   
@@ -32,7 +32,7 @@ SplashScreen::SplashScreen() : DisplayItem("Splashscreen"){
         this -> backColor = this -> canvas-> color565(c[0],c[1],c[2]);
     });
 
-    DebounceButton::addInterrupt(5, [this]{
+    addButtonEvent(5, [this]{
         if(DebounceButton::twoButtonsClicked(4)){
             this->backColor = TFT_BLACK;
             this->color[0] = 200;   

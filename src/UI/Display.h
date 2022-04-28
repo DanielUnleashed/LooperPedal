@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 #include "UI/GUI/DisplayItem.h"
+#include "UI/GUI/Widget.h"
 
 class Display {
     public:
@@ -15,6 +16,8 @@ class Display {
     void drawDisplay(TFT_eSprite &canvas);
     void forceDraw();
     void addRedrawHandle(TaskHandle_t h);
+
+    void attachInputs();
 
     private:
     std::vector<DisplayItem*> itemList;

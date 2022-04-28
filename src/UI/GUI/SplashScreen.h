@@ -2,7 +2,6 @@
 #define SPLASHSCREEN_h
 
 #include "DisplayItem.h"
-#include "UI/Input/RotaryEncoder.h"
 
 class SplashScreen : public DisplayItem{
 

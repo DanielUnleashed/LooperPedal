@@ -48,7 +48,7 @@ bool RotaryEncoder::addInterrupt(uint8_t rotatoryIndex, std::function<void(bool)
 
 bool RotaryEncoder::addButtonInterrupt(uint8_t buttonIndex, std::function<void(void)> func){
     if(ISRButtonEvents[buttonIndex]){
-        Utilities::debug("Button %d is already in use\n", buttonIndex);
+        Utilities::debug("Rotary button %d is already in use\n", buttonIndex);
         return false;
     }else{
         ISRButtonEvents[buttonIndex] = func;
@@ -64,6 +64,12 @@ bool RotaryEncoder::removeInterrupt(uint8_t rotatoryIndex){
 bool RotaryEncoder::removeButtonInterrupt(uint8_t buttonIndex){
     ISRButtonEvents[buttonIndex] = {};
     return !ISRButtonEvents[buttonIndex];
+}
+
+bool RotaryEncoder::clearAll(){
+    for(std::function<void(bool)> &f : ISREvents) f = {};
+    for(std::function<void(void)> &f : ISRButtonEvents) f = {};
+    return true;
 }
 
 RotaryEncoder::RotaryEncoder(uint8_t a, uint8_t b){

@@ -10,6 +10,11 @@
 #define DEFAULT_DEBOUNCE_TIME 200 //ms
 #define DEFAULT_DOUBLE_CLICK_TIME 800 //ms
 
+struct ButtonEvent{
+    uint8_t pin;
+    std::function<void(void)> func;
+};
+
 class DebounceButton{
     public:
         DebounceButton(uint8_t chipPin);
@@ -27,6 +32,7 @@ class DebounceButton{
         static bool addInterrupt(uint8_t buttonIndex, std::function<void(void)> func);
         static bool addMultipleInterrupt(uint8_t* buttonIndexes, std::function<void(void)> func);
         static bool clearMultipleInterrupt(uint8_t* buttonIndexes);
+        static bool clearAll();
         static bool removeInterrupt(uint8_t buttonIndex);
 
     private:

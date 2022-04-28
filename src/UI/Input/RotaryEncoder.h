@@ -8,7 +8,12 @@
 #include "utils/Utilities.h"
 #include "DebounceButton.h"
 
-#define DEFAULT_ROTARY_DEBOUNCE 150
+#define DEFAULT_ROTARY_DEBOUNCE 80
+
+struct RotaryEncoderEvent{
+    uint8_t pin;
+    std::function<void(bool)> func;
+};
 
 class RotaryEncoder{
     public:
@@ -34,6 +39,7 @@ class RotaryEncoder{
         static void init();
         static bool addInterrupt(uint8_t rotatoryIndex, std::function<void(bool incr)> func);
         static bool addButtonInterrupt(uint8_t buttonIndex, std::function<void(void)> func);
+        static bool clearAll();
         static bool removeInterrupt(uint8_t rotatoryIndex);
         static bool removeButtonInterrupt(uint8_t buttonIndex);
 

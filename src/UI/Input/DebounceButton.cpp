@@ -36,6 +36,14 @@ bool DebounceButton::addMultipleInterrupt(uint8_t* buttonIndexes, std::function<
     return allSet;
 }
 
+bool DebounceButton::clearAll(){
+    /*uint8_t clearArray[4];
+    for(uint8_t i = 0; i < 4; i++) clearArray[i] = i;
+    clearMultipleInterrupt(clearArray);*/
+    for(std::function<void(void)> &f : ISREvents) f = {};
+    return true;
+}
+
 bool DebounceButton::clearMultipleInterrupt(uint8_t* buttonIndexes){
     if(sizeof(buttonIndexes) == 0) Utilities::debug("There are no button to clear\n");
     bool allSet = true;

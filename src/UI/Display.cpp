@@ -33,3 +33,7 @@ void Display::addRedrawHandle(TaskHandle_t h){
     redrawHandle = h;
     for(DisplayItem *it : itemList) it -> attachRedrawHandler(h);
 }
+
+void Display::attachInputs(){
+    for(DisplayItem *it : itemList) it -> attachEvents();
+}

@@ -16,6 +16,7 @@ bool MenuManager::isInTransition = false;
 void MenuManager::init(){
     startTFT();
     DisplayItem::startDisplayItems(width, height);
+    Widget::startWidgets();
     DebounceButton::init();
     RotaryEncoder::init();
 
@@ -35,6 +36,8 @@ void MenuManager::launch(){
     for(Display d : displayList){
         d.addRedrawHandle(drawTaskhandle);
     }
+
+    displayList[0].attachInputs();
 }
 
 void MenuManager::drawTask(void* funcParams){
@@ -51,11 +54,11 @@ void MenuManager::drawTask(void* funcParams){
             if(dispOverlay.animationID == DisplayOverlay::ANIM_SWEEP_OUT_LEFT) currentDisplay = nextDisplay;
             if(!dispOverlay.needsToRedraw()){
                 isInTransition = false;
+                displayList[nextDisplay].attachInputs();
                 //Little trick to not modify forceDraw();
                 ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
             }
         }else{
-            canvas.fillSprite(TFT_BLACK);
             displayList[currentDisplay].drawDisplay(canvas);
         }
 
@@ -81,11 +84,11 @@ bool MenuManager::changeScreen(String displayName){
     const std::vector<uint16_t> c{TFT_GOLD, TFT_GOLD};
     dispOverlay.drawMultipleAnimation(v, c);
 
-    uint8_t clearArray[4];
-    for(uint8_t i = 0; i < 4; i++) clearArray[i] = i;
-    DebounceButton::clearMultipleInterrupt(clearArray);
+    DebounceButton::clearAll();
+    RotaryEncoder::clearAll();
 
     nextDisplay = getDisplayByName(displayName);
+
     isInTransition = true;
     return true;
 }
