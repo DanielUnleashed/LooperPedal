@@ -37,7 +37,7 @@ void MenuManager::launch(){
         d.addRedrawHandle(drawTaskhandle);
     }
 
-    displayList[0].attachInputs();
+    displayList[0].launchDisplay();
 }
 
 void MenuManager::drawTask(void* funcParams){
@@ -52,9 +52,10 @@ void MenuManager::drawTask(void* funcParams){
             dispOverlay.render(canvas);
 
             if(dispOverlay.animationID == DisplayOverlay::ANIM_SWEEP_OUT_LEFT) currentDisplay = nextDisplay;
-            if(!dispOverlay.needsToRedraw()){
+            if(!dispOverlay.needsToRedraw()){ //Ended display overlay animation
                 isInTransition = false;
-                displayList[nextDisplay].attachInputs();
+                
+                displayList[nextDisplay].launchDisplay();
                 //Little trick to not modify forceDraw();
                 ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
             }
@@ -101,6 +102,10 @@ uint8_t MenuManager::getDisplayByName(String displayName){
     }
     Utilities::error("Could not find display %s\n", displayName.c_str());
     throw std::runtime_error("MenuManager error!");
+}
+
+Display* MenuManager::getCurrentDisplay(){
+    return &displayList[currentDisplay];
 }
 
 void MenuManager::launchOverlay(uint8_t overlayIndex){

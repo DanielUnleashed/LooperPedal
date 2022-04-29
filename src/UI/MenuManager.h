@@ -28,6 +28,8 @@ class MenuManager {
     static bool changeScreen(String screenName);
     static void launchOverlay(uint8_t animationID);
 
+    static Display* getCurrentDisplay();
+
     private:
     static TFT_eSPI tft;
     static uint16_t width, height;

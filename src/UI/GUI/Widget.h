@@ -6,23 +6,42 @@
 class Widget : public DisplayItem{
 
     public:
-    Widget(String name, uint8_t tileX, uint8_t tileY, uint8_t sizeX, uint8_t sizeY);
+    Widget(String name, uint8_t tileX, uint8_t tileY, uint8_t sizeX, uint8_t sizeY, 
+        uint8_t inWidgetSelectables);
+
+    String widgetName;
+    uint16_t widgetID;
+
+    uint8_t inWidgetSelectables;
 
     static void startWidgets();
     static void increaseCursor();
     static void decreaseCursor();
-    static bool isSelectingTile;
 
-    void draw() override;
+    static bool isWidgetSelectionMode;
+
     virtual void widgetDraw() = 0;
+
+    static std::vector<Widget*> displayedWidgets;
+    static void addWidget(Widget* w);
+    static void removeWidget(Widget* w);
+    static void clearWidgets();
+    // Will sort the list above according to placement priorities.
+    static void sortDisplayedWidgetsList();
+
+    static void switchSelectionMode();
 
     protected:
     static uint16_t tileSize;
     static uint16_t padX, padY;
 
-    static int8_t cursorPosition;
+    // For holding a widget
+    static int8_t holdingPosition;
+    // For moving through the interface
+    static int8_t selectedWidget;
+    static int8_t inWidgetSelection;
 
-    bool isWidgetSelected = false;
+    bool isSelected();
 
     uint8_t sizeX, sizeY;
     uint8_t tileX, tileY;
@@ -41,6 +60,9 @@ class Widget : public DisplayItem{
     void drawText(uint8_t pX, uint8_t pY, String text, uint16_t color);
     void drawCentreText(uint8_t pX, uint8_t pY, String text, uint16_t color);
     void pushSprite(TFT_eSprite &sprite, uint16_t x, uint16_t y);
+
+    private:
+    void draw() override;
 
 };
 

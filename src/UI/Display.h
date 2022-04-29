@@ -17,7 +17,7 @@ class Display {
     void forceDraw();
     void addRedrawHandle(TaskHandle_t h);
 
-    void attachInputs();
+    void launchDisplay();
 
     private:
     std::vector<DisplayItem*> itemList;

@@ -169,7 +169,14 @@
     "streambuf": "cpp",
     "cinttypes": "cpp",
     "utility": "cpp",
-    "typeinfo": "cpp"
+    "typeinfo": "cpp",
+    "atomic": "cpp",
+    "iterator": "cpp",
+    "map": "cpp",
+    "memory_resource": "cpp",
+    "optional": "cpp",
+    "random": "cpp",
+    "string_view": "cpp"
   },
   "cmake.configureOnOpen": false
 }

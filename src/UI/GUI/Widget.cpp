@@ -1,44 +1,103 @@
 #include "Widget.h"
 
+std::vector<Widget*> Widget::displayedWidgets;
 uint16_t Widget::tileSize, Widget::padX, Widget::padY;
 
-int8_t Widget::cursorPosition = 0;
-bool Widget::isSelectingTile = false;
+int8_t Widget::holdingPosition = 0, Widget::selectedWidget = 0, Widget::inWidgetSelection = 0;
+bool Widget::isWidgetSelectionMode = false;
 
-Widget::Widget(String name, uint8_t tx, uint8_t ty, uint8_t sx, uint8_t sy) : DisplayItem(name){
-    itemName = name;
+Widget::Widget(String name, uint8_t tx, uint8_t ty, uint8_t sx, uint8_t sy, uint8_t iW) : DisplayItem("Widget"){
+    static uint16_t widgetCounter = 0;
+    widgetID = widgetCounter++;
+
+    widgetName = name;
     tileX = tx;
     tileY = ty;
     sizeX = sx;
     sizeY = sy;
+
+    inWidgetSelectables = iW;
 
     oX = tileSize*tileX + padX;
     oY = tileSize*tileY + padY;
 }
 
 void Widget::draw(){
-    if(isSelectingTile && isWidgetSelected){
-        if(cursorPosition >= (TILES_X-sizeX+1)*(TILES_Y-sizeY+1)) cursorPosition = 0;
-        if(cursorPosition < 0) cursorPosition = (TILES_X-sizeX+1)*(TILES_Y-sizeY+1) - 1;
+    if(isWidgetSelectionMode && isSelected()){
+        if(holdingPosition >= (TILES_X-sizeX+1)*(TILES_Y-sizeY+1)) holdingPosition = 0;
+        if(holdingPosition < 0) holdingPosition = (TILES_X-sizeX+1)*(TILES_Y-sizeY+1) - 1;
 
         drawFilledRect(0,0,100,100,TFT_BLACK);
-        tileY = cursorPosition/(TILES_X-sizeX+1);
-        tileX = cursorPosition%(TILES_X-sizeX+1);
+        tileY = holdingPosition/(TILES_X-sizeX+1);
+        tileX = holdingPosition%(TILES_X-sizeX+1);
         oX = tileSize*tileX + padX;
         oY = tileSize*tileY + padY;
         drawRectangle(0,0,100,100,TFT_GREEN);
     }else{
         widgetDraw();
+        if(isSelected()) drawRectangle(0,0,100,100, TFT_RED);
+    }
+}
+
+bool Widget::isSelected(){
+    return displayedWidgets[selectedWidget]->widgetID == widgetID;
+}
+
+void Widget::switchSelectionMode(){
+    isWidgetSelectionMode = !isWidgetSelectionMode;
+    if(isWidgetSelectionMode){
+        Widget* sel = displayedWidgets[selectedWidget];
+        holdingPosition = sel->tileY*TILES_X + sel->tileX;
     }
 }
 
 void Widget::increaseCursor(){
-    cursorPosition++;
+    if(isWidgetSelectionMode) holdingPosition++;
+    else{
+        if(inWidgetSelection+1 < displayedWidgets[selectedWidget]->inWidgetSelectables){
+            inWidgetSelection++;
+        }else{
+            if(selectedWidget+1 < displayedWidgets.size()) selectedWidget++;
+            else selectedWidget = 0;
+            inWidgetSelection = 0;
+        }
+    }
 }
 
-
 void Widget::decreaseCursor(){
-    cursorPosition--;
+    if(isWidgetSelectionMode) holdingPosition--;
+    else{
+        if(inWidgetSelection-1 >= 0){
+            inWidgetSelection--;
+        }else{
+            if(selectedWidget-1 < 0) selectedWidget = displayedWidgets.size()-1;
+            else selectedWidget--;
+            inWidgetSelection = displayedWidgets[selectedWidget]->inWidgetSelectables-1;
+        }
+    }
+}
+
+void Widget::addWidget(Widget* w){
+    displayedWidgets.push_back(w);
+}
+
+void Widget::removeWidget(Widget* in){
+    for(auto it = begin(displayedWidgets); it != end(displayedWidgets); it++){
+        if((*it)->widgetID == in->widgetID)
+            displayedWidgets.erase(it);
+    }
+}
+
+void Widget::clearWidgets(){
+    displayedWidgets.clear();
+}
+
+void Widget::sortDisplayedWidgetsList(){
+    std::sort(displayedWidgets.begin(), displayedWidgets.end(), [](Widget* w1, Widget* w2)->bool{
+        uint16_t length1 = w1->tileY * TILES_X + w1->tileX;
+        uint16_t length2 = w2->tileY * TILES_X + w2->tileX;
+        return length1 < length2;
+    });
 }
 
 void Widget::startWidgets(){

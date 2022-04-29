@@ -13,14 +13,14 @@ void setup() {
 
   MenuManager::init();
 
-  static Taskbar taskbar(0,3);
-  taskbar.addButton("Chicken", 1);
-  taskbar.addButton("Strips", 3);
+  Taskbar* taskbar = new Taskbar(0,3);
+  taskbar->addButton("Chicken", 1);
+  taskbar->addButton("Strips", 3);
 
   static DemoWidget demo(0,0,2,2);
   
   static Display mainDisplay("Main");
-  mainDisplay.addItem(&taskbar);
+  mainDisplay.addItem(taskbar);
   mainDisplay.addItem(&demo);
 
   MenuManager::addDisplay(mainDisplay);

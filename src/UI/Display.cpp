@@ -18,6 +18,10 @@ void Display::forceDraw(){
 void Display::addItem(DisplayItem *item){
     itemList.push_back(item);
     if(redrawHandle != NULL) item -> attachRedrawHandler(redrawHandle);
+    if(item->itemName.equals("Widget")){
+        Widget::addWidget((Widget*) item);
+        Widget::sortDisplayedWidgetsList();
+    }
 }
 
 void Display::removeItem(DisplayItem *item){
@@ -34,6 +38,13 @@ void Display::addRedrawHandle(TaskHandle_t h){
     for(DisplayItem *it : itemList) it -> attachRedrawHandler(h);
 }
 
-void Display::attachInputs(){
-    for(DisplayItem *it : itemList) it -> attachEvents();
+void Display::launchDisplay(){
+    Widget::clearWidgets();
+    for(DisplayItem *it : itemList){
+        it -> attachEvents();
+        if(it->itemName.equals("Widget")){
+            Widget::addWidget((Widget*)it);
+        }
+    }
+    Widget::sortDisplayedWidgetsList();
 }
