@@ -6,14 +6,13 @@ DemoWidget::DemoWidget(uint8_t tileX, uint8_t tileY, uint8_t sizeX, uint8_t size
 
         if(in) increaseCursor();
         else decreaseCursor();
-        redraw();
+        redrawFromISR();
     });
 
     addRotaryButtonEvent(0, [this]{
-        Serial.println("hallo");
         isSelectingTile = !isSelectingTile;
         isWidgetSelected = !isWidgetSelected;
-        redraw();
+        redrawFromISR();
     });
 }
 

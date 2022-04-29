@@ -112,7 +112,7 @@ void AudioPlayer::memoryTask(void* funcParams){
 void IRAM_ATTR AudioPlayer::frequencyTimer(){
   if(!isPlaying) return;
 
-  vTaskEnterCritical(&timerMux);
+  taskENTER_CRITICAL(&timerMux);
   #ifdef PASS_AUDIO_INPUT_DURING_RECORDING
     uint16_t adcRead = adc.updateReadings();
     uint32_t mix;
@@ -128,7 +128,7 @@ void IRAM_ATTR AudioPlayer::frequencyTimer(){
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     vTaskNotifyGiveFromISR(memoryTaskHandle, &xHigherPriorityTaskWoken);
   }
-  vTaskExitCritical(&timerMux);
+  taskEXIT_CRITICAL(&timerMux);
 }
 
 void AudioPlayer::statusMonitorTask(void* funcParams){

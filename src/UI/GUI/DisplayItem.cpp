@@ -52,6 +52,14 @@ void DisplayItem::redraw(){
     else Utilities::error("RedrawHandle is null in %s!\n", itemName.c_str());
 }
 
+void DisplayItem::redrawFromISR(){
+    needsUpdate = true;
+    if(redrawHandle != NULL){
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        vTaskNotifyGiveFromISR(redrawHandle, &xHigherPriorityTaskWoken); 
+    }else Utilities::error("RedrawHandle is null in %s!\n", itemName.c_str());
+}
+
 void DisplayItem::endAnimation(){
     needsUpdate = false;
 }
