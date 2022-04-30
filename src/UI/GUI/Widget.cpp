@@ -29,7 +29,7 @@ Widget::Widget(String name, uint8_t tx, uint8_t ty, uint8_t sx, uint8_t sy, uint
     oY = tileSize*tileY + padY;
 
     if(MenuManager::isLaunched){
-        isWidgetSelectionMode = true;
+        switchSelectionMode();
         holdingPosition = 0;
         selectedWidget = 0;
     }
