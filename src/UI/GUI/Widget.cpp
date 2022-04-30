@@ -31,7 +31,7 @@ Widget::Widget(String name, uint8_t tx, uint8_t ty, uint8_t sx, uint8_t sy, uint
     if(MenuManager::isLaunched){
         switchSelectionMode();
         holdingPosition = 0;
-        selectedWidget = 0;
+        selectedWidget = 0; //This should be changed!
     }
 }
 
@@ -225,6 +225,18 @@ void Widget::widgetEventTask(void* funcParams){
                     t->addButton("Dim.X", 0);
                     t->addButton("Dim.Y", 1);
                     t->addButton("Back", 3);
+
+                    DebounceButton::addInterrupt(0, []{
+                        displayedWidgets[selectedWidget] -> sizeX++;
+                        if(displayedWidgets[selectedWidget]->sizeX > TILES_X) displayedWidgets[selectedWidget]->sizeX = 1;
+                        displayedWidgets[selectedWidget] -> redrawFromISR();
+                    });
+
+                    DebounceButton::addInterrupt(1, []{
+                        displayedWidgets[selectedWidget] -> sizeY++;
+                        if(displayedWidgets[selectedWidget]->sizeY > TILES_Y) displayedWidgets[selectedWidget]->sizeY = 1;
+                        displayedWidgets[selectedWidget] -> redrawFromISR();
+                    });
 
                     DebounceButton::addInterrupt(3, []{
                         widgetEvent = UNDO_WIDGET_SELECTION;
