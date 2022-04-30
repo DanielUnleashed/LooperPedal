@@ -6,8 +6,10 @@ Display::Display(String n){
 }
 
 void Display::drawDisplay(TFT_eSprite &canvas){
+    Widget::startDraw(canvas);
     for(DisplayItem* it : itemList)
         if(it -> needsToRedraw()) it -> render(canvas);
+    Widget::finalDraw(canvas);
 }
 
 void Display::forceDraw(){

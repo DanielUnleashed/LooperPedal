@@ -10,6 +10,7 @@ class Widget : public DisplayItem{
     static const uint8_t INCREASE_CURSOR = 1;
     static const uint8_t DECREASE_CURSOR = 2;
     static const uint8_t SWITCH_SELECTION_MODES = 3;
+    static const uint8_t UNDO_WIDGET_SELECTION = 4;
 
     Widget(String name, uint8_t tileX, uint8_t tileY, uint8_t sizeX, uint8_t sizeY, 
         uint8_t inWidgetSelectables);
@@ -25,7 +26,12 @@ class Widget : public DisplayItem{
 
     static bool isWidgetSelectionMode;
 
+    static void startDraw(TFT_eSprite &canvas);
     virtual void widgetDraw() = 0;
+    static void finalDraw(TFT_eSprite &canvas);
+
+    static bool tileMapOverlap[TILES_X][TILES_Y];
+
     static void widgetEventTask(void* funcParams);
     static TaskHandle_t widgetEventHandle;
     static uint8_t widgetEvent;
@@ -37,6 +43,7 @@ class Widget : public DisplayItem{
     // Will sort the list above according to placement priorities.
     static void sortDisplayedWidgetsList();
     static bool areTilesOverlapping();
+    static bool getTileOverlapMap();
     static void redrawAll();
 
     static void switchSelectionMode();
@@ -59,6 +66,7 @@ class Widget : public DisplayItem{
     uint16_t oX, oY;
 
     Point transformRelativePoint(uint8_t pX, uint8_t pY);
+    void recalculateRelativePoint();
 
     //General draw functions
     void drawGrid();
@@ -71,6 +79,8 @@ class Widget : public DisplayItem{
     void drawText(uint8_t pX, uint8_t pY, String text, uint16_t color);
     void drawCentreText(uint8_t pX, uint8_t pY, String text, uint16_t color);
     void pushSprite(TFT_eSprite &sprite, uint16_t x, uint16_t y);
+
+    static void fillTile(TFT_eSprite &canvas, uint8_t x, uint8_t y, uint16_t color);
 
     private:
     void draw() override;

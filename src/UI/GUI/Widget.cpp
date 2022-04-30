@@ -11,6 +11,8 @@ uint8_t Widget::widgetEvent = NONE_EVENT;
 int8_t Widget::holdingPosition = 0, Widget::previousHoldingPosition = 0, Widget::selectedWidget = 0, Widget::inWidgetSelection = 0;
 bool Widget::isWidgetSelectionMode = false;
 
+bool Widget::tileMapOverlap[TILES_X][TILES_Y];
+
 Widget::Widget(String name, uint8_t tx, uint8_t ty, uint8_t sx, uint8_t sy, uint8_t iW) : DisplayItem("Widget"){
     static uint16_t widgetCounter = 0;
     widgetID = widgetCounter++;
@@ -33,17 +35,33 @@ Widget::Widget(String name, uint8_t tx, uint8_t ty, uint8_t sx, uint8_t sy, uint
     }
 }
 
+void Widget::startDraw(TFT_eSprite &canvas){
+    //Maybe draw a background here?
+    canvas.fillRect(0,0,width, height-TASKBAR_HEIGHT, TFT_BLACK);
+}
+
 void Widget::draw(){
-    if(isWidgetSelectionMode && isSelected()){
-        drawFilledRect(0,0,100,100,TFT_BLACK);
-        tileY = holdingPosition/(TILES_X-sizeX+1);
-        tileX = holdingPosition%(TILES_X-sizeX+1);
-        oX = tileSize*tileX + padX;
-        oY = tileSize*tileY + padY;
-        drawRectangle(0,0,100,100,TFT_GREEN);
+    if(isWidgetSelectionMode){
+        if(isSelected()) return;
+        drawFilledRect(0,0,100,100,TFT_DARKGREY);
     }else{
         widgetDraw();
         if(isSelected()) drawRectangle(0,0,100,100, TFT_RED);
+    }
+}
+
+void Widget::finalDraw(TFT_eSprite &canvas){
+    if(isWidgetSelectionMode){
+        Widget* w = displayedWidgets[selectedWidget];
+        getTileOverlapMap();
+
+        for(uint8_t x = w->tileX; x <w->tileX+w->sizeX; x++){
+            for(uint8_t y = w->tileY; y <w->tileY+w->sizeY; y++){
+                if(tileMapOverlap[x][y]) fillTile(canvas, x, y, TFT_RED);
+                else fillTile(canvas, x, y, TFT_GREEN);
+            }
+        }
+        displayedWidgets[selectedWidget]->drawRectangle(0,0,100,100,TFT_DARKGREEN);
     }
 }
 
@@ -106,6 +124,24 @@ bool Widget::areTilesOverlapping(){
     return false;
 }
 
+bool Widget::getTileOverlapMap(){
+    bool tileMap[TILES_X][TILES_Y];
+    memset(tileMap, 0, sizeof(tileMap));
+    memset(tileMapOverlap, 0, sizeof(tileMapOverlap));
+    bool theresOverlap = false;
+    for(Widget* w : displayedWidgets){
+        for(uint8_t i = 0; i < w->sizeX; i++){
+            for(uint8_t j = 0; j < w->sizeY; j++){
+                if(tileMap[w->tileX+i][w->tileY+j]){
+                    theresOverlap = true;
+                    tileMapOverlap[w->tileX+i][w->tileY+j] = true;
+                }else tileMap[w->tileX+i][w->tileY+j] = true;
+            }
+        }
+    }
+    return theresOverlap;
+}
+
 void Widget::redrawAll(){
     for(Widget* w : displayedWidgets) w->needsUpdate = true;
     displayedWidgets[0] -> redrawFromISR();
@@ -115,6 +151,8 @@ void Widget::startWidgets(){
     uint16_t distX = width/TILES_X;
     uint16_t distY = (height - TASKBAR_HEIGHT)/TILES_Y;
     tileSize = distX<distY ? distX : distY;
+
+    Serial.printf("TileSize: %d\n", tileSize);
 
     padX = (width - tileSize*TILES_X)/2;
     padY = (height - TASKBAR_HEIGHT - tileSize*TILES_Y)/2;
@@ -132,6 +170,7 @@ void Widget::widgetEventTask(void* funcParams){
                 holdingPosition++;
                 if(holdingPosition >= (TILES_X-displayedWidgets[selectedWidget]->sizeX+1)*(TILES_Y-displayedWidgets[selectedWidget]->sizeY+1)) 
                     holdingPosition = 0;
+                displayedWidgets[selectedWidget] -> recalculateRelativePoint();
                 redrawAll();
             }else{
                 displayedWidgets[selectedWidget] -> redrawFromISR();
@@ -149,6 +188,7 @@ void Widget::widgetEventTask(void* funcParams){
                 holdingPosition--;
                 if(holdingPosition < 0) 
                     holdingPosition = (TILES_X-displayedWidgets[selectedWidget]->sizeX+1)*(TILES_Y-displayedWidgets[selectedWidget]->sizeY+1) - 1;
+                displayedWidgets[selectedWidget] -> recalculateRelativePoint();
                 redrawAll();
             }else{
                 displayedWidgets[selectedWidget] -> redrawFromISR();
@@ -178,7 +218,8 @@ void Widget::widgetEventTask(void* funcParams){
                 Widget* sel = displayedWidgets[selectedWidget];
                 holdingPosition = sel->tileY*(TILES_X - sel->sizeX + 1) + sel->tileX;
 
-                if(taskbarIndex >= 0) {
+                if(taskbarIndex >= 0) { //If the taskbar exists then...
+                    //Substitute all the current buttons and add the custom move functions.
                     t->saveAndRemoveButtons();
                     DebounceButton::saveAndRemoveButtons();
                     t->addButton("Dim.X", 0);
@@ -186,23 +227,25 @@ void Widget::widgetEventTask(void* funcParams){
                     t->addButton("Back", 3);
 
                     DebounceButton::addInterrupt(3, []{
-                        holdingPosition = previousHoldingPosition;
-                        Serial.println(holdingPosition);
-                        displayedWidgets[selectedWidget]->tileY = previousHoldingPosition/(TILES_X-displayedWidgets[selectedWidget]->sizeX+1);
-                        displayedWidgets[selectedWidget]->tileX = previousHoldingPosition%(TILES_X-displayedWidgets[selectedWidget]->sizeX+1);
-                        switchSelectionMode();
+                        widgetEvent = UNDO_WIDGET_SELECTION;
+                        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+                        vTaskNotifyGiveFromISR(widgetEventHandle, &xHigherPriorityTaskWoken); 
                     });
-
                     t->forceRedraw();
                 }
             }else{
                 if(taskbarIndex >= 0) {
+                    // Undo the change made above.
                     t->undoRemoveButtons();
                     DebounceButton::undoRemoveButtons();
                     t->forceRedraw();
                 }
             }
             redrawAll();
+        }else if(widgetEvent == UNDO_WIDGET_SELECTION){
+            holdingPosition = previousHoldingPosition;
+            displayedWidgets[selectedWidget] -> recalculateRelativePoint();
+            switchSelectionMode();
         }
     }
 }
@@ -214,6 +257,13 @@ Point Widget::transformRelativePoint(uint8_t pX, uint8_t pY){
     if(pY < 100) ret.y = oY + sizeY*tileSize*pY/100;
     else ret.y = height-1;
     return ret;
+}
+
+void Widget::recalculateRelativePoint(){
+    tileY = holdingPosition/(TILES_X-sizeX+1);
+    tileX = holdingPosition%(TILES_X-sizeX+1);
+    oX = tileSize*tileX + padX;
+    oY = tileSize*tileY + padY;
 }
 
 // ***** DRAW FUNCTIONS *****
@@ -288,4 +338,16 @@ void Widget::drawCentreText(uint8_t pX, uint8_t pY, String text, uint16_t color)
 
 void Widget::pushSprite(TFT_eSprite &sp, uint16_t x, uint16_t y){
     sp.pushToSprite(canvas, x, y);
+}
+
+void Widget::fillTile(TFT_eSprite &canvas, uint8_t x, uint8_t y, uint16_t color){
+    uint16_t oX = padX + x*tileSize;
+    uint16_t oY = padY + y*tileSize;
+
+    uint16_t mX = oX + tileSize-1;
+    uint16_t mY = oY + tileSize-1;
+    for(uint8_t i = 1; i < tileSize; i+=4){
+        canvas.drawLine(oX + i, oY, oX, oY + i, color);
+        canvas.drawLine(mX - i, mY, mX, mY - i, color);
+    }
 }
