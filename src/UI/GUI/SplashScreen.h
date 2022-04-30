@@ -12,10 +12,15 @@ class SplashScreen : public DisplayItem{
 
     private:
     //Simple cube :)
-    double vertex[8][3] = {{1,1,-1},{1,-1,-1},{1,1,1},{1,-1,1},{-1,1,-1},{-1,-1,-1},{-1,1,1},{-1,-1,1}};
+    /*double vertex[8][3] = {{1,1,-1},{1,-1,-1},{1,1,1},{1,-1,1},{-1,1,-1},{-1,-1,-1},{-1,1,1},{-1,-1,1}};
     //Faces index in .obj files start at 1, remember that!!
     uint16_t faces[6][4] = {{1,5,7,3},{4,3,7,8},{8,7,5,6},{6,2,4,8},{2,1,3,4},{6,5,1,2}};
-    double normals[6][3] = {{0,1,0},{0,0,1},{-1,0,0},{0,-1,0},{1,0,0},{0,0,-1}};
+    double normals[6][3] = {{0,1,0},{0,0,1},{-1,0,0},{0,-1,0},{1,0,0},{0,0,-1}};*/
+
+    //Simple house :)))))
+    double vertex[9][3] = {{1,1,-1},{1,-1,-1},{1,1,1},{1,-1,1},{-1,1,-1},{-1,-1,-1},{-1,1,1},{-1,-1,1},{0,2,0}};
+    uint16_t faces[9][4] = {{5,7,9,0},{4,3,7,8},{8,7,5,6},{6,2,4,8},{2,1,3,4},{6,5,1,2},{3,1,9},{1,5,9},{7,3,9}};
+    double normals[9][3] = {{-0.707,0.707,0},{0,0,1},{-1,0,0},{0,-1,0},{1,0,0},{0,0,-1},{0.707,0.707,0},{0,0.707,-0.707},{0,0.707,0.707}};
     std::vector<std::array<uint16_t, 2>> edges;
 
     volatile bool fillPolygons = true;
@@ -30,6 +35,8 @@ class SplashScreen : public DisplayItem{
     const double sun[3] = {0.5774,-0.5774,-0.5774};
 
     volatile double inputVariable = 0;
+
+    uint8_t getEdgesCount(uint8_t index);
 
     void startParameters(TFT_eSprite*);
     void smoothRotation(double th, double &omega);

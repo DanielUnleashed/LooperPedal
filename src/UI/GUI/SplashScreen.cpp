@@ -48,8 +48,9 @@ SplashScreen::SplashScreen() : DisplayItem("Splashscreen"){
     // First fill the edges vector. It makes sure that the edges aren't repeated.
     uint16_t faceCount = sizeof(faces)/sizeof(faces[0]);
     for(uint16_t i = 0; i < faceCount; i++){
-        for(uint8_t j = 0; j < 4; j++){
-            uint16_t v0 = faces[i][j==0 ? 3 : j-1];
+        uint8_t edgeCount = getEdgesCount(i);
+        for(uint8_t j = 0; j < edgeCount; j++){
+            uint16_t v0 = faces[i][j==0 ? edgeCount-1 : j-1];
             uint16_t v1 = faces[i][j];
             if(v0 > v1){
                 uint16_t temp = v0;
@@ -171,6 +172,7 @@ void SplashScreen::startParameters(TFT_eSprite *spr){
         //This vertex will be out of the screen
         if (projVertex[0] < -aspectRatio || projVertex[0] > aspectRatio || projVertex[1] < -1.0 || projVertex[1] > 1.0) continue; 
     
+        // Little coords shifting
         uint16_t x = min(w-1.0, (projVertex[0]+1)*w/2.0);
         uint16_t y = min(h-1.0, (1.0 - (projVertex[1]+1.0)/2.0)*h);
         projectedPoints[index][0] = x;
@@ -196,11 +198,12 @@ void SplashScreen::startParameters(TFT_eSprite *spr){
         double dot = norm[0]*toFace[0] + norm[1]*toFace[1] + norm[2]*toFace[2];
         if(dot > 0) continue; //If not visible, continue
 
+        uint16_t totalEdges = getEdgesCount(index);
         if(fillPolygons){
+            // Coloring factor for the shadows of the object
             double sunDot = norm[0]*sun[0] + norm[1]*sun[1] + norm[2]*sun[2];
             double shadowFactor = max(0.3, (1-sunDot)/2);
 
-            uint16_t totalEdges = sizeof(faces[index])/sizeof(faces[index][0]);
             uint16_t ind0 = faces[index][0] - 1;
             uint16_t vert0x = projectedPoints[ind0][0];
             uint16_t vert0y = projectedPoints[ind0][1];
@@ -219,8 +222,8 @@ void SplashScreen::startParameters(TFT_eSprite *spr){
             }
         }else{
             //If visible, assign the sides to also be visible.
-            for(uint8_t j = 0; j < 4; j++){
-                uint16_t v0 = faces[index][j==0 ? 3 : j-1];
+            for(uint8_t j = 0; j < totalEdges; j++){
+                uint16_t v0 = faces[index][j==0 ? totalEdges-1 : j-1];
                 uint16_t v1 = faces[index][j];
                 if(v0 > v1){
                     uint16_t temp = v0;
@@ -371,4 +374,12 @@ void SplashScreen::multMatrixHomogeneous(double inVector[3], double matrix[4][4]
     outVector[0] = out[0];
     outVector[1] = out[1];
     outVector[2] = out[2];
+}
+
+uint8_t SplashScreen::getEdgesCount(uint8_t index){
+    uint8_t totalSize = sizeof(faces[index])/sizeof(faces[index][0]);
+    for(uint8_t i = 0; i < totalSize; i++){
+        if(faces[index][i] == 0) return i;
+    }
+    return totalSize;
 }
