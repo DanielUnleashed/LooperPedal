@@ -25,6 +25,7 @@ void Taskbar::draw(){
 bool Taskbar::addButton(String tagName, uint8_t index){
     if(index >= TOTAL_BUTTONS) Utilities::error("Button index %d out of bounds (max. %d)\n", index, TOTAL_BUTTONS);
     if(buttons[index].isEnabled) return false;
+    if(tagName.equals("")) return false;
     
     buttons[index].isEnabled = true;
     if(tagName.length() > 5){
@@ -37,4 +38,19 @@ bool Taskbar::addButton(String tagName, uint8_t index){
 bool Taskbar::removeButton(uint8_t index){
     buttons[index].isEnabled = false;
     return true;
+}
+
+void Taskbar::saveAndRemoveButtons(){
+    for(uint8_t i = 0; i < 4; i++){
+        previousButtons[i].isEnabled = buttons[i].isEnabled;
+        previousButtons[i].tagName = buttons[i].tagName;
+        removeButton(i);
+    }
+}
+
+void Taskbar::undoRemoveButtons(){
+    for(uint8_t i = 0; i < 4; i++){
+        removeButton(i);
+        if(previousButtons[i].isEnabled) addButton(previousButtons[i].tagName, i);
+    }
 }

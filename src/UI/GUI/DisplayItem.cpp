@@ -1,4 +1,5 @@
 #include "DisplayItem.h"
+#include "UI/MenuManager.h"
 
 uint16_t DisplayItem::width, DisplayItem::height;
 
@@ -32,10 +33,6 @@ void DisplayItem::startDisplayItems(uint16_t w, uint16_t h){
     height = h;
 }
 
-void DisplayItem::attachRedrawHandler(TaskHandle_t h){
-    redrawHandle = h;
-}
-
 void DisplayItem::startAnimation(){
     startAnimationTime = micros();
     redraw();
@@ -48,16 +45,12 @@ void DisplayItem::render(TFT_eSprite &c){
 
 void DisplayItem::redraw(){
     needsUpdate = true;
-    if(redrawHandle != NULL) xTaskNotifyGive(redrawHandle);
-    else Utilities::error("RedrawHandle is null in %s!\n", itemName.c_str());
+    MenuManager::wakeUpDrawTask();
 }
 
 void DisplayItem::redrawFromISR(){
     needsUpdate = true;
-    if(redrawHandle != NULL){
-        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        vTaskNotifyGiveFromISR(redrawHandle, &xHigherPriorityTaskWoken); 
-    }else Utilities::error("RedrawHandle is null in %s!\n", itemName.c_str());
+    MenuManager::wakeUpDrawTaskFromISR();
 }
 
 void DisplayItem::endAnimation(){

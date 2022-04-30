@@ -1,9 +1,14 @@
 #include "Widget.h"
+#include "UI/MenuManager.h"
+#include "UI/GUI/Taskbar.h"
 
 std::vector<Widget*> Widget::displayedWidgets;
+TaskHandle_t Widget::widgetEventHandle = NULL;
 uint16_t Widget::tileSize, Widget::padX, Widget::padY;
 
-int8_t Widget::holdingPosition = 0, Widget::selectedWidget = 0, Widget::inWidgetSelection = 0;
+uint8_t Widget::widgetEvent = NONE_EVENT;
+
+int8_t Widget::holdingPosition = 0, Widget::previousHoldingPosition = 0, Widget::selectedWidget = 0, Widget::inWidgetSelection = 0;
 bool Widget::isWidgetSelectionMode = false;
 
 Widget::Widget(String name, uint8_t tx, uint8_t ty, uint8_t sx, uint8_t sy, uint8_t iW) : DisplayItem("Widget"){
@@ -20,13 +25,16 @@ Widget::Widget(String name, uint8_t tx, uint8_t ty, uint8_t sx, uint8_t sy, uint
 
     oX = tileSize*tileX + padX;
     oY = tileSize*tileY + padY;
+
+    if(MenuManager::isLaunched){
+        isWidgetSelectionMode = true;
+        holdingPosition = 0;
+        selectedWidget = 0;
+    }
 }
 
 void Widget::draw(){
     if(isWidgetSelectionMode && isSelected()){
-        if(holdingPosition >= (TILES_X-sizeX+1)*(TILES_Y-sizeY+1)) holdingPosition = 0;
-        if(holdingPosition < 0) holdingPosition = (TILES_X-sizeX+1)*(TILES_Y-sizeY+1) - 1;
-
         drawFilledRect(0,0,100,100,TFT_BLACK);
         tileY = holdingPosition/(TILES_X-sizeX+1);
         tileX = holdingPosition%(TILES_X-sizeX+1);
@@ -44,37 +52,21 @@ bool Widget::isSelected(){
 }
 
 void Widget::switchSelectionMode(){
-    isWidgetSelectionMode = !isWidgetSelectionMode;
-    if(isWidgetSelectionMode){
-        Widget* sel = displayedWidgets[selectedWidget];
-        holdingPosition = sel->tileY*TILES_X + sel->tileX;
-    }
+    widgetEvent = SWITCH_SELECTION_MODES;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    vTaskNotifyGiveFromISR(widgetEventHandle, &xHigherPriorityTaskWoken); 
 }
 
 void Widget::increaseCursor(){
-    if(isWidgetSelectionMode) holdingPosition++;
-    else{
-        if(inWidgetSelection+1 < displayedWidgets[selectedWidget]->inWidgetSelectables){
-            inWidgetSelection++;
-        }else{
-            if(selectedWidget+1 < displayedWidgets.size()) selectedWidget++;
-            else selectedWidget = 0;
-            inWidgetSelection = 0;
-        }
-    }
+    widgetEvent = INCREASE_CURSOR;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    vTaskNotifyGiveFromISR(widgetEventHandle, &xHigherPriorityTaskWoken); 
 }
 
 void Widget::decreaseCursor(){
-    if(isWidgetSelectionMode) holdingPosition--;
-    else{
-        if(inWidgetSelection-1 >= 0){
-            inWidgetSelection--;
-        }else{
-            if(selectedWidget-1 < 0) selectedWidget = displayedWidgets.size()-1;
-            else selectedWidget--;
-            inWidgetSelection = displayedWidgets[selectedWidget]->inWidgetSelectables-1;
-        }
-    }
+    widgetEvent = DECREASE_CURSOR;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    vTaskNotifyGiveFromISR(widgetEventHandle, &xHigherPriorityTaskWoken); 
 }
 
 void Widget::addWidget(Widget* w){
@@ -100,6 +92,25 @@ void Widget::sortDisplayedWidgetsList(){
     });
 }
 
+bool Widget::areTilesOverlapping(){
+    bool tileMap[TILES_X][TILES_Y];
+    memset(tileMap, 0, sizeof(tileMap));
+    for(Widget* w : displayedWidgets){
+        for(uint8_t i = 0; i < w->sizeX; i++){
+            for(uint8_t j = 0; j < w->sizeY; j++){
+                if(tileMap[w->tileX+i][w->tileY+j]) return true;
+                else tileMap[w->tileX+i][w->tileY+j] = true;
+            }
+        }
+    }
+    return false;
+}
+
+void Widget::redrawAll(){
+    for(Widget* w : displayedWidgets) w->needsUpdate = true;
+    displayedWidgets[0] -> redrawFromISR();
+}
+
 void Widget::startWidgets(){
     uint16_t distX = width/TILES_X;
     uint16_t distY = (height - TASKBAR_HEIGHT)/TILES_Y;
@@ -107,6 +118,93 @@ void Widget::startWidgets(){
 
     padX = (width - tileSize*TILES_X)/2;
     padY = (height - TASKBAR_HEIGHT - tileSize*TILES_Y)/2;
+
+    xTaskCreatePinnedToCore(widgetEventTask, "WidgetEvents", 10000, NULL, 5, &widgetEventHandle, 0);
+}
+
+void Widget::widgetEventTask(void* funcParams){
+    for(;;){
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
+        if(widgetEvent == NONE_EVENT) continue;
+        else if(widgetEvent == INCREASE_CURSOR){
+            if(isWidgetSelectionMode){
+                holdingPosition++;
+                if(holdingPosition >= (TILES_X-displayedWidgets[selectedWidget]->sizeX+1)*(TILES_Y-displayedWidgets[selectedWidget]->sizeY+1)) 
+                    holdingPosition = 0;
+                redrawAll();
+            }else{
+                displayedWidgets[selectedWidget] -> redrawFromISR();
+                if(inWidgetSelection+1 < displayedWidgets[selectedWidget]->inWidgetSelectables){
+                    inWidgetSelection++;
+                }else{
+                    if(selectedWidget+1 < displayedWidgets.size()) selectedWidget++;
+                    else selectedWidget = 0;
+                    inWidgetSelection = 0;
+                }
+                displayedWidgets[selectedWidget] -> redrawFromISR();
+            }
+        }else if(widgetEvent == DECREASE_CURSOR){
+            if(isWidgetSelectionMode){
+                holdingPosition--;
+                if(holdingPosition < 0) 
+                    holdingPosition = (TILES_X-displayedWidgets[selectedWidget]->sizeX+1)*(TILES_Y-displayedWidgets[selectedWidget]->sizeY+1) - 1;
+                redrawAll();
+            }else{
+                displayedWidgets[selectedWidget] -> redrawFromISR();
+                if(inWidgetSelection-1 >= 0){
+                    inWidgetSelection--;
+                }else{
+                    if(selectedWidget-1 < 0) selectedWidget = displayedWidgets.size()-1;
+                    else selectedWidget--;
+                    inWidgetSelection = displayedWidgets[selectedWidget]->inWidgetSelectables-1;
+                }
+                displayedWidgets[selectedWidget] -> redrawFromISR();
+            }
+        }else if(widgetEvent == SWITCH_SELECTION_MODES){
+            // If tiles are overlapping then don't change modes.
+            if(isWidgetSelectionMode && areTilesOverlapping()) continue;
+
+            // When entering selection mode, store the original position, so if 'Back' is pressed, it can return to the original position.
+            if(!isWidgetSelectionMode)
+                previousHoldingPosition = displayedWidgets[selectedWidget]->tileY*(TILES_X - displayedWidgets[selectedWidget]->sizeX + 1) + displayedWidgets[selectedWidget]->tileX;
+
+            isWidgetSelectionMode = !isWidgetSelectionMode;
+            int8_t taskbarIndex = MenuManager::getCurrentDisplay()->hasTaskbar();
+            Taskbar* t;
+            if(taskbarIndex >= 0) t = (Taskbar*)MenuManager::getCurrentDisplay()->getDisplayItem(taskbarIndex);
+
+            if(isWidgetSelectionMode){
+                Widget* sel = displayedWidgets[selectedWidget];
+                holdingPosition = sel->tileY*(TILES_X - sel->sizeX + 1) + sel->tileX;
+
+                if(taskbarIndex >= 0) {
+                    t->saveAndRemoveButtons();
+                    DebounceButton::saveAndRemoveButtons();
+                    t->addButton("Dim.X", 0);
+                    t->addButton("Dim.Y", 1);
+                    t->addButton("Back", 3);
+
+                    DebounceButton::addInterrupt(3, []{
+                        holdingPosition = previousHoldingPosition;
+                        Serial.println(holdingPosition);
+                        displayedWidgets[selectedWidget]->tileY = previousHoldingPosition/(TILES_X-displayedWidgets[selectedWidget]->sizeX+1);
+                        displayedWidgets[selectedWidget]->tileX = previousHoldingPosition%(TILES_X-displayedWidgets[selectedWidget]->sizeX+1);
+                        switchSelectionMode();
+                    });
+
+                    t->forceRedraw();
+                }
+            }else{
+                if(taskbarIndex >= 0) {
+                    t->undoRemoveButtons();
+                    DebounceButton::undoRemoveButtons();
+                    t->forceRedraw();
+                }
+            }
+            redrawAll();
+        }
+    }
 }
 
 Point Widget::transformRelativePoint(uint8_t pX, uint8_t pY){

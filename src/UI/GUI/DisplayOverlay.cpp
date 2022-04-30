@@ -1,4 +1,5 @@
 #include "DisplayOverlay.h"
+#include "UI/MenuManager.h"
 
 DisplayOverlay::DisplayOverlay() : DisplayItem("DisplayOverlay") {
     needsUpdate = false;
@@ -137,7 +138,7 @@ void DisplayOverlay::draw(){
         endAnimation();
         animationQueue.clear();
         animationQueuePalette.clear();
-        if(redrawHandle != NULL) xTaskNotifyGive(redrawHandle);
+        MenuManager::wakeUpDrawTask();
     }else redraw();
 }
 // Idea "leased" from https://www.geogebra.org/m/cXXGKUQk

@@ -30,6 +30,11 @@ class MenuManager {
 
     static Display* getCurrentDisplay();
 
+    static void wakeUpDrawTask();
+    static void wakeUpDrawTaskFromISR();
+
+    static bool isLaunched;
+
     private:
     static TFT_eSPI tft;
     static uint16_t width, height;
@@ -41,7 +46,7 @@ class MenuManager {
 
     static void startTFT();
 
-    static TaskHandle_t drawTaskhandle;
+    static TaskHandle_t drawTaskHandle;
     static void drawTask(void* funcParams);
     static uint8_t getDisplayByName(String name);
 

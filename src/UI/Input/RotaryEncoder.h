@@ -8,7 +8,7 @@
 #include "utils/Utilities.h"
 #include "DebounceButton.h"
 
-#define DEFAULT_ROTARY_DEBOUNCE 80
+#define DEFAULT_ROTARY_DEBOUNCE 120
 
 struct RotaryEncoderEvent{
     uint8_t pin;

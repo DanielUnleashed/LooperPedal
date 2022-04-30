@@ -8,10 +8,11 @@ uint8_t MenuManager::currentDisplay = 0;
 
 DisplayOverlay MenuManager::dispOverlay;
 
-TaskHandle_t MenuManager::drawTaskhandle = NULL;
+TaskHandle_t MenuManager::drawTaskHandle = NULL;
 
 uint8_t MenuManager::nextDisplay;
 bool MenuManager::isInTransition = false;
+bool MenuManager::isLaunched = false;
 
 void MenuManager::init(){
     startTFT();
@@ -29,15 +30,10 @@ void MenuManager::init(){
 }
 
 void MenuManager::launch(){
-    xTaskCreatePinnedToCore(drawTask, "DrawTask", 10000, NULL, 5, &drawTaskhandle, 0);
-    dispOverlay.attachRedrawHandler(drawTaskhandle);
+    xTaskCreatePinnedToCore(drawTask, "DrawTask", 10000, NULL, 5, &drawTaskHandle, 0);
     dispOverlay.diagonalRadius = sqrt(width*width + height*height);
-
-    for(Display d : displayList){
-        d.addRedrawHandle(drawTaskhandle);
-    }
-
     displayList[0].launchDisplay();
+    isLaunched = true;
 }
 
 void MenuManager::drawTask(void* funcParams){
@@ -68,6 +64,19 @@ void MenuManager::drawTask(void* funcParams){
         delay(DRAW_MS);
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     }
+}
+
+void MenuManager::wakeUpDrawTask(){
+    if(drawTaskHandle != NULL){
+        xTaskNotifyGive(drawTaskHandle); 
+    }else Utilities::error("RedrawHandle is null!\n");
+}
+
+void MenuManager::wakeUpDrawTaskFromISR(){
+    if(drawTaskHandle != NULL){
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        vTaskNotifyGiveFromISR(drawTaskHandle, &xHigherPriorityTaskWoken); 
+    }else Utilities::error("RedrawHandle is null!\n");
 }
 
 void MenuManager::addDisplay(Display d){

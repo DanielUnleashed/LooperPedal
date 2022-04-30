@@ -1,4 +1,5 @@
 #include "Display.h"
+#include "UI/MenuManager.h"
 
 Display::Display(String n){
     name = n;
@@ -12,15 +13,18 @@ void Display::drawDisplay(TFT_eSprite &canvas){
 void Display::forceDraw(){
     for(DisplayItem* it : itemList)
         it -> forceRedraw();
-    if(redrawHandle != NULL) xTaskNotifyGive(redrawHandle);
+    MenuManager::wakeUpDrawTask();
 }
 
 void Display::addItem(DisplayItem *item){
     itemList.push_back(item);
-    if(redrawHandle != NULL) item -> attachRedrawHandler(redrawHandle);
     if(item->itemName.equals("Widget")){
         Widget::addWidget((Widget*) item);
         Widget::sortDisplayedWidgetsList();
+    }
+    if(MenuManager::isLaunched){
+        //item -> forceRedraw(); Not necesary!
+        MenuManager::wakeUpDrawTask();
     }
 }
 
@@ -33,11 +37,6 @@ void Display::removeItem(DisplayItem *item){
     }
 }
 
-void Display::addRedrawHandle(TaskHandle_t h){
-    redrawHandle = h;
-    for(DisplayItem *it : itemList) it -> attachRedrawHandler(h);
-}
-
 void Display::launchDisplay(){
     Widget::clearWidgets();
     for(DisplayItem *it : itemList){
@@ -47,4 +46,14 @@ void Display::launchDisplay(){
         }
     }
     Widget::sortDisplayedWidgetsList();
+}
+
+int8_t Display::hasTaskbar(){
+    for(uint8_t i = 0; i < itemList.size(); i++) 
+        if(itemList[i]->itemName.equals("Taskbar")) return i;
+    return -1; 
+}
+
+DisplayItem* Display::getDisplayItem(uint8_t index){
+    return itemList[index];
 }

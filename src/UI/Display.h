@@ -15,13 +15,14 @@ class Display {
 
     void drawDisplay(TFT_eSprite &canvas);
     void forceDraw();
-    void addRedrawHandle(TaskHandle_t h);
 
     void launchDisplay();
 
+    int8_t hasTaskbar();
+    DisplayItem* getDisplayItem(uint8_t index);
+
     private:
     std::vector<DisplayItem*> itemList;
-    TaskHandle_t redrawHandle;
 };
 
 #endif

@@ -2,6 +2,7 @@
 
 DebounceButton* DebounceButton::systemButtons[TOTAL_BUTTONS];
 std::function<void(void)> IRAM_ATTR DebounceButton::ISREvents[TOTAL_BUTTONS];
+std::function<void(void)> IRAM_ATTR DebounceButton::previousISREvents[TOTAL_BUTTONS];
 
 // Maybe implement with a loop with https://stackoverflow.com/questions/11081573/passing-a-variable-as-a-template-argument
 void DebounceButton::init(){
@@ -120,4 +121,18 @@ bool DebounceButton::doubleClicked(){
 
 bool DebounceButton::twoButtonsClicked(uint8_t otherButton){
     return (millis()-systemButtons[otherButton]->lastTimePressed) < DEFAULT_DEBOUNCE_TIME;
+}
+
+void DebounceButton::saveAndRemoveButtons(){
+    for(uint8_t i = 0; i < 4; i++){
+        previousISREvents[i] = ISREvents[i];
+        removeInterrupt(i);
+    }
+}
+
+void DebounceButton::undoRemoveButtons(){
+    for(uint8_t i = 0; i < 4; i++){
+        removeInterrupt(i);
+        addInterrupt(i, previousISREvents[i]);
+    }
 }

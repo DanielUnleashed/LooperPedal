@@ -5,7 +5,7 @@
 
 struct TaskbarButton{
     bool isEnabled = false;
-    String tagName;
+    String tagName = "";
 };
 
 class Taskbar : public DisplayItem{
@@ -17,8 +17,12 @@ class Taskbar : public DisplayItem{
     bool addButton(String tagName, uint8_t index);
     bool removeButton(uint8_t index);
 
+    void saveAndRemoveButtons();
+    void undoRemoveButtons();
+
     private: 
     TaskbarButton buttons[4];
+    TaskbarButton previousButtons[4];
 
 };
 

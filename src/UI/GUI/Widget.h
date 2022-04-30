@@ -6,6 +6,11 @@
 class Widget : public DisplayItem{
 
     public:
+    static const uint8_t NONE_EVENT = 0;
+    static const uint8_t INCREASE_CURSOR = 1;
+    static const uint8_t DECREASE_CURSOR = 2;
+    static const uint8_t SWITCH_SELECTION_MODES = 3;
+
     Widget(String name, uint8_t tileX, uint8_t tileY, uint8_t sizeX, uint8_t sizeY, 
         uint8_t inWidgetSelectables);
 
@@ -21,6 +26,9 @@ class Widget : public DisplayItem{
     static bool isWidgetSelectionMode;
 
     virtual void widgetDraw() = 0;
+    static void widgetEventTask(void* funcParams);
+    static TaskHandle_t widgetEventHandle;
+    static uint8_t widgetEvent;
 
     static std::vector<Widget*> displayedWidgets;
     static void addWidget(Widget* w);
@@ -28,6 +36,8 @@ class Widget : public DisplayItem{
     static void clearWidgets();
     // Will sort the list above according to placement priorities.
     static void sortDisplayedWidgetsList();
+    static bool areTilesOverlapping();
+    static void redrawAll();
 
     static void switchSelectionMode();
 
@@ -37,6 +47,7 @@ class Widget : public DisplayItem{
 
     // For holding a widget
     static int8_t holdingPosition;
+    static int8_t previousHoldingPosition;
     // For moving through the interface
     static int8_t selectedWidget;
     static int8_t inWidgetSelection;

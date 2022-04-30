@@ -28,7 +28,6 @@ class  DisplayItem {
 
     String itemName;
     bool needsUpdate = true; // If it CURRENTLY needs update.
-    void attachRedrawHandler(TaskHandle_t h);
     bool needsToRedraw();
     void forceRedraw();
 
@@ -52,7 +51,6 @@ class  DisplayItem {
     void addRotaryButtonEvent(uint8_t buttonIndex, std::function<void(void)> func);
 
     //Graphics
-    TaskHandle_t redrawHandle;
     void startAnimation();
     void redraw();
     void redrawFromISR();

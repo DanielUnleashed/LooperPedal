@@ -25,15 +25,15 @@ class DebounceButton{
         bool doubleClicked();
         static bool twoButtonsClicked(uint8_t otherButton);
 
-        static DebounceButton* systemButtons[TOTAL_BUTTONS];
-        static IRAM_ATTR std::function<void(void)> ISREvents[TOTAL_BUTTONS];
-
         static void init();
         static bool addInterrupt(uint8_t buttonIndex, std::function<void(void)> func);
         static bool addMultipleInterrupt(uint8_t* buttonIndexes, std::function<void(void)> func);
         static bool clearMultipleInterrupt(uint8_t* buttonIndexes);
         static bool clearAll();
         static bool removeInterrupt(uint8_t buttonIndex);
+
+        static void saveAndRemoveButtons();
+        static void undoRemoveButtons();
 
     private:
         volatile uint32_t lastTimePressed = 0;
@@ -43,6 +43,9 @@ class DebounceButton{
         volatile bool buttonIsPressed = false;
         volatile uint8_t repeatedPressesCount = 0;
 
+        static DebounceButton* systemButtons[TOTAL_BUTTONS];
+        static IRAM_ATTR std::function<void(void)> ISREvents[TOTAL_BUTTONS];
+        static IRAM_ATTR std::function<void(void)> previousISREvents[TOTAL_BUTTONS];
         bool updateState();
 
         template <int interrupt>
