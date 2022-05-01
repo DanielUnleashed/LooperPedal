@@ -47,6 +47,7 @@ class  DisplayItem {
     std::vector<ButtonEvent> rotaryButtonEvents;
 
     void addButtonEvent(uint8_t buttonIndex, std::function<void(void)> func);
+    void addButtonEvent(uint8_t buttonIndex, std::function<void(void)> func, String name);
     void addRotaryEvent(uint8_t rotatoryIndex, std::function<void(bool incr)> func);
     void addRotaryButtonEvent(uint8_t buttonIndex, std::function<void(void)> func);
 

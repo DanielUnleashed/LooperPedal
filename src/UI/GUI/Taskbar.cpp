@@ -1,10 +1,10 @@
 #include "Taskbar.h"
 #include "Widget.h"
 
-Taskbar::Taskbar(uint8_t tileX, uint8_t tileY) : DisplayItem("Taskbar"){}
+Taskbar::Taskbar() : DisplayItem("Taskbar"){}
 
 void Taskbar::draw(){
-    canvas -> fillSprite(TFT_BLACK);
+    canvas -> fillRect(0, height-TASKBAR_HEIGHT, width, TASKBAR_HEIGHT, TFT_BLACK);
     //canvas -> fillRoundRect(0,height-TASKBAR_HEIGHT, width,TASKBAR_HEIGHT, 2, 0x190A);
     for(uint8_t i = 0; i < 4; i++){
         if(!buttons[i].isEnabled) continue;
@@ -22,7 +22,7 @@ void Taskbar::draw(){
     needsUpdate = false;
 }
 
-bool Taskbar::addButton(String tagName, uint8_t index){
+bool Taskbar::addButton(uint8_t index, String tagName){
     if(index >= TOTAL_BUTTONS) Utilities::error("Button index %d out of bounds (max. %d)\n", index, TOTAL_BUTTONS);
     if(buttons[index].isEnabled) return false;
     if(tagName.equals("")) return false;
@@ -51,6 +51,6 @@ void Taskbar::saveAndRemoveButtons(){
 void Taskbar::undoRemoveButtons(){
     for(uint8_t i = 0; i < 4; i++){
         removeButton(i);
-        if(previousButtons[i].isEnabled) addButton(previousButtons[i].tagName, i);
+        if(previousButtons[i].isEnabled) addButton(i, previousButtons[i].tagName);
     }
 }

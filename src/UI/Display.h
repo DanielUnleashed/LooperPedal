@@ -5,6 +5,8 @@
 #include "UI/GUI/DisplayItem.h"
 #include "UI/GUI/Widget.h"
 
+#include "UI/GUI/Taskbar.h"
+
 class Display {
     public:
     String name;
@@ -18,11 +20,15 @@ class Display {
 
     void launchDisplay();
 
-    int8_t hasTaskbar();
+    void addTaskbar();
+
+    bool hasTaskbar();
+    Taskbar* getTaskbar();
     DisplayItem* getDisplayItem(uint8_t index);
 
     private:
     std::vector<DisplayItem*> itemList;
+    Taskbar* taskbar = NULL;
 };
 
 #endif

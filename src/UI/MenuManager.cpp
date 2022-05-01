@@ -51,17 +51,19 @@ void MenuManager::drawTask(void* funcParams){
             if(!dispOverlay.needsToRedraw()){ //Ended display overlay animation
                 isInTransition = false;
                 
+                // This reattaches the interrupts and the buttons in the taskbar.
                 displayList[nextDisplay].launchDisplay();
-                //Little trick to not modify forceDraw();
-                ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
             }
         }else{
             displayList[currentDisplay].drawDisplay(canvas);
         }
 
+        // Pushes the sprite to the screen.
         canvas.pushSprite(0, 0);
 
+        // Waits for desired minimum FPS
         delay(DRAW_MS);
+        // Wait until a DisplayItem needs to update (enhances performance)
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     }
 }

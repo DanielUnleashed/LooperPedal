@@ -50,10 +50,18 @@ void Display::launchDisplay(){
     Widget::sortDisplayedWidgetsList();
 }
 
-int8_t Display::hasTaskbar(){
-    for(uint8_t i = 0; i < itemList.size(); i++) 
-        if(itemList[i]->itemName.equals("Taskbar")) return i;
-    return -1; 
+bool Display::hasTaskbar(){
+    return taskbar != NULL;
+}
+
+void Display::addTaskbar(){
+    taskbar = new Taskbar();
+    itemList.push_back(taskbar);
+}
+
+Taskbar* Display::getTaskbar(){
+    if(taskbar == NULL) Serial.println("Taskbar is null!\n");
+    return taskbar;
 }
 
 DisplayItem* Display::getDisplayItem(uint8_t index){

@@ -13,6 +13,7 @@
 struct ButtonEvent{
     uint8_t pin;
     std::function<void(void)> func;
+    String name;
 };
 
 class DebounceButton{

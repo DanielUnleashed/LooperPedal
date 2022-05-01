@@ -15,11 +15,10 @@ DemoWidget::DemoWidget(uint8_t tileX, uint8_t tileY, uint8_t sizeX, uint8_t size
     addButtonEvent(0, [this]{
         if(!Widget::isWidgetSelectionMode) MenuManager::getCurrentDisplay() -> addItem(new DemoWidget(0,0,2,2));
         else Utilities::debug("First drop the item!\n");
-    });
+    }, "New");
 }
 
 void DemoWidget::widgetDraw(){
-    drawFilledRect(0,0,100,100,TFT_BLACK);
     drawFilledRect(0,0,100,100,TFT_DARKCYAN);
     drawCentreText(50,50,"Pollo",TFT_WHITE);
 }

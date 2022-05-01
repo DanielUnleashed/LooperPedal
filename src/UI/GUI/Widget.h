@@ -69,7 +69,7 @@ class Widget : public DisplayItem{
     void recalculateRelativePoint();
 
     //General draw functions
-    void drawGrid();
+    static void drawGrid(TFT_eSprite &canvas, uint16_t color);
     void drawRectangle(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t color);
     void drawRoundRectangle(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t color);
     void drawFilledRect(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t fillColor);

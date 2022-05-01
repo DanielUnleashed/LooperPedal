@@ -31,13 +31,14 @@ Widget::Widget(String name, uint8_t tx, uint8_t ty, uint8_t sx, uint8_t sy, uint
     if(MenuManager::isLaunched){
         switchSelectionMode();
         holdingPosition = 0;
-        selectedWidget = 0; //This should be changed!
+        selectedWidget = 0;
     }
 }
 
 void Widget::startDraw(TFT_eSprite &canvas){
     //Maybe draw a background here?
     canvas.fillRect(0,0,width, height-TASKBAR_HEIGHT, TFT_BLACK);
+    drawGrid(canvas, TFT_DARKGREY);
 }
 
 void Widget::draw(){
@@ -106,6 +107,7 @@ void Widget::sortDisplayedWidgetsList(){
     std::sort(displayedWidgets.begin(), displayedWidgets.end(), [](Widget* w1, Widget* w2)->bool{
         uint16_t length1 = w1->tileY * TILES_X + w1->tileX;
         uint16_t length2 = w2->tileY * TILES_X + w2->tileX;
+        if(length1 == length2) w1->widgetID < w2->widgetID; //If they're situated in the same coords, prioritize the newer one.
         return length1 < length2;
     });
 }
@@ -166,15 +168,16 @@ void Widget::widgetEventTask(void* funcParams){
 
         if(widgetEvent == NONE_EVENT) continue;
         else if(widgetEvent == INCREASE_CURSOR){
+            Widget* w = displayedWidgets[selectedWidget];
             if(isWidgetSelectionMode){
                 holdingPosition++;
-                if(holdingPosition >= (TILES_X-displayedWidgets[selectedWidget]->sizeX+1)*(TILES_Y-displayedWidgets[selectedWidget]->sizeY+1)) 
+                if(holdingPosition >= (TILES_X-w->sizeX+1)*(TILES_Y-w->sizeY+1)) 
                     holdingPosition = 0;
-                displayedWidgets[selectedWidget] -> recalculateRelativePoint();
+                w -> recalculateRelativePoint();
                 redrawAll();
             }else{
-                displayedWidgets[selectedWidget] -> redrawFromISR();
-                if(inWidgetSelection+1 < displayedWidgets[selectedWidget]->inWidgetSelectables){
+                w -> redrawFromISR();
+                if(inWidgetSelection+1 < w->inWidgetSelectables){
                     inWidgetSelection++;
                 }else{
                     if(selectedWidget+1 < displayedWidgets.size()) selectedWidget++;
@@ -184,14 +187,15 @@ void Widget::widgetEventTask(void* funcParams){
                 displayedWidgets[selectedWidget] -> redrawFromISR();
             }
         }else if(widgetEvent == DECREASE_CURSOR){
+            Widget* w = displayedWidgets[selectedWidget];
             if(isWidgetSelectionMode){
                 holdingPosition--;
                 if(holdingPosition < 0) 
-                    holdingPosition = (TILES_X-displayedWidgets[selectedWidget]->sizeX+1)*(TILES_Y-displayedWidgets[selectedWidget]->sizeY+1) - 1;
-                displayedWidgets[selectedWidget] -> recalculateRelativePoint();
+                    holdingPosition = (TILES_X-w->sizeX+1)*(TILES_Y-w->sizeY+1) - 1;
+                w -> recalculateRelativePoint();
                 redrawAll();
             }else{
-                displayedWidgets[selectedWidget] -> redrawFromISR();
+                w -> redrawFromISR();
                 if(inWidgetSelection-1 >= 0){
                     inWidgetSelection--;
                 }else{
@@ -202,29 +206,28 @@ void Widget::widgetEventTask(void* funcParams){
                 displayedWidgets[selectedWidget] -> redrawFromISR();
             }
         }else if(widgetEvent == SWITCH_SELECTION_MODES){
+            Widget* selw = displayedWidgets[selectedWidget];
+
             // If tiles are overlapping then don't change modes.
             if(isWidgetSelectionMode && areTilesOverlapping()) continue;
 
             // When entering selection mode, store the original position, so if 'Back' is pressed, it can return to the original position.
             if(!isWidgetSelectionMode)
-                previousHoldingPosition = displayedWidgets[selectedWidget]->tileY*(TILES_X - displayedWidgets[selectedWidget]->sizeX + 1) + displayedWidgets[selectedWidget]->tileX;
+                previousHoldingPosition = selw->tileY*(TILES_X - selw->sizeX + 1) + selw->tileX;
 
             isWidgetSelectionMode = !isWidgetSelectionMode;
-            int8_t taskbarIndex = MenuManager::getCurrentDisplay()->hasTaskbar();
-            Taskbar* t;
-            if(taskbarIndex >= 0) t = (Taskbar*)MenuManager::getCurrentDisplay()->getDisplayItem(taskbarIndex);
+            Taskbar* t = MenuManager::getCurrentDisplay()->getTaskbar();
 
             if(isWidgetSelectionMode){
-                Widget* sel = displayedWidgets[selectedWidget];
-                holdingPosition = sel->tileY*(TILES_X - sel->sizeX + 1) + sel->tileX;
+                holdingPosition = selw->tileY*(TILES_X - selw->sizeX + 1) + selw->tileX;
 
-                if(taskbarIndex >= 0) { //If the taskbar exists then...
+                if(t != NULL) { //If the taskbar exists then...
                     //Substitute all the current buttons and add the custom move functions.
                     t->saveAndRemoveButtons();
                     DebounceButton::saveAndRemoveButtons();
-                    t->addButton("Dim.X", 0);
-                    t->addButton("Dim.Y", 1);
-                    t->addButton("Back", 3);
+                    t->addButton(0, "Dim.X");
+                    t->addButton(1, "Dim.Y");
+                    t->addButton(3, "Back");
 
                     DebounceButton::addInterrupt(0, []{
                         displayedWidgets[selectedWidget] -> sizeX++;
@@ -246,11 +249,13 @@ void Widget::widgetEventTask(void* funcParams){
                     t->forceRedraw();
                 }
             }else{
-                if(taskbarIndex >= 0) {
+                if(t != NULL) {
                     // Undo the change made above.
                     t->undoRemoveButtons();
                     DebounceButton::undoRemoveButtons();
                     t->forceRedraw();
+
+                    sortDisplayedWidgetsList();
                 }
             }
             redrawAll();
@@ -279,14 +284,14 @@ void Widget::recalculateRelativePoint(){
 }
 
 // ***** DRAW FUNCTIONS *****
-void Widget::drawGrid(){
+void Widget::drawGrid(TFT_eSprite &canvas, uint16_t color){
     // Draw tile squares.
-    canvas->drawRect(padX,padY, tileSize*TILES_X, tileSize*TILES_Y, TFT_WHITE);
+    canvas.drawRect(padX,padY, tileSize*TILES_X, tileSize*TILES_Y, color);
     //Line 0 has already been drawn.
     for(uint8_t i = 1; i < TILES_Y; i++)
-        canvas->drawFastHLine(padX, padY+i*tileSize, tileSize*TILES_X, TFT_WHITE);
+        canvas.drawFastHLine(padX, padY+i*tileSize, tileSize*TILES_X, color);
     for(uint8_t i = 1; i < TILES_X; i++)
-        canvas->drawFastVLine(padX+i*tileSize, padY, tileSize*TILES_Y, TFT_WHITE);
+        canvas.drawFastVLine(padX+i*tileSize, padY, tileSize*TILES_Y, color);
 }
 
 void Widget::drawRectangle(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t color){
