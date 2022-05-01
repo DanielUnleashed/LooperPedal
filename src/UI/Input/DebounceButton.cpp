@@ -1,14 +1,17 @@
 #include "DebounceButton.h"
 
 DebounceButton* DebounceButton::systemButtons[TOTAL_BUTTONS];
-std::function<void(void)> IRAM_ATTR DebounceButton::ISREvents[TOTAL_BUTTONS];
-std::function<void(void)> IRAM_ATTR DebounceButton::previousISREvents[TOTAL_BUTTONS];
+IRAM_ATTR std::vector<ButtonFunction> DebounceButton::ISREvents[TOTAL_BUTTONS];
+IRAM_ATTR std::vector<ButtonFunction> DebounceButton::previousISREvents[TOTAL_BUTTONS];
+
+ButtonEvent DebounceButton::buttonLongPressWatch;
+
+TaskHandle_t DebounceButton::buttonTaskHandle = NULL;
 
 // Maybe implement with a loop with https://stackoverflow.com/questions/11081573/passing-a-variable-as-a-template-argument
 void DebounceButton::init(){
     for(uint8_t i = 0; i < TOTAL_BUTTONS; i++){
         systemButtons[i] = new DebounceButton(PUSH_BUTTON[i]); 
-        ISREvents[i] = {};
     }
 
     attachInterrupt(systemButtons[0]->pin, &ISR_BUTTON<0>, CHANGE);
@@ -17,12 +20,38 @@ void DebounceButton::init(){
     attachInterrupt(systemButtons[3]->pin, &ISR_BUTTON<3>, CHANGE);
     attachInterrupt(systemButtons[4]->pin, &ISR_BUTTON<4>, CHANGE);
     attachInterrupt(systemButtons[5]->pin, &ISR_BUTTON<5>, CHANGE);
+
+    xTaskCreatePinnedToCore(longPressTimeTask, "WidgetEvents", 10000, NULL, 5, &buttonTaskHandle, 0);
 }
 
 template <int interrupt>
 void IRAM_ATTR DebounceButton::ISR_BUTTON(){
-    // Will check if the ISR has been added and if the button was clicked
-    if(ISREvents[interrupt] && systemButtons[interrupt] -> clicked()) ISREvents[interrupt](); 
+    std::vector<ButtonFunction> eventList = ISREvents[interrupt];
+    for(uint8_t i = 0; i < eventList.size(); i++){
+        ButtonFunction ev = eventList[i];
+        if(!ev.func) continue; //Continue if there is no function.
+
+        //Switch depending on the type of input assigned to the function.
+        switch(ev.functionalEvent){
+            case CLICK: if(systemButtons[interrupt]->clicked()) ev.func(); break;
+            case LONG_PRESS:{
+                buttonLongPressWatch = {interrupt, ev.func};
+                BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+                vTaskNotifyGiveFromISR(buttonTaskHandle, &xHigherPriorityTaskWoken); 
+                break;
+            }
+        }
+    }
+}
+
+void DebounceButton::longPressTimeTask(void* funcParams){
+    for(;;){
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        Serial.printf("Interrupt %d\n", buttonLongPressWatch.pin);
+        systemButtons[buttonLongPressWatch.pin]->clicked();
+        delay(1500);
+        if(systemButtons[buttonLongPressWatch.pin]->buttonIsPressed) buttonLongPressWatch.func();
+    }
 }
 
 bool DebounceButton::addMultipleInterrupt(uint8_t* buttonIndexes, std::function<void(void)> func){
@@ -41,7 +70,12 @@ bool DebounceButton::clearAll(){
     /*uint8_t clearArray[4];
     for(uint8_t i = 0; i < 4; i++) clearArray[i] = i;
     clearMultipleInterrupt(clearArray);*/
-    for(std::function<void(void)> &f : ISREvents) f = {};
+    for(uint8_t i = 0; i < TOTAL_BUTTONS; i++){
+        uint8_t ISRcount = ISREvents[i].size();
+        for(uint8_t j = 0; j < ISRcount; j++){
+            ISREvents[i][j].func = {};
+        }
+    }
     return true;
 }
 
@@ -58,19 +92,24 @@ bool DebounceButton::clearMultipleInterrupt(uint8_t* buttonIndexes){
 }
 
 bool DebounceButton::addInterrupt(uint8_t buttonIndex, std::function<void(void)> func){
-    if(buttonIndex > TOTAL_BUTTONS) Utilities::debug("Button %d is out of the array!\n", buttonIndex);
-    if(ISREvents[buttonIndex]){
-        Utilities::debug("Button %d is already in use\n", buttonIndex);
-        return false;
-    }else{
-        ISREvents[buttonIndex] = func;
-        return true;
+    return addInterrupt(buttonIndex, func, CLICK);
+}
+
+bool DebounceButton::addInterrupt(uint8_t buttonIndex, std::function<void(void)> func, uint8_t mode){
+    if(buttonIndex > TOTAL_BUTTONS) Utilities::debug("Button %d is over the number of buttons (max. %d)!\n", buttonIndex, TOTAL_BUTTONS);
+    for(uint8_t i = 0; i < ISREvents[buttonIndex].size(); i++){
+        if(ISREvents[buttonIndex][i].functionalEvent == mode){
+            Utilities::debug("Button %d is already in use with mode %d\n", buttonIndex, mode);
+            return false;
+        }
     }
+    ISREvents[buttonIndex].push_back({func, mode});
+    return true;
 }
 
 bool DebounceButton::removeInterrupt(uint8_t buttonIndex){
-    ISREvents[buttonIndex] = {};
-    return !ISREvents[buttonIndex];
+    ISREvents[buttonIndex].clear(); //Erases everything in this pin.
+    return true;
 }
 
 DebounceButton::DebounceButton(uint8_t chipPin){
@@ -133,6 +172,9 @@ void DebounceButton::saveAndRemoveButtons(){
 void DebounceButton::undoRemoveButtons(){
     for(uint8_t i = 0; i < 4; i++){
         removeInterrupt(i);
-        addInterrupt(i, previousISREvents[i]);
+        for(uint8_t j = 0; j < previousISREvents[i].size(); j++){
+            ButtonFunction f = previousISREvents[i][j];
+            addInterrupt(i, f.func, f.functionalEvent);
+        }
     }
 }

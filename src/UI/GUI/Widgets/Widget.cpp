@@ -36,7 +36,7 @@ Widget::Widget(String name, uint8_t tx, uint8_t ty, uint8_t sx, uint8_t sy, uint
 void Widget::startDraw(TFT_eSprite &canvas){
     //Maybe draw a background here?
     canvas.fillRect(0,0,width, height-TASKBAR_HEIGHT, TFT_BLACK);
-    drawGrid(canvas, TFT_DARKGREY);
+    if(isWidgetSelectionMode) drawGrid(canvas, TFT_DARKGREY);
 }
 
 void Widget::draw(){
@@ -343,6 +343,28 @@ void Widget::drawRoundRectangle(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, 
     canvas->drawRoundRect(transP.x, transP.y, lx, ly, 4, color);
 }
 
+void Widget::drawRectangleByCenter(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t color){
+    Point centerP = transformRelativePoint(pX, pY);
+    Point transP = {centerP.x - sX/2, centerP.y - sY/2};
+
+    canvas->drawRect(transP.x, transP.y, sX, sY, color);
+}
+
+void Widget::drawRoundRectangleByCenter(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t color){
+    Point centerP = transformRelativePoint(pX, pY);
+    Point transP = {centerP.x - sX/2, centerP.y - sY/2};
+    
+    canvas->drawRoundRect(transP.x, transP.y, sX, sY, 4, color);
+}
+
+void Widget::drawRoundFilledRectangle(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t color){
+    Point transP = transformRelativePoint(pX, pY);
+    uint16_t lx = sizeX*tileSize*sX/100;
+    uint16_t ly = sizeY*tileSize*sY/100;
+
+    canvas->fillRoundRect(transP.x, transP.y, lx, ly, 4, color);
+}
+
 void Widget::drawFilledRect(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t fillColor){
     Point transP = transformRelativePoint(pX, pY);
     uint16_t lx = sizeX*tileSize*sX/100;
@@ -366,24 +388,51 @@ void Widget::drawHLine(uint8_t pX, uint8_t pY, uint8_t length, uint16_t color){
     canvas->drawFastHLine(transP.x, transP.y, l, color);
 }
 
+void Widget::drawHLine(uint8_t pX, uint8_t pY, uint8_t length, uint8_t width, uint16_t color){
+    Point transP = transformRelativePoint(pX, pY);
+    uint16_t l = sizeX*tileSize*length/100;
+    canvas->drawFastHLine(transP.x, transP.y, l, color);
+    for(uint8_t i = 0; i < width; i++){
+        canvas->drawFastHLine(transP.x, transP.y-i, l, color);
+        canvas->drawFastHLine(transP.x, transP.y+i, l, color);
+    }
+}
+
 void Widget::drawVLine(uint8_t pX, uint8_t pY, uint8_t length, uint16_t color){
     Point transP = transformRelativePoint(pX, pY);
     uint16_t l = sizeY*tileSize*length/100;
     canvas->drawFastVLine(transP.x, transP.y, l, color);
 }
 
+void Widget::drawText(uint8_t pX, uint8_t pY, String text, uint8_t datum, uint8_t size, uint16_t color){
+    Point transP = transformRelativePoint(pX, pY);
+    canvas->setTextColor(color);
+    canvas->setTextDatum(datum); //TL_DATUM, TB_DATUM...
+    canvas->drawString(text, transP.x, transP.y, size);
+}
+
 void Widget::drawText(uint8_t pX, uint8_t pY, String text, uint16_t color){
     Point transP = transformRelativePoint(pX, pY);
     canvas->setTextColor(color);
-    canvas->setTextDatum(TL_DATUM); //Top left datum
+    canvas->setTextDatum(TL_DATUM); //TL_DATUM, TB_DATUM...
     canvas->drawString(text, transP.x, transP.y, 2);
 }
 
 void Widget::drawCentreText(uint8_t pX, uint8_t pY, String text, uint16_t color){
     Point transP = transformRelativePoint(pX, pY);
     canvas->setTextColor(color);
-    canvas->setTextDatum(MC_DATUM); //Medium center datum
+    canvas->setTextDatum(CC_DATUM); //TL_DATUM, TB_DATUM...
     canvas->drawString(text, transP.x, transP.y, 2);
+}
+
+void Widget::drawCircumference(uint8_t pX, uint8_t pY, uint8_t radius, uint16_t color){
+    Point transP = transformRelativePoint(pX, pY);
+    canvas->drawCircle(transP.x, transP.y, radius, color);
+}
+
+void Widget::drawCircle(uint8_t pX, uint8_t pY, uint8_t radius, uint16_t color){
+    Point transP = transformRelativePoint(pX, pY);
+    canvas->fillCircle(transP.x, transP.y, radius, color);
 }
 
 void Widget::pushSprite(TFT_eSprite &sp, uint16_t x, uint16_t y){

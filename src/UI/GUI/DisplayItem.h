@@ -48,8 +48,10 @@ class  DisplayItem {
 
     void addButtonEvent(uint8_t buttonIndex, std::function<void(void)> func);
     void addButtonEvent(uint8_t buttonIndex, std::function<void(void)> func, String name);
+    void addButtonEvent(uint8_t buttonIndex, std::function<void(void)> func, String name, uint8_t mode);
     void addRotaryEvent(uint8_t rotatoryIndex, std::function<void(bool incr)> func);
     void addRotaryButtonEvent(uint8_t buttonIndex, std::function<void(void)> func);
+    void addRotaryButtonEvent(uint8_t buttonIndex, std::function<void(void)> func, uint8_t mode);
 
     //Graphics
     void startAnimation();

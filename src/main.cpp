@@ -2,6 +2,7 @@
 #include "UI/MenuManager.h"
 #include "UI/GUI/Taskbar.h"
 #include "UI/GUI/Widgets/DemoWidget.h"
+#include "UI/GUI/Widgets/AudioPlayerWidget.h"
 #include "UI/Display.h"
 
 void setup() {
@@ -14,17 +15,20 @@ void setup() {
   MenuManager::init();
 
   DemoWidget* demo = new DemoWidget(0,0,2,2);
-  
+  AudioPlayerWidget* aud = new AudioPlayerWidget(0,2,4,2);
+
+
   static Display mainDisplay("Main");
   mainDisplay.addTaskbar();
   mainDisplay.addItem(demo);
+  mainDisplay.addItem(aud);
 
   MenuManager::addDisplay(mainDisplay);
   MenuManager::launch();
 
-  AudioPlayer::begin();
+  /*AudioPlayer::begin();
   //AudioPlayer::addSDAudioFile("/tereza.wav");
-  AudioPlayer::addRECAudioFile(0);
+  AudioPlayer::addRECAudioFile(0);*/
 }
 
 void loop() {}

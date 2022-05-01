@@ -1,0 +1,806 @@
+===============================================================================
+EXTENSION NAME : linecounter
+EXTENSION VERSION : 0.2.7
+-------------------------------------------------------------------------------
+count time : 2022-05-01 17:22:17
+count workspace : c:\Users\dbeja\Documents\PlatformIO\Projects\LooperPedal
+total files : 772
+total code lines : 528399
+total comment lines : 28632
+total blank lines : 13939
+
+    statistics
+   |      extension|     total code|  total comment|    total blank|percent|
+   -------------------------------------------------------------------------
+   |           .ini|              6|              9|              1| 0.0011|
+   |               |            240|              5|             39|  0.045|
+   |            .md|            105|             15|             71|  0.020|
+   |           .cpp|          10511|           2407|           2290|    2.0|
+   |             .h|         393334|          12246|           3709|     74|
+   |      .checksum|              1|              0|              0|0.00019|
+   |           .pde|            500|            452|            152|  0.095|
+   |            .py|            147|             58|             49|  0.028|
+   |           .tmp|             22|              0|              0| 0.0042|
+   |             .c|          10124|           3551|           1730|    1.9|
+   |           .txt|            353|              6|             92|  0.067|
+   |          .json|             23|              0|              0| 0.0044|
+   |           .pio|            132|            116|             22|  0.025|
+   |    .properties|             10|              1|              1| 0.0019|
+   |           .ino|          15398|           9766|           5481|    2.9|
+   |             .d|           8615|              0|              0|    1.6|
+   |             .a|              1|              0|              0|0.00019|
+   |           .map|          88877|              0|            302|     17|
+   -------------------------------------------------------------------------
+.gitignore, code is 5, comment is 0, blank is 0.
+.pio\build\Looper Pedal\.sconsign39.dblite, it is a binary file.
+.pio\build\Looper Pedal\firmware.bin, it is a binary file.
+.pio\build\Looper Pedal\firmware.elf, it is a binary file.
+.pio\build\Looper Pedal\firmware.map, code is 88877, comment is 0, blank is 302.
+.pio\build\Looper Pedal\FrameworkArduino\base64.cpp.d, code is 132, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\base64.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\cbuf.cpp.d, code is 3, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\cbuf.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\Esp.cpp.d, code is 138, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\Esp.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-adc.c.d, code is 106, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-adc.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-bt.c.d, code is 102, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-bt.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-cpu.c.d, code is 119, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-cpu.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-dac.c.d, code is 103, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-dac.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-gpio.c.d, code is 109, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-gpio.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-i2c-slave.c.d, code is 90, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-i2c-slave.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-i2c.c.d, code is 109, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-i2c.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-ledc.c.d, code is 103, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-ledc.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-matrix.c.d, code is 99, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-matrix.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-misc.c.d, code is 128, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-misc.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-psram.c.d, code is 99, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-psram.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-rmt.c.d, code is 103, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-rmt.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-sigmadelta.c.d, code is 104, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-sigmadelta.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-spi.c.d, code is 117, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-spi.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-time.c.d, code is 139, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-time.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-timer.c.d, code is 105, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-timer.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-tinyusb.c.d, code is 3, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-tinyusb.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-touch.c.d, code is 105, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-touch.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-uart.c.d, code is 109, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\esp32-hal-uart.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\firmware_msc_fat.c.d, code is 3, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\firmware_msc_fat.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\FirmwareMSC.cpp.d, code is 5, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\FirmwareMSC.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\FunctionalInterrupt.cpp.d, code is 130, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\FunctionalInterrupt.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\HardwareSerial.cpp.d, code is 107, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\HardwareSerial.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\HWCDC.cpp.d, code is 4, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\HWCDC.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\IPAddress.cpp.d, code is 129, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\IPAddress.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\IPv6Address.cpp.d, code is 130, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\IPv6Address.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\libb64\cdecode.c.d, code is 3, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\libb64\cdecode.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\libb64\cencode.c.d, code is 3, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\libb64\cencode.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\main.cpp.d, code is 133, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\main.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\MD5Builder.cpp.d, code is 130, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\MD5Builder.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\Print.cpp.d, code is 130, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\Print.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\stdlib_noniso.c.d, code is 12, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\stdlib_noniso.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\Stream.cpp.d, code is 129, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\Stream.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\StreamString.cpp.d, code is 129, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\StreamString.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\USB.cpp.d, code is 4, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\USB.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\USBCDC.cpp.d, code is 4, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\USBCDC.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\USBMSC.cpp.d, code is 4, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\USBMSC.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\wiring_pulse.c.d, code is 106, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\wiring_pulse.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\wiring_shift.c.d, code is 106, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\wiring_shift.c.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\WMath.cpp.d, code is 18, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\WMath.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\FrameworkArduino\WString.cpp.d, code is 128, comment is 0, blank is 0.
+.pio\build\Looper Pedal\FrameworkArduino\WString.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\idedata.json, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\lib338\libLittleFS.a, it is a binary file.
+.pio\build\Looper Pedal\lib338\LittleFS\LittleFS.cpp.d, code is 137, comment is 0, blank is 0.
+.pio\build\Looper Pedal\lib338\LittleFS\LittleFS.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\lib4ab\FS\FS.cpp.d, code is 130, comment is 0, blank is 0.
+.pio\build\Looper Pedal\lib4ab\FS\FS.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\lib4ab\FS\vfs_api.cpp.d, code is 131, comment is 0, blank is 0.
+.pio\build\Looper Pedal\lib4ab\FS\vfs_api.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\lib4ab\libFS.a, it is a binary file.
+.pio\build\Looper Pedal\lib5c2\libSPI.a, it is a binary file.
+.pio\build\Looper Pedal\lib5c2\SPI\SPI.cpp.d, code is 5, comment is 0, blank is 0.
+.pio\build\Looper Pedal\lib5c2\SPI\SPI.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\lib94b\libSD.a, it is a binary file.
+.pio\build\Looper Pedal\lib94b\SD\SD.cpp.d, code is 139, comment is 0, blank is 0.
+.pio\build\Looper Pedal\lib94b\SD\SD.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\lib94b\SD\sd_diskio.cpp.d, code is 155, comment is 0, blank is 0.
+.pio\build\Looper Pedal\lib94b\SD\sd_diskio.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\lib94b\SD\sd_diskio_crc.c.d, code is 2, comment is 0, blank is 0.
+.pio\build\Looper Pedal\lib94b\SD\sd_diskio_crc.c.o, it is a binary file.
+.pio\build\Looper Pedal\libb06\libTFT_eSPI.a, it is a binary file.
+.pio\build\Looper Pedal\libb06\TFT_eSPI\TFT_eSPI.cpp.d, code is 228, comment is 0, blank is 0.
+.pio\build\Looper Pedal\libb06\TFT_eSPI\TFT_eSPI.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\libc47\libSPIFFS.a, it is a binary file.
+.pio\build\Looper Pedal\libc47\SPIFFS\SPIFFS.cpp.d, code is 134, comment is 0, blank is 0.
+.pio\build\Looper Pedal\libc47\SPIFFS\SPIFFS.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\libFrameworkArduino.a, it is a binary file.
+.pio\build\Looper Pedal\libFrameworkArduinoVariant.a, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\partitions.bin, it is a binary file.
+.pio\build\Looper Pedal\src\audioFiles\AudioFile.cpp.d, code is 134, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\audioFiles\AudioFile.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\audioFiles\RECAudioFile.cpp.d, code is 137, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\audioFiles\RECAudioFile.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\audioFiles\SDAudioFile.cpp.d, code is 136, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\audioFiles\SDAudioFile.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\audioFiles\WavFile.cpp.d, code is 135, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\audioFiles\WavFile.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\AudioPlayer.cpp.d, code is 139, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\AudioPlayer.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\chip\adc.cpp.d, code is 132, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\chip\adc.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\chip\dac.cpp.d, code is 131, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\chip\dac.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\CircularBuffer.cpp.d, code is 128, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\CircularBuffer.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\main.cpp.d, code is 236, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\main.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\Metronome.cpp.d, code is 131, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\Metronome.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\UI\Display.cpp.d, code is 228, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\UI\Display.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\UI\GUI\DisplayItem.cpp.d, code is 228, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\UI\GUI\DisplayItem.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\UI\GUI\DisplayOverlay.cpp.d, code is 229, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\UI\GUI\DisplayOverlay.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\UI\GUI\SplashScreen.cpp.d, code is 229, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\UI\GUI\SplashScreen.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\UI\GUI\Taskbar.cpp.d, code is 225, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\UI\GUI\Taskbar.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\UI\GUI\Widgets\AudioPlayerWidget.cpp.d, code is 2, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\UI\GUI\Widgets\AudioPlayerWidget.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\UI\GUI\Widgets\DemoWidget.cpp.d, code is 229, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\UI\GUI\Widgets\DemoWidget.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\UI\GUI\Widgets\Widget.cpp.d, code is 229, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\UI\GUI\Widgets\Widget.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\UI\Input\DebounceButton.cpp.d, code is 129, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\UI\Input\DebounceButton.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\UI\Input\RotaryEncoder.cpp.d, code is 129, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\UI\Input\RotaryEncoder.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\UI\MenuManager.cpp.d, code is 228, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\UI\MenuManager.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\utils\AuxSPI.cpp.d, code is 130, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\utils\AuxSPI.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\src\utils\Utilities.cpp.d, code is 128, comment is 0, blank is 0.
+.pio\build\Looper Pedal\src\utils\Utilities.cpp.o, it is a binary file.
+.pio\build\Looper Pedal\tmp2gnx5nhw.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\tmp5igal1ev.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\tmp_x3aemfs.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\tmpbss4a_pq.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\tmpdvbhz_l7.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\tmpexyvomcm.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\tmpfcw25s7e.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\tmpjmfvkxgd.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\tmpjmiq3sld.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\tmpjrqx18hs.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\tmpknpasg1u.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\tmplu3zz648.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\tmpp1ni9gib.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\tmpphcv639h.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\tmpqk8q_55l.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\tmpsb6gwj1b.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\tmpthm335d2.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\tmpv9enu05r.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\tmpvb6bnk2n.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\tmpvely1esg.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\tmpwsuvnin1.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\Looper Pedal\tmpzpqlgfz0.tmp, code is 1, comment is 0, blank is 0.
+.pio\build\project.checksum, code is 1, comment is 0, blank is 0.
+.pio\libdeps\Looper Pedal\TFT_eSPI\.gitattributes, code is 15, comment is 0, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\.gitignore, code is 37, comment is 0, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\.piopm, code is 1, comment is 0, blank is 0.
+.pio\libdeps\Looper Pedal\TFT_eSPI\CMakeLists.txt, code is 4, comment is 0, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\160 x 128\Arduino_Life\Arduino_Life.ino, code is 94, comment is 49, blank is 31.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\160 x 128\Pong_v3\Pong_v3.ino, code is 150, comment is 17, blank is 63.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\160 x 128\RLE_Font_test\RLE_Font_test.ino, code is 128, comment is 19, blank is 43.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\160 x 128\TFT_Char_times\TFT_Char_times.ino, code is 70, comment is 20, blank is 40.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\160 x 128\TFT_Clock\TFT_Clock.ino, code is 90, comment is 34, blank is 23.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\160 x 128\TFT_Clock_Digital\TFT_Clock_Digital.ino, code is 79, comment is 53, blank is 19.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\160 x 128\TFT_Ellipse\TFT_Ellipse.ino, code is 29, comment is 9, blank is 14.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\160 x 128\TFT_flash_jpg\jpeg1.h, code is 208, comment is 1, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\160 x 128\TFT_flash_jpg\jpeg2.h, code is 296, comment is 1, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\160 x 128\TFT_flash_jpg\jpeg3.h, code is 280, comment is 1, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\160 x 128\TFT_flash_jpg\jpeg4.h, code is 164, comment is 1, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\160 x 128\TFT_flash_jpg\TFT_flash_jpg.ino, code is 105, comment is 73, blank is 45.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\160 x 128\TFT_graphicstest_PDQ3\TFT_graphicstest_PDQ3.ino, code is 533, comment is 46, blank is 143.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\160 x 128\TFT_graphicstest_small\TFT_graphicstest_small.ino, code is 210, comment is 31, blank is 37.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\160 x 128\TFT_Meter_5\TFT_Meter_5.ino, code is 114, comment is 72, blank is 44.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\160 x 128\TFT_Print_Test\TFT_Print_Test.ino, code is 27, comment is 35, blank is 16.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\160 x 128\TFT_Rainbow\TFT_Rainbow.ino, code is 83, comment is 35, blank is 23.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\160 x 128\UTFT_demo_fast\UTFT_demo_fast.ino, code is 249, comment is 41, blank is 56.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\All_Free_Fonts_Demo\All_Free_Fonts_Demo.ino, code is 271, comment is 195, blank is 31.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\All_Free_Fonts_Demo\Free_Fonts.h, code is 263, comment is 59, blank is 60.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\Cellular_Automata\Cellular_Automata.ino, code is 94, comment is 42, blank is 32.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\Free_Font_Demo\Free_Font_Demo.ino, code is 172, comment is 106, blank is 70.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\Free_Font_Demo\Free_Fonts.h, code is 263, comment is 59, blank is 60.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\Keypad_240x320\Keypad_240x320.ino, code is 167, comment is 86, blank is 56.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\Read_ID_bitbash\Read_ID_bitbash.ino, code is 93, comment is 61, blank is 24.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\RLE_Font_test\RLE_Font_test.ino, code is 224, comment is 18, blank is 63.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_ArcFill\TFT_ArcFill.ino, code is 109, comment is 35, blank is 32.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_Char_times\TFT_Char_times.ino, code is 88, comment is 16, blank is 40.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_Clock\TFT_Clock.ino, code is 90, comment is 48, blank is 24.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_Clock_Digital\TFT_Clock_Digital.ino, code is 71, comment is 73, blank is 22.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_Custom_Fonts\TFT_Custom_Fonts.ino, code is 66, comment is 87, blank is 28.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_Ellipse\TFT_Ellipse.ino, code is 29, comment is 8, blank is 14.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_FillArcSpiral\TFT_FillArcSpiral.ino, code is 103, comment is 34, blank is 25.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_Float_Test\TFT_Float_Test.ino, code is 39, comment is 37, blank is 29.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_graphicstest_one_lib\TFT_graphicstest_one_lib.ino, code is 246, comment is 63, blank is 65.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_graphicstest_PDQ\TFT_graphicstest_PDQ.ino, code is 576, comment is 47, blank is 136.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_Mandlebrot\TFT_Mandlebrot.ino, code is 72, comment is 13, blank is 16.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_Matrix\TFT_Matrix.ino, code is 58, comment is 33, blank is 17.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_Meter_linear\TFT_Meter_linear.ino, code is 113, comment is 75, blank is 44.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_Meters\TFT_Meters.ino, code is 175, comment is 84, blank is 59.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_Pie_Chart\TFT_Pie_Chart.ino, code is 44, comment is 21, blank is 25.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_Pong\TFT_Pong.ino, code is 148, comment is 20, blank is 63.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_Print_Test\TFT_Print_Test.ino, code is 32, comment is 34, blank is 17.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_Rainbow_one_lib\TFT_Rainbow_one_lib.ino, code is 104, comment is 57, blank is 26.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_Read_Reg\TFT_Read_Reg.ino, code is 74, comment is 42, blank is 33.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_Spiro\TFT_Spiro.ino, code is 70, comment is 17, blank is 22.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_Starfield\TFT_Starfield.ino, code is 62, comment is 12, blank is 16.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_String_Align\TFT_String_Align.ino, code is 61, comment is 29, blank is 33.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\TFT_Terminal\TFT_Terminal.ino, code is 62, comment is 79, blank is 23.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\320 x 240\UTFT_demo\UTFT_demo.ino, code is 238, comment is 42, blank is 55.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\Cellular_Automata\Cellular_Automata.ino, code is 94, comment is 42, blank is 32.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\Demo_3D_cube\Demo_3D_cube.ino, code is 232, comment is 52, blank is 83.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\Free_Font_Demo\Free_Font_Demo.ino, code is 152, comment is 93, blank is 75.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\Free_Font_Demo\Free_Fonts.h, code is 263, comment is 60, blank is 61.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\Graph_2\Graph_2.ino, code is 171, comment is 104, blank is 60.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\Keypad_480x320\Keypad_480x320.ino, code is 167, comment is 89, blank is 56.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\TFT_Char_times\TFT_Char_times.ino, code is 89, comment is 24, blank is 40.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\TFT_Ellipse\TFT_Ellipse.ino, code is 29, comment is 8, blank is 16.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\TFT_flash_jpg\jpeg1.h, code is 764, comment is 2, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\TFT_flash_jpg\jpeg2.h, code is 208, comment is 2, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\TFT_flash_jpg\jpeg3.h, code is 608, comment is 2, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\TFT_flash_jpg\jpeg4.h, code is 653, comment is 2, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\TFT_flash_jpg\TFT_flash_jpg.ino, code is 113, comment is 84, blank is 55.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\TFT_graphicstest_one_lib\TFT_graphicstest_one_lib.ino, code is 251, comment is 63, blank is 61.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\TFT_Meter_4\TFT_Meter_4.ino, code is 113, comment is 76, blank is 45.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\TFT_Meters\TFT_Meters.ino, code is 174, comment is 91, blank is 57.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\TFT_Padding_demo\TFT_Padding_demo.ino, code is 84, comment is 79, blank is 63.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\TFT_Print_Test\TFT_Print_Test.ino, code is 33, comment is 35, blank is 17.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\TFT_Rainbow480\TFT_Rainbow480.ino, code is 107, comment is 61, blank is 25.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\TFT_ring_meter\Alert.h, code is 35, comment is 35, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\TFT_ring_meter\TFT_ring_meter.ino, code is 164, comment is 97, blank is 55.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\TFT_String_Align\TFT_String_Align.ino, code is 66, comment is 41, blank is 42.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\Touch_Controller_Demo\Touch_Controller_Demo.ino, code is 53, comment is 5, blank is 18.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\480 x 320\UTFT_Demo_480x320\UTFT_Demo_480x320.ino, code is 238, comment is 34, blank is 57.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\DMA test\boing_ball\boing_ball.ino, code is 106, comment is 87, blank is 32.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\DMA test\boing_ball\graphic.h, code is 1371, comment is 2, blank is 4.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\DMA test\Bouncy_Circles\Bouncy_Circles.ino, code is 130, comment is 63, blank is 33.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\DMA test\Flash_Jpg_DMA\Flash_Jpg_DMA.ino, code is 53, comment is 43, blank is 23.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\DMA test\Flash_Jpg_DMA\panda.h, code is 793, comment is 22, blank is 1.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\DMA test\SpriteRotatingCube\SpriteRotatingCube.ino, code is 226, comment is 120, blank is 66.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\ePaper\Floyd_Steinberg\data\TestCard.bmp, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\ePaper\Floyd_Steinberg\data\Tiger.bmp, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\ePaper\Floyd_Steinberg\EPD_Support.h, code is 63, comment is 50, blank is 18.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\ePaper\Floyd_Steinberg\Floyd_Steinberg.ino, code is 73, comment is 103, blank is 54.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\ePaper\Floyd_Steinberg\Floyd_Steinberg_BMP.ino, code is 94, comment is 101, blank is 36.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\ePaper\Floyd_Steinberg\SPIFFS.ino, code is 68, comment is 14, blank is 14.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\alphaBlend_Test\alphaBlend_Test.ino, code is 92, comment is 94, blank is 24.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_1\Animated_Eyes_1.ino, code is 70, comment is 68, blank is 27.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_1\config.h, code is 36, comment is 67, blank is 15.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_1\data\catEye.h, code is 11584, comment is 1, blank is 16.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_1\data\defaultEye.h, code is 13330, comment is 5, blank is 15.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_1\data\doeEye.h, code is 15632, comment is 1, blank is 14.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_1\data\dragonEye.h, code is 17004, comment is 2, blank is 14.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_1\data\goatEye.h, code is 12794, comment is 1, blank is 13.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_1\data\logo.h, code is 96, comment is 1, blank is 4.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_1\data\naugaEye.h, code is 7599, comment is 0, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_1\data\newtEye.h, code is 13332, comment is 2, blank is 14.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_1\data\noScleraEye.h, code is 17004, comment is 2, blank is 14.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_1\data\owlEye.h, code is 7599, comment is 1, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_1\data\terminatorEye.h, code is 13332, comment is 1, blank is 14.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_1\eye_functions.ino, code is 310, comment is 188, blank is 48.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_1\user.cpp, code is 6, comment is 56, blank is 5.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_1\user_bat.cpp, code is 63, comment is 32, blank is 13.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_1\user_xmas.cpp, code is 40, comment is 23, blank is 14.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_2\Animated_Eyes_2.ino, code is 70, comment is 74, blank is 29.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_2\config.h, code is 36, comment is 67, blank is 15.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_2\data\catEye.h, code is 11584, comment is 1, blank is 16.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_2\data\defaultEye.h, code is 13330, comment is 5, blank is 15.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_2\data\doeEye.h, code is 15632, comment is 1, blank is 14.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_2\data\dragonEye.h, code is 17004, comment is 2, blank is 14.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_2\data\goatEye.h, code is 12794, comment is 1, blank is 13.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_2\data\logo.h, code is 96, comment is 1, blank is 4.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_2\data\naugaEye.h, code is 7599, comment is 0, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_2\data\newtEye.h, code is 13332, comment is 2, blank is 14.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_2\data\noScleraEye.h, code is 17004, comment is 2, blank is 14.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_2\data\owlEye.h, code is 7599, comment is 1, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_2\data\terminatorEye.h, code is 13332, comment is 1, blank is 14.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_2\eye_functions.ino, code is 310, comment is 188, blank is 48.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_2\user.cpp, code is 6, comment is 56, blank is 5.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_2\user_bat.cpp, code is 63, comment is 32, blank is 13.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_2\user_xmas.cpp, code is 40, comment is 23, blank is 14.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Animated_Eyes_2\wiring.ino, code is 0, comment is 31, blank is 0.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\drawXBitmap\drawXBitmap.ino, code is 21, comment is 26, blank is 19.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\drawXBitmap\xbm.h, code is 33, comment is 13, blank is 6.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\ESP32_SDcard_jpeg\ESP32_SDcard_jpeg.ino, code is 148, comment is 85, blank is 53.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\ESP8266_uncannyEyes\defaultEye.h, code is 11957, comment is 0, blank is 9.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\ESP8266_uncannyEyes\dragonEye.h, code is 15629, comment is 0, blank is 9.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\ESP8266_uncannyEyes\ESP8266_uncannyEyes.ino, code is 225, comment is 271, blank is 67.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\ESP8266_uncannyEyes\goatEye.h, code is 11421, comment is 0, blank is 9.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\ESP8266_uncannyEyes\noScleraEye.h, code is 15629, comment is 0, blank is 9.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\ESP8266_uncannyEyes\screenshotToConsole.ino, code is 146, comment is 65, blank is 17.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Gradient_Fill\Gradient_Fill.ino, code is 18, comment is 18, blank is 5.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Local_Custom_Fonts\Local_Custom_Fonts.ino, code is 27, comment is 83, blank is 21.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Local_Custom_Fonts\MyFont.h, code is 3355, comment is 229, blank is 6.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\On_Off_Button\On_Off_Button.ino, code is 133, comment is 39, blank is 37.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\TFT_Button_Label_Datum\TFT_Button_Label_Datum.ino, code is 118, comment is 50, blank is 36.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\TFT_Flash_Bitmap\Alert.h, code is 35, comment is 34, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\TFT_Flash_Bitmap\Close.h, code is 35, comment is 34, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\TFT_Flash_Bitmap\Info.h, code is 35, comment is 34, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\TFT_Flash_Bitmap\TFT_Flash_Bitmap.ino, code is 30, comment is 33, blank is 14.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\TFT_Screen_Capture\processing_sketch.ino, code is 0, comment is 533, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\TFT_Screen_Capture\screenServer.ino, code is 94, comment is 99, blank is 34.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\TFT_Screen_Capture\TFT_Screen_Capture.ino, code is 123, comment is 85, blank is 34.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\TFT_SPIFFS_BMP\BMP_functions.ino, code is 64, comment is 12, blank is 18.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\TFT_SPIFFS_BMP\data\parrot.bmp, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\TFT_SPIFFS_BMP\TFT_SPIFFS_BMP.ino, code is 26, comment is 27, blank is 15.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Touch_calibrate\Touch_calibrate.ino, code is 49, comment is 32, blank is 26.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Viewport_Demo\Viewport_commands.ino, code is 0, comment is 40, blank is 0.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Viewport_Demo\Viewport_Demo.ino, code is 56, comment is 35, blank is 27.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Generic\Viewport_graphicstest\Viewport_graphicstest.ino, code is 252, comment is 70, blank is 68.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\PNG Images\Flash_PNG\Flash_PNG.ino, code is 37, comment is 24, blank is 12.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\PNG Images\Flash_PNG\panda_png.h, code is 7096, comment is 0, blank is 0.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\PNG Images\LittleFS_PNG\LittleFS_PNG.ino, code is 55, comment is 33, blank is 15.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\PNG Images\LittleFS_PNG\PNG_FS_Support.ino, code is 21, comment is 4, blank is 5.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\PNG Images\LittleFS_PNG_DMA\LittleFS_PNG_DMA.ino, code is 57, comment is 38, blank is 17.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\PNG Images\LittleFS_PNG_DMA\PNG_FS_Support.ino, code is 21, comment is 4, blank is 5.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Font_Demo_1_Array\Font_Demo_1_Array.ino, code is 71, comment is 76, blank is 46.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Font_Demo_1_Array\Notes.ino, code is 0, comment is 56, blank is 0.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Font_Demo_1_Array\NotoSansBold15.h, code is 675, comment is 17, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Font_Demo_1_Array\NotoSansBold36.h, code is 2763, comment is 17, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Font_Demo_2_Array\Font_Demo_2_Array.ino, code is 112, comment is 58, blank is 58.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Font_Demo_2_Array\Notes.ino, code is 0, comment is 56, blank is 0.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Font_Demo_2_Array\NotoSansBold15.h, code is 675, comment is 17, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Font_Demo_2_Array\NotoSansBold36.h, code is 2763, comment is 17, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Font_Demo_3_Array\Font_Demo_3_Array.ino, code is 87, comment is 90, blank is 64.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Font_Demo_3_Array\Notes.ino, code is 0, comment is 61, blank is 0.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Font_Demo_3_Array\NotoSansBold15.h, code is 675, comment is 17, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Font_Demo_3_Array\NotoSansBold36.h, code is 2763, comment is 17, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Font_Demo_3_Array\NotoSansMonoSCB20.h, code is 964, comment is 17, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Font_Demo_4_Array\Font_Demo_4_Array.ino, code is 41, comment is 63, blank is 34.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Font_Demo_4_Array\Notes.ino, code is 0, comment is 56, blank is 0.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Font_Demo_4_Array\NotoSansBold15.h, code is 675, comment is 17, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Font_Demo_4_Array\NotoSansBold36.h, code is 2763, comment is 17, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Print_Smooth_Font\Final_Frontier_28.h, code is 1583, comment is 17, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Print_Smooth_Font\Print_Smooth_Font.ino, code is 95, comment is 58, blank is 32.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Smooth_font_gradient\NotoSansBold15.h, code is 675, comment is 17, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Smooth_font_gradient\NotoSansBold36.h, code is 2763, comment is 17, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Smooth_font_gradient\Smooth_font_gradient.ino, code is 44, comment is 40, blank is 21.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Smooth_font_reading_TFT\NotoSansBold15.h, code is 675, comment is 17, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Smooth_font_reading_TFT\NotoSansBold36.h, code is 2763, comment is 17, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Smooth_font_reading_TFT\Smooth_font_reading_TFT.ino, code is 84, comment is 39, blank is 23.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Unicode_test\data\Final-Frontier-28.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Unicode_test\data\Latin-Hiragana-24.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Unicode_test\data\Unicode-Test-72.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Unicode_test\Final_Frontier_28.h, code is 1583, comment is 17, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Unicode_test\Latin_Hiragana_24.h, code is 3407, comment is 17, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Unicode_test\Unicode_test.ino, code is 57, comment is 55, blank is 44.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\FLASH_Array\Unicode_test\Unicode_Test_72.h, code is 2282, comment is 17, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Font_Demo_1\data\NotoSansBold15.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Font_Demo_1\data\NotoSansBold36.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Font_Demo_1\Font_Demo_1.ino, code is 85, comment is 77, blank is 50.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Font_Demo_1\Notes.ino, code is 0, comment is 56, blank is 0.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Font_Demo_2\data\NotoSansBold15.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Font_Demo_2\data\NotoSansBold36.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Font_Demo_2\Font_Demo_2.ino, code is 127, comment is 59, blank is 62.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Font_Demo_2\Notes.ino, code is 0, comment is 56, blank is 0.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Font_Demo_3\data\NotoSansBold15.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Font_Demo_3\data\NotoSansBold36.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Font_Demo_3\data\NotoSansMonoSCB20.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Font_Demo_3\Font_Demo_3.ino, code is 102, comment is 91, blank is 68.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Font_Demo_3\Notes.ino, code is 0, comment is 61, blank is 0.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Font_Demo_4\data\NotoSansBold15.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Font_Demo_4\data\NotoSansBold36.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Font_Demo_4\Font_Demo_4.ino, code is 56, comment is 66, blank is 38.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Font_Demo_4\Notes.ino, code is 0, comment is 56, blank is 0.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Print_Smooth_Font\data\Final-Frontier-28.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Print_Smooth_Font\Print_Smooth_Font.ino, code is 63, comment is 65, blank is 31.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Smooth_font_gradient\data\NotoSansBold15.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Smooth_font_gradient\data\NotoSansBold36.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Smooth_font_gradient\Smooth_font_gradient.ino, code is 59, comment is 45, blank is 27.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Smooth_font_reading_TFT\data\NotoSansBold15.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Smooth_font_reading_TFT\data\NotoSansBold36.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Smooth_font_reading_TFT\Smooth_font_reading_TFT.ino, code is 99, comment is 47, blank is 28.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Unicode_test\data\Final-Frontier-28.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Unicode_test\data\Latin-Hiragana-24.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Unicode_test\data\Unicode-Test-72.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Unicode_test\LittleFS_functions.ino, code is 22, comment is 11, blank is 8.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\LittleFS\Unicode_test\Unicode_test.ino, code is 68, comment is 56, blank is 39.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SD_Card\ESP32_Smooth_Font_SD\data\Final-Frontier-28.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SD_Card\ESP32_Smooth_Font_SD\ESP32_Smooth_Font_SD.ino, code is 91, comment is 58, blank is 32.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Font_Demo_1\data\NotoSansBold15.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Font_Demo_1\data\NotoSansBold36.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Font_Demo_1\Font_Demo_1.ino, code is 83, comment is 80, blank is 50.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Font_Demo_1\Notes.ino, code is 0, comment is 56, blank is 0.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Font_Demo_2\data\NotoSansBold15.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Font_Demo_2\data\NotoSansBold36.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Font_Demo_2\Font_Demo_2.ino, code is 125, comment is 62, blank is 62.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Font_Demo_2\Notes.ino, code is 0, comment is 56, blank is 0.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Font_Demo_3\data\NotoSansBold15.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Font_Demo_3\data\NotoSansBold36.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Font_Demo_3\data\NotoSansMonoSCB20.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Font_Demo_3\Font_Demo_3.ino, code is 100, comment is 94, blank is 67.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Font_Demo_3\Notes.ino, code is 0, comment is 61, blank is 0.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Font_Demo_4\data\NotoSansBold15.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Font_Demo_4\data\NotoSansBold36.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Font_Demo_4\Font_Demo_4.ino, code is 54, comment is 68, blank is 38.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Font_Demo_4\Notes.ino, code is 0, comment is 56, blank is 0.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Print_Smooth_Font\data\Final-Frontier-28.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Print_Smooth_Font\Print_Smooth_Font.ino, code is 103, comment is 70, blank is 34.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Smooth_font_gradient\data\NotoSansBold15.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Smooth_font_gradient\data\NotoSansBold36.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Smooth_font_gradient\Smooth_font_gradient.ino, code is 57, comment is 48, blank is 27.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Smooth_font_reading_TFT\data\NotoSansBold15.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Smooth_font_reading_TFT\data\NotoSansBold36.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Smooth_font_reading_TFT\Smooth_font_reading_TFT.ino, code is 97, comment is 49, blank is 28.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Unicode_test\data\Final-Frontier-28.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Unicode_test\data\Latin-Hiragana-24.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Unicode_test\data\Unicode-Test-72.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Unicode_test\SPIFFS_functions.ino, code is 63, comment is 13, blank is 11.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Fonts\SPIFFS\Unicode_test\Unicode_test.ino, code is 60, comment is 55, blank is 44.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Graphics\Anti-aliased_Clock\Anti-aliased_Clock.ino, code is 84, comment is 56, blank is 44.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Graphics\Anti-aliased_Clock\NotoSansBold15.h, code is 676, comment is 18, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Graphics\Anti-aliased_Clock\NTP_Time.h, code is 207, comment is 114, blank is 72.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Smooth Graphics\Smooth_Graphics_Demo\Smooth_Graphics_Demo.ino, code is 98, comment is 51, blank is 37.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Animated_dial\Animated_dial.ino, code is 104, comment is 81, blank is 47.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Animated_dial\dial.h, code is 1133, comment is 17, blank is 1.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Animated_dial\NotoSansBold36.h, code is 361, comment is 18, blank is 1.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\One_bit_Sprite_Demo\One_bit_Sprite_Demo.ino, code is 43, comment is 52, blank is 21.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\One_bit_Yin_Yang\One_bit_Yin_Yang.ino, code is 45, comment is 40, blank is 23.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Orrery\astronomy.c, code is 5562, comment is 2207, blank is 1054.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Orrery\astronomy.h, code is 411, comment is 421, blank is 72.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Orrery\Orrery.ino, code is 92, comment is 41, blank is 37.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Rotated_Sprite_1\Rotated_Sprite_1.ino, code is 93, comment is 78, blank is 58.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Rotated_Sprite_2\Rotated_Sprite_2.ino, code is 78, comment is 90, blank is 47.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Rotated_Sprite_3\Rotated_Sprite_3.ino, code is 45, comment is 80, blank is 25.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Sprite_draw\Sprite_draw.ino, code is 66, comment is 58, blank is 27.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Sprite_draw_4bit\Sprite_draw_4bit.ino, code is 105, comment is 70, blank is 39.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Sprite_image_4bit\sample_images.h, code is 2, comment is 1, blank is 1.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Sprite_image_4bit\Sprite_image_4bit.ino, code is 92, comment is 43, blank is 23.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Sprite_image_4bit\starImage.cpp, code is 1282, comment is 1, blank is 161.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Sprite_RLE_Font_test\Sprite_RLE_Font_test.ino, code is 135, comment is 18, blank is 47.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Sprite_scroll\Sprite_scroll.ino, code is 57, comment is 64, blank is 21.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Sprite_scroll_16bit\Sprite_scroll_16bit.ino, code is 88, comment is 82, blank is 39.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Sprite_scroll_1bit\Sprite_scroll_1bit.ino, code is 60, comment is 73, blank is 23.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Sprite_scroll_4bit\Sprite_scroll_4bit.ino, code is 78, comment is 63, blank is 24.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Sprite_scroll_8bit\Sprite_scroll_8bit.ino, code is 89, comment is 91, blank is 40.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Sprite_scroll_wrap_1bit\Sprite_scroll_wrap_1bit.ino, code is 65, comment is 57, blank is 37.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Sprite_TFT_Rainbow\Sprite_TFT_Rainbow.ino, code is 89, comment is 39, blank is 27.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Transparent_Sprite_Demo\Transparent_Sprite_Demo.ino, code is 58, comment is 61, blank is 33.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Sprite\Transparent_Sprite_Demo_4bit\Transparent_Sprite_Demo_4bit.ino, code is 46, comment is 83, blank is 27.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Test and diagnostics\Colour_Test\Colour_Test.ino, code is 46, comment is 55, blank is 35.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Test and diagnostics\Read_User_Setup\Read_User_Setup.ino, code is 132, comment is 36, blank is 31.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Test and diagnostics\Test_Touch_Controller\Test_Touch_Controller.ino, code is 16, comment is 15, blank is 18.
+.pio\libdeps\Looper Pedal\TFT_eSPI\examples\Test and diagnostics\TFT_ReadWrite_Test\TFT_ReadWrite_Test.ino, code is 24, comment is 3, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Extensions\Button.cpp, code is 84, comment is 9, blank is 13.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Extensions\Button.h, code is 26, comment is 16, blank is 8.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Extensions\Smooth_font.cpp, code is 362, comment is 178, blank is 79.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Extensions\Smooth_font.h, code is 42, comment is 22, blank is 14.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Extensions\Sprite.cpp, code is 1852, comment is 488, blank is 383.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Extensions\Sprite.h, code is 80, comment is 77, blank is 44.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Extensions\Touch.cpp, code is 216, comment is 103, blank is 62.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Extensions\Touch.h, code is 17, comment is 17, blank is 7.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\Custom\Orbitron_Light_24.h, code is 194, comment is 192, blank is 1.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\Custom\Orbitron_Light_32.h, code is 194, comment is 192, blank is 1.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\Custom\Roboto_Thin_24.h, code is 194, comment is 192, blank is 1.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\Custom\Satisfy_24.h, code is 194, comment is 192, blank is 1.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\Custom\Yellowtail_32.h, code is 194, comment is 192, blank is 1.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\Font16.c, code is 528, comment is 316, blank is 97.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\Font16.h, code is 8, comment is 0, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\Font32rle.c, code is 956, comment is 24, blank is 99.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\Font32rle.h, code is 8, comment is 0, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\Font64rle.c, code is 273, comment is 21, blank is 19.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\Font64rle.h, code is 8, comment is 0, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\Font72rle.c, code is 344, comment is 22, blank is 17.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\Font72rle.h, code is 8, comment is 0, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\Font72x53rle.c, code is 218, comment is 23, blank is 18.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\Font72x53rle.h, code is 8, comment is 0, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\Font7srle.c, code is 240, comment is 23, blank is 17.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\Font7srle.h, code is 8, comment is 0, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeMono12pt7b.h, code is 223, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeMono18pt7b.h, code is 359, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeMono24pt7b.h, code is 573, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeMono9pt7b.h, code is 172, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeMonoBold12pt7b.h, code is 246, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeMonoBold18pt7b.h, code is 419, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeMonoBold24pt7b.h, code is 668, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeMonoBold9pt7b.h, code is 185, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeMonoBoldOblique12pt7b.h, code is 265, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeMonoBoldOblique18pt7b.h, code is 456, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeMonoBoldOblique24pt7b.h, code is 738, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeMonoBoldOblique9pt7b.h, code is 199, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeMonoOblique12pt7b.h, code is 244, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeMonoOblique18pt7b.h, code is 394, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeMonoOblique24pt7b.h, code is 639, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeMonoOblique9pt7b.h, code is 183, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSans12pt7b.h, code is 266, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSans18pt7b.h, code is 448, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSans24pt7b.h, code is 723, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSans9pt7b.h, code is 197, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSansBold12pt7b.h, code is 284, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSansBold18pt7b.h, code is 477, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSansBold24pt7b.h, code is 780, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSansBold9pt7b.h, code is 204, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSansBoldOblique12pt7b.h, code is 313, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSansBoldOblique18pt7b.h, code is 541, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSansBoldOblique24pt7b.h, code is 889, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSansBoldOblique9pt7b.h, code is 223, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSansOblique12pt7b.h, code is 298, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSansOblique18pt7b.h, code is 514, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSansOblique24pt7b.h, code is 836, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSansOblique9pt7b.h, code is 216, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSerif12pt7b.h, code is 255, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSerif18pt7b.h, code is 425, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSerif24pt7b.h, code is 686, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSerif9pt7b.h, code is 191, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSerifBold12pt7b.h, code is 267, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSerifBold18pt7b.h, code is 458, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSerifBold24pt7b.h, code is 755, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSerifBold9pt7b.h, code is 198, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSerifBoldItalic12pt7b.h, code is 288, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSerifBoldItalic18pt7b.h, code is 496, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSerifBoldItalic24pt7b.h, code is 789, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSerifBoldItalic9pt7b.h, code is 211, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSerifItalic12pt7b.h, code is 267, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSerifItalic18pt7b.h, code is 446, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSerifItalic24pt7b.h, code is 733, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\FreeSerifItalic9pt7b.h, code is 198, comment is 96, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\gfxfont.h, code is 66, comment is 70, blank is 20.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\license.txt, code is 25, comment is 1, blank is 9.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\print.txt, code is 49, comment is 0, blank is 12.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\GFXFF\TomThumb.h, code is 421, comment is 48, blank is 5.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\glcdfont.c, code is 260, comment is 3, blank is 4.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Fonts\TrueType\Not_yet_supported.txt, code is 1, comment is 0, blank is 0.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Kconfig, code is 124, comment is 1, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\keywords.txt, code is 168, comment is 0, blank is 33.
+.pio\libdeps\Looper Pedal\TFT_eSPI\library.json, code is 22, comment is 0, blank is 0.
+.pio\libdeps\Looper Pedal\TFT_eSPI\library.properties, code is 10, comment is 1, blank is 1.
+.pio\libdeps\Looper Pedal\TFT_eSPI\license.txt, code is 99, comment is 5, blank is 36.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Processors\pio_8bit_parallel.pio, code is 40, comment is 44, blank is 8.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Processors\pio_8bit_parallel.pio.h, code is 53, comment is 36, blank is 8.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Processors\pio_SPI.pio, code is 46, comment is 36, blank is 7.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Processors\pio_SPI.pio.h, code is 57, comment is 40, blank is 8.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Processors\pio_SPI_18bit.pio, code is 46, comment is 36, blank is 7.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Processors\pio_SPI_18bit.pio.h, code is 57, comment is 40, blank is 8.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Processors\TFT_eSPI_ESP32.c, code is 519, comment is 230, blank is 107.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Processors\TFT_eSPI_ESP32.h, code is 345, comment is 182, blank is 81.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Processors\TFT_eSPI_ESP8266.c, code is 283, comment is 106, blank is 64.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Processors\TFT_eSPI_ESP8266.h, code is 148, comment is 65, blank is 42.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Processors\TFT_eSPI_Generic.c, code is 122, comment is 104, blank is 44.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Processors\TFT_eSPI_Generic.h, code is 104, comment is 67, blank is 33.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Processors\TFT_eSPI_RP2040.c, code is 390, comment is 246, blank is 106.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Processors\TFT_eSPI_RP2040.h, code is 254, comment is 120, blank is 90.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Processors\TFT_eSPI_STM32.c, code is 429, comment is 226, blank is 84.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Processors\TFT_eSPI_STM32.h, code is 721, comment is 319, blank is 144.
+.pio\libdeps\Looper Pedal\TFT_eSPI\README.md, code is 89, comment is 14, blank is 64.
+.pio\libdeps\Looper Pedal\TFT_eSPI\README.txt, code is 7, comment is 0, blank is 0.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_config.h, code is 205, comment is 48, blank is 51.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\EPD_Defines.h, code is 20, comment is 1, blank is 6.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\GC9A01_Defines.h, code is 24, comment is 5, blank is 6.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\GC9A01_Init.h, code is 186, comment is 1, blank is 45.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\GC9A01_Rotation.h, code is 24, comment is 5, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\HX8357D_Defines.h, code is 67, comment is 6, blank is 25.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\HX8357D_Init.h, code is 86, comment is 39, blank is 22.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\HX8357D_Rotation.h, code is 24, comment is 5, blank is 1.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ILI9163_Defines.h, code is 46, comment is 7, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ILI9163_Init.h, code is 30, comment is 25, blank is 4.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ILI9163_Rotation.h, code is 40, comment is 1, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ILI9225_Defines.h, code is 66, comment is 44, blank is 12.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ILI9225_Init.h, code is 90, comment is 2, blank is 13.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ILI9225_Rotation.h, code is 35, comment is 2, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ILI9341_Defines.h, code is 110, comment is 10, blank is 24.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ILI9341_Init.h, code is 195, comment is 40, blank is 48.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ILI9341_Rotation.h, code is 76, comment is 3, blank is 4.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ILI9481_Defines.h, code is 26, comment is 6, blank is 12.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ILI9481_Init.h, code is 414, comment is 42, blank is 112.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ILI9481_Rotation.h, code is 24, comment is 5, blank is 1.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ILI9486_Defines.h, code is 44, comment is 9, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ILI9486_Init.h, code is 60, comment is 11, blank is 12.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ILI9486_Rotation.h, code is 44, comment is 9, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ILI9488_Defines.h, code is 26, comment is 6, blank is 12.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ILI9488_Init.h, code is 70, comment is 25, blank is 22.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ILI9488_Rotation.h, code is 24, comment is 5, blank is 1.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\R61581_Defines.h, code is 26, comment is 6, blank is 12.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\R61581_Init.h, code is 53, comment is 7, blank is 20.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\R61581_Rotation.h, code is 24, comment is 5, blank is 1.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\RM68140_Defines.h, code is 26, comment is 6, blank is 12.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\RM68140_Init.h, code is 51, comment is 7, blank is 19.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\RM68140_Rotation.h, code is 40, comment is 5, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\S6D02A1_Defines.h, code is 39, comment is 7, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\S6D02A1_Init.h, code is 36, comment is 36, blank is 4.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\S6D02A1_Rotation.h, code is 24, comment is 1, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\SSD1351_Defines.h, code is 16, comment is 8, blank is 2.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\SSD1351_Init.h, code is 35, comment is 16, blank is 0.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\SSD1351_Rotation.h, code is 28, comment is 4, blank is 5.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\SSD1963_Defines.h, code is 43, comment is 7, blank is 8.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\SSD1963_Init.h, code is 300, comment is 120, blank is 96.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\SSD1963_Rotation.h, code is 24, comment is 2, blank is 4.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ST7735_Defines.h, code is 129, comment is 18, blank is 33.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ST7735_Init.h, code is 185, comment is 115, blank is 9.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ST7735_Rotation.h, code is 128, comment is 2, blank is 3.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ST7789_2_Defines.h, code is 127, comment is 61, blank is 18.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ST7789_2_Init.h, code is 15, comment is 3, blank is 4.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ST7789_2_Rotation.h, code is 72, comment is 5, blank is 7.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ST7789_Defines.h, code is 130, comment is 62, blank is 18.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ST7789_Init.h, code is 90, comment is 24, blank is 25.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ST7789_Rotation.h, code is 112, comment is 5, blank is 7.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ST7796_Defines.h, code is 76, comment is 4, blank is 20.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ST7796_Init.h, code is 77, comment is 39, blank is 24.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_Drivers\ST7796_Rotation.h, code is 44, comment is 3, blank is 4.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_eSPI.cpp, code is 3657, comment is 1213, blank is 954.
+.pio\libdeps\Looper Pedal\TFT_eSPI\TFT_eSPI.h, code is 513, comment is 382, blank is 165.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Tools\bmp2array4bit\bmp2array4bit.py, code is 147, comment is 58, blank is 49.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Tools\bmp2array4bit\README.md, code is 15, comment is 0, blank is 6.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Tools\bmp2array4bit\star.bmp, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Tools\Create_Smooth_Font\Create_font\Create_font.pde, code is 114, comment is 336, blank is 79.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Tools\Create_Smooth_Font\Create_font\data\Final-Frontier.ttf, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Tools\Create_Smooth_Font\Create_font\FontFiles\Final-Frontier28.vlw, it is a binary file.
+.pio\libdeps\Looper Pedal\TFT_eSPI\Tools\Screenshot_client\Screenshot_client.pde, code is 386, comment is 116, blank is 73.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setup.h, code is 16, comment is 280, blank is 76.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setup_Select.h, code is 112, comment is 117, blank is 44.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup100_RP2040_ILI9488_parallel.h, code is 22, comment is 32, blank is 11.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup101_RP2040_ILI9481_parallel.h, code is 22, comment is 32, blank is 11.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup102_RP2040_ILI9341_parallel.h, code is 22, comment is 32, blank is 11.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup103_RP2040_ILI9486_parallel.h, code is 22, comment is 32, blank is 11.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup104_RP2040_ST7796_parallel.h, code is 22, comment is 32, blank is 11.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup10_RPi_touch_ILI9486.h, code is 17, comment is 17, blank is 11.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup11_RPi_touch_ILI9486.h, code is 20, comment is 15, blank is 9.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup12_M5Stack_Basic_Core.h, code is 20, comment is 14, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup135_ST7789.h, code is 19, comment is 34, blank is 16.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup136_LilyGo_TTV.h, code is 19, comment is 15, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup137_LilyGo_TDisplay_RP2040.h, code is 21, comment is 17, blank is 7.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup13_ILI9481_Parallel.h, code is 24, comment is 15, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup14_ILI9341_Parallel.h, code is 24, comment is 15, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup15_HX8357D.h, code is 16, comment is 20, blank is 11.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup16_ILI9488_Parallel.h, code is 24, comment is 15, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup17_ePaper.h, code is 10, comment is 31, blank is 8.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup18_ST7789.h, code is 14, comment is 25, blank is 15.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup19_RM68140_Parallel.h, code is 24, comment is 15, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup1_ILI9341.h, code is 16, comment is 15, blank is 13.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup200_GC9A01.h, code is 18, comment is 17, blank is 9.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup201_WT32_SC01.h, code is 23, comment is 23, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup202_SSD1351_128.h, code is 25, comment is 25, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup203_ST7789.h, code is 19, comment is 34, blank is 16.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup20_ILI9488.h, code is 15, comment is 16, blank is 12.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup21_ILI9488.h, code is 19, comment is 17, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup22_TTGO_T4.h, code is 20, comment is 8, blank is 11.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup22_TTGO_T4_v1.3.h, code is 21, comment is 6, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup23_TTGO_TM.h, code is 24, comment is 12, blank is 13.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup24_ST7789.h, code is 18, comment is 33, blank is 15.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup25_TTGO_T_Display.h, code is 24, comment is 9, blank is 14.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup26_TTGO_T_Wristband.h, code is 22, comment is 17, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup27_RPi_ST7796_ESP32.h, code is 20, comment is 71, blank is 22.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup28_RPi_ST7796_ESP8266.h, code is 18, comment is 74, blank is 25.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup29_ILI9341_STM32.h, code is 19, comment is 67, blank is 23.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup2_ST7735.h, code is 18, comment is 21, blank is 16.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup30_ILI9341_Parallel_STM32.h, code is 26, comment is 29, blank is 11.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup31_ST7796_Parallel_STM32.h, code is 26, comment is 29, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup32_ILI9341_STM32F103.h, code is 18, comment is 43, blank is 14.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup33_RPi_ILI9486_STM32.h, code is 17, comment is 43, blank is 18.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup34_ILI9481_Parallel_STM32.h, code is 26, comment is 29, blank is 9.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup35_ILI9341_STM32_Port_Bus.h, code is 29, comment is 35, blank is 11.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup36_RPi_touch_ST7796.h, code is 20, comment is 13, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup3_ILI9163.h, code is 17, comment is 17, blank is 13.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup43_ST7735.h, code is 26, comment is 28, blank is 12.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup44_TTGO_CameraPlus.h, code is 20, comment is 14, blank is 6.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup45_TTGO_T_Watch.h, code is 18, comment is 13, blank is 8.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup46_GC9A01_ESP32.h, code is 19, comment is 12, blank is 7.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup47_ST7735.h, code is 22, comment is 27, blank is 13.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup4_S6D02A1.h, code is 15, comment is 17, blank is 11.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup50_SSD1963_Parallel.h, code is 25, comment is 67, blank is 18.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup51_LilyPi_ILI9481.h, code is 20, comment is 13, blank is 6.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup52_LilyPi_ST7796.h, code is 21, comment is 13, blank is 6.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup5_RPi_ILI9486.h, code is 15, comment is 15, blank is 11.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup60_RP2040_ILI9341.h, code is 19, comment is 146, blank is 32.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup61_RP2040_ILI9341_PIO_SPI.h, code is 17, comment is 28, blank is 9.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup62_RP2040_Nano_Connect_ILI9341.h, code is 30, comment is 154, blank is 32.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup6_RPi_Wr_ILI9486.h, code is 16, comment is 16, blank is 12.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup70_ESP32_S2_ILI9341.h, code is 20, comment is 13, blank is 10.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup71_ESP32_S2_ST7789.h, code is 18, comment is 8, blank is 8.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup72_ESP32_ST7789_172x320.h, code is 21, comment is 18, blank is 8.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup7_ST7735_128x128.h, code is 18, comment is 21, blank is 17.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup8_ILI9163_128x128.h, code is 17, comment is 17, blank is 13.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\Setup9_ST7735_Overlap.h, code is 19, comment is 27, blank is 19.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\SetupX_Template.h, code is 16, comment is 278, blank is 75.
+.pio\libdeps\Looper Pedal\TFT_eSPI\User_Setups\User_Custom_Fonts.h, code is 7, comment is 31, blank is 8.
+examples\ADC_Benchmark.cpp, code is 17, comment is 1, blank is 7.
+examples\ADC_Recorder.cpp, code is 82, comment is 3, blank is 25.
+examples\DAC_Test.cpp, code is 19, comment is 0, blank is 6.
+examples\DebounceButton_Test1.cpp, code is 14, comment is 0, blank is 3.
+examples\DebounceButton_Test2.cpp, code is 21, comment is 0, blank is 6.
+examples\GUI_Text.cpp, code is 13, comment is 0, blank is 3.
+examples\HSPI_Test.cpp, code is 20, comment is 1, blank is 4.
+examples\Looper_Blank.cpp, code is 12, comment is 0, blank is 4.
+examples\Metronome_Demo.cpp, code is 10, comment is 0, blank is 3.
+examples\MultiTrack_Test.cpp, code is 22, comment is 1, blank is 5.
+examples\RealTimeRecording_Demo.cpp, code is 69, comment is 0, blank is 20.
+examples\RECAudioFile_Demo.cpp, code is 58, comment is 0, blank is 19.
+include\README, code is 13, comment is 1, blank is 5.
+lib\README, code is 37, comment is 2, blank is 9.
+platformio.ini, code is 6, comment is 9, blank is 1.
+README.md, code is 1, comment is 1, blank is 1.
+src\audioFiles\AudioFile.cpp, code is 41, comment is 1, blank is 8.
+src\audioFiles\AudioFile.h, code is 45, comment is 1, blank is 16.
+src\audioFiles\RECAudioFile.cpp, code is 145, comment is 14, blank is 40.
+src\audioFiles\RECAudioFile.h, code is 40, comment is 2, blank is 17.
+src\audioFiles\SDAudioFile.cpp, code is 108, comment is 11, blank is 19.
+src\audioFiles\SDAudioFile.h, code is 35, comment is 0, blank is 15.
+src\audioFiles\WavFile.cpp, code is 230, comment is 26, blank is 53.
+src\audioFiles\WavFile.h, code is 51, comment is 15, blank is 11.
+src\AudioPlayer.cpp, code is 200, comment is 5, blank is 37.
+src\AudioPlayer.h, code is 50, comment is 2, blank is 19.
+src\chip\adc.cpp, code is 68, comment is 1, blank is 8.
+src\chip\adc.h, code is 31, comment is 0, blank is 8.
+src\chip\dac.cpp, code is 19, comment is 2, blank is 5.
+src\chip\DAC.h, code is 14, comment is 0, blank is 3.
+src\CircularBuffer.cpp, code is 52, comment is 4, blank is 8.
+src\CircularBuffer.h, code is 21, comment is 0, blank is 5.
+src\defines.h, code is 22, comment is 11, blank is 13.
+src\main.cpp, code is 22, comment is 1, blank is 7.
+src\Metronome.cpp, code is 58, comment is 7, blank is 16.
+src\Metronome.h, code is 30, comment is 1, blank is 10.
+src\UI\Display.cpp, code is 57, comment is 1, blank is 10.
+src\UI\Display.h, code is 24, comment is 0, blank is 10.
+src\UI\GUI\DisplayItem.cpp, code is 67, comment is 0, blank is 16.
+src\UI\GUI\DisplayItem.h, code is 42, comment is 5, blank is 20.
+src\UI\GUI\DisplayOverlay.cpp, code is 170, comment is 20, blank is 21.
+src\UI\GUI\DisplayOverlay.h, code is 43, comment is 2, blank is 15.
+src\UI\GUI\SplashScreen.cpp, code is 294, comment is 50, blank is 51.
+src\UI\GUI\SplashScreen.h, code is 28, comment is 8, blank is 13.
+src\UI\GUI\Taskbar.cpp, code is 44, comment is 4, blank is 9.
+src\UI\GUI\Taskbar.h, code is 20, comment is 0, blank is 9.
+src\UI\GUI\Widgets\AudioPlayerWidget.cpp, code is 0, comment is 0, blank is 0.
+src\UI\GUI\Widgets\AudioPlayerWidget.h, code is 0, comment is 0, blank is 0.
+src\UI\GUI\Widgets\DemoWidget.cpp, code is 19, comment is 0, blank is 5.
+src\UI\GUI\Widgets\DemoWidget.h, code is 9, comment is 0, blank is 6.
+src\UI\GUI\Widgets\Widget.cpp, code is 335, comment is 12, blank is 60.
+src\UI\GUI\Widgets\Widget.h, code is 67, comment is 4, blank is 23.
+src\UI\Input\DebounceButton.cpp, code is 113, comment is 8, blank is 17.
+src\UI\Input\DebounceButton.h, code is 43, comment is 2, blank is 13.
+src\UI\Input\RotaryEncoder.cpp, code is 93, comment is 7, blank is 18.
+src\UI\Input\RotaryEncoder.h, code is 49, comment is 1, blank is 15.
+src\UI\MenuManager.cpp, code is 160, comment is 5, blank is 37.
+src\UI\MenuManager.h, code is 44, comment is 0, blank is 21.
+src\utils\AuxSPI.cpp, code is 128, comment is 7, blank is 16.
+src\utils\AuxSPI.h, code is 33, comment is 9, blank is 9.
+src\utils\Utilities.cpp, code is 60, comment is 1, blank is 8.
+src\utils\Utilities.h, code is 25, comment is 1, blank is 9.
+test\README, code is 8, comment is 1, blank is 3.
+===============================================================================

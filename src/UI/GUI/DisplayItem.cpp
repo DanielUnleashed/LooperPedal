@@ -9,7 +9,7 @@ DisplayItem::DisplayItem(String n){
 
 void DisplayItem::attachEvents(){
     for(ButtonEvent ev : buttonEvents){
-        DebounceButton::addInterrupt(ev.pin, ev.func);
+        DebounceButton::addInterrupt(ev.pin, ev.func, ev.functionalEvent);
         if(ev.name.equals("")) continue;
         Taskbar* t = MenuManager::getCurrentDisplay() -> getTaskbar();
         if(t != NULL){
@@ -22,12 +22,17 @@ void DisplayItem::attachEvents(){
 }
 
 void DisplayItem::addButtonEvent(uint8_t buttonIndex, std::function<void()> func){
-    ButtonEvent ev = {buttonIndex, func, ""};
+    ButtonEvent ev = {buttonIndex, func, "", 0};
     buttonEvents.push_back(ev);
 }
 
 void DisplayItem::addButtonEvent(uint8_t buttonIndex, std::function<void()> func, String name){
-    ButtonEvent ev = {buttonIndex, func, name};
+    ButtonEvent ev = {buttonIndex, func, name, 0};
+    buttonEvents.push_back(ev);
+}
+
+void DisplayItem::addButtonEvent(uint8_t buttonIndex, std::function<void()> func, String name, uint8_t mode){
+    ButtonEvent ev = {buttonIndex, func, name, mode};
     buttonEvents.push_back(ev);
 }
 
@@ -37,7 +42,12 @@ void DisplayItem::addRotaryEvent(uint8_t rotatoryIndex, std::function<void(bool 
 }
 
 void DisplayItem::addRotaryButtonEvent(uint8_t buttonIndex, std::function<void(void)> func){
-    ButtonEvent ev = {buttonIndex, func, ""};
+    ButtonEvent ev = {buttonIndex, func, "", 0};
+    rotaryButtonEvents.push_back(ev);
+}
+
+void DisplayItem::addRotaryButtonEvent(uint8_t buttonIndex, std::function<void(void)> func, uint8_t mode){
+    ButtonEvent ev = {buttonIndex, func, "", mode};
     rotaryButtonEvents.push_back(ev);
 }
 

@@ -76,12 +76,24 @@ class Widget : public DisplayItem{
     static void drawGrid(TFT_eSprite &canvas, uint16_t color);
     void drawRectangle(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t color);
     void drawRoundRectangle(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t color);
+    void drawRectangleByCenter(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t color);
+    void drawRoundRectangleByCenter(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t color);
+
+    void drawRoundFilledRectangle(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t color);
     void drawFilledRect(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t fillColor);
     void drawFilledRect(uint8_t pX, uint8_t pY, uint8_t sX, uint8_t sY, uint16_t colorA, uint16_t colorB, bool drawHorizontal);
+    
     void drawHLine(uint8_t pX, uint8_t pY, uint8_t length, uint16_t color);
+    void drawHLine(uint8_t pX, uint8_t pY, uint8_t length, uint8_t width, uint16_t color);
     void drawVLine(uint8_t pX, uint8_t pY, uint8_t length, uint16_t color);
+    
+    void drawText(uint8_t pX, uint8_t pY, String text, uint8_t datum, uint8_t size, uint16_t color);
     void drawText(uint8_t pX, uint8_t pY, String text, uint16_t color);
+    void drawRightText(uint8_t pX, uint8_t pY, String text, uint16_t color);
     void drawCentreText(uint8_t pX, uint8_t pY, String text, uint16_t color);
+    
+    void drawCircumference(uint8_t pX, uint8_t pY, uint8_t radius, uint16_t color);
+    void drawCircle(uint8_t pX, uint8_t pY, uint8_t radius, uint16_t color);
     void pushSprite(TFT_eSprite &sprite, uint16_t x, uint16_t y);
 
     static void fillTile(TFT_eSprite &canvas, uint8_t x, uint8_t y, uint16_t color);

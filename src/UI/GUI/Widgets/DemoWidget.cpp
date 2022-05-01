@@ -15,7 +15,7 @@ DemoWidget::DemoWidget(uint8_t tileX, uint8_t tileY, uint8_t sizeX, uint8_t size
     addButtonEvent(0, [this]{
         if(!Widget::isWidgetSelectionMode) MenuManager::getCurrentDisplay() -> addItem(new DemoWidget(0,0,2,2));
         else Utilities::debug("First drop the item!\n");
-    }, "New");
+    }, "New", DebounceButton::LONG_PRESS);
 }
 
 void DemoWidget::widgetDraw(){
