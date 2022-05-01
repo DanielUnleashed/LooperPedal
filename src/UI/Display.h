@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 #include "UI/GUI/DisplayItem.h"
-#include "UI/GUI/Widget.h"
+#include "UI/GUI/Widgets/Widget.h"
 
 #include "UI/GUI/Taskbar.h"
 

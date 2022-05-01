@@ -1,7 +1,7 @@
 #include "AudioPlayer.h"
 #include "UI/MenuManager.h"
 #include "UI/GUI/Taskbar.h"
-#include "UI/GUI/DemoWidget.h"
+#include "UI/GUI/Widgets/DemoWidget.h"
 #include "UI/Display.h"
 
 void setup() {
@@ -22,9 +22,9 @@ void setup() {
   MenuManager::addDisplay(mainDisplay);
   MenuManager::launch();
 
-  /*AudioPlayer::begin();
+  AudioPlayer::begin();
   //AudioPlayer::addSDAudioFile("/tereza.wav");
-  AudioPlayer::addRECAudioFile(0);*/
+  AudioPlayer::addRECAudioFile(0);
 }
 
 void loop() {}

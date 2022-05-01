@@ -1,7 +1,7 @@
 #ifndef WIDGET_h
 #define WIDGET_h
 
-#include "DisplayItem.h"
+#include "UI/GUI/DisplayItem.h"
 
 class Widget : public DisplayItem{
 

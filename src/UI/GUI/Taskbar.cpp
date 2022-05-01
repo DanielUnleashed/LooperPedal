@@ -1,5 +1,5 @@
 #include "Taskbar.h"
-#include "Widget.h"
+#include "UI/GUI/Widgets/Widget.h"
 
 Taskbar::Taskbar() : DisplayItem("Taskbar"){}
 
