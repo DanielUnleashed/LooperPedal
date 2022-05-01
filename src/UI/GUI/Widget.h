@@ -11,18 +11,22 @@ class Widget : public DisplayItem{
     static const uint8_t DECREASE_CURSOR = 2;
     static const uint8_t SWITCH_SELECTION_MODES = 3;
     static const uint8_t UNDO_WIDGET_SELECTION = 4;
+    static const uint8_t DELETE_SELECTED_WIDGET = 5;
 
     Widget(String name, uint8_t tileX, uint8_t tileY, uint8_t sizeX, uint8_t sizeY, 
         uint8_t inWidgetSelectables);
 
     String widgetName;
     uint16_t widgetID;
+    bool hasBeenPlaced = true;
 
     uint8_t inWidgetSelectables;
 
     static void startWidgets();
     static void increaseCursor();
     static void decreaseCursor();
+    static void undoWidgetSelection();
+    static void deleteSelectedWidget();
 
     static bool isWidgetSelectionMode;
 

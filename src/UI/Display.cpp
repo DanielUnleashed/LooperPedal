@@ -22,7 +22,6 @@ void Display::addItem(DisplayItem *item){
     itemList.push_back(item);
     if(item->itemName.equals("Widget")){
         Widget::addWidget((Widget*) item);
-        Widget::sortDisplayedWidgetsList();
     }
     if(MenuManager::isLaunched){
         //item -> forceRedraw(); Not necesary!

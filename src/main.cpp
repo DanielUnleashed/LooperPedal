@@ -13,11 +13,11 @@ void setup() {
 
   MenuManager::init();
 
-  static DemoWidget demo(0,0,2,2);
+  DemoWidget* demo = new DemoWidget(0,0,2,2);
   
   static Display mainDisplay("Main");
   mainDisplay.addTaskbar();
-  mainDisplay.addItem(&demo);
+  mainDisplay.addItem(demo);
 
   MenuManager::addDisplay(mainDisplay);
   MenuManager::launch();

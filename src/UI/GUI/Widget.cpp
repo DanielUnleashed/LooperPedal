@@ -29,9 +29,7 @@ Widget::Widget(String name, uint8_t tx, uint8_t ty, uint8_t sx, uint8_t sy, uint
     oY = tileSize*tileY + padY;
 
     if(MenuManager::isLaunched){
-        switchSelectionMode();
-        holdingPosition = 0;
-        selectedWidget = 0;
+        hasBeenPlaced = false;
     }
 }
 
@@ -88,15 +86,35 @@ void Widget::decreaseCursor(){
     vTaskNotifyGiveFromISR(widgetEventHandle, &xHigherPriorityTaskWoken); 
 }
 
+void Widget::undoWidgetSelection(){
+    widgetEvent = UNDO_WIDGET_SELECTION;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    vTaskNotifyGiveFromISR(widgetEventHandle, &xHigherPriorityTaskWoken); 
+}
+
+void Widget::deleteSelectedWidget(){
+    widgetEvent = DELETE_SELECTED_WIDGET;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    vTaskNotifyGiveFromISR(widgetEventHandle, &xHigherPriorityTaskWoken); 
+}
+
 void Widget::addWidget(Widget* w){
     displayedWidgets.push_back(w);
+    if(MenuManager::isLaunched){
+        selectedWidget = displayedWidgets.size()-1;
+        holdingPosition = 0;
+        switchSelectionMode();
+    }
 }
 
 void Widget::removeWidget(Widget* in){
-    for(auto it = begin(displayedWidgets); it != end(displayedWidgets); it++){
-        if((*it)->widgetID == in->widgetID)
-            displayedWidgets.erase(it);
+    for(uint8_t i = 0; i < displayedWidgets.size(); i++){
+        if(displayedWidgets[i]->widgetID == in->widgetID){
+            displayedWidgets.erase(displayedWidgets.begin() + i);
+            return;
+        }
     }
+    Utilities::debug("Couldn't delete the %s widget\n", in->widgetName.c_str());
 }
 
 void Widget::clearWidgets(){
@@ -107,7 +125,7 @@ void Widget::sortDisplayedWidgetsList(){
     std::sort(displayedWidgets.begin(), displayedWidgets.end(), [](Widget* w1, Widget* w2)->bool{
         uint16_t length1 = w1->tileY * TILES_X + w1->tileX;
         uint16_t length2 = w2->tileY * TILES_X + w2->tileX;
-        if(length1 == length2) w1->widgetID < w2->widgetID; //If they're situated in the same coords, prioritize the newer one.
+        if(length1 == length2) return w1->widgetID < w2->widgetID; //If they're situated in the same coords, prioritize the newer one.
         return length1 < length2;
     });
 }
@@ -227,6 +245,7 @@ void Widget::widgetEventTask(void* funcParams){
                     DebounceButton::saveAndRemoveButtons();
                     t->addButton(0, "Dim.X");
                     t->addButton(1, "Dim.Y");
+                    t->addButton(2, "Erase");
                     t->addButton(3, "Back");
 
                     DebounceButton::addInterrupt(0, []{
@@ -241,14 +260,17 @@ void Widget::widgetEventTask(void* funcParams){
                         displayedWidgets[selectedWidget] -> redrawFromISR();
                     });
 
+                    DebounceButton::addInterrupt(2, []{
+                        deleteSelectedWidget();
+                    });
+
                     DebounceButton::addInterrupt(3, []{
-                        widgetEvent = UNDO_WIDGET_SELECTION;
-                        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-                        vTaskNotifyGiveFromISR(widgetEventHandle, &xHigherPriorityTaskWoken); 
+                        undoWidgetSelection();
                     });
                     t->forceRedraw();
                 }
             }else{
+                displayedWidgets[selectedWidget] -> hasBeenPlaced = true;
                 if(t != NULL) {
                     // Undo the change made above.
                     t->undoRemoveButtons();
@@ -260,8 +282,19 @@ void Widget::widgetEventTask(void* funcParams){
             }
             redrawAll();
         }else if(widgetEvent == UNDO_WIDGET_SELECTION){
-            holdingPosition = previousHoldingPosition;
-            displayedWidgets[selectedWidget] -> recalculateRelativePoint();
+            if(displayedWidgets[selectedWidget] -> hasBeenPlaced){
+                holdingPosition = previousHoldingPosition;
+                displayedWidgets[selectedWidget] -> recalculateRelativePoint();
+                switchSelectionMode();
+            }else{
+                deleteSelectedWidget();
+            }
+        }else if(widgetEvent == DELETE_SELECTED_WIDGET){
+            Widget* w = displayedWidgets[selectedWidget];
+            MenuManager::getCurrentDisplay() -> removeItem(w);
+            removeWidget(w);
+            delete w;
+            selectedWidget = 0;
             switchSelectionMode();
         }
     }
