@@ -9,6 +9,7 @@ class DemoWidget : public Widget{
     DemoWidget(uint8_t tileX, uint8_t tileY, uint8_t sizeX, uint8_t sizeY);
 
     void widgetDraw() override;
+    void selectionFunctions(uint8_t selection) override;
 
 };
 

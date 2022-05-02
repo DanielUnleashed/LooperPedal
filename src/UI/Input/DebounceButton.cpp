@@ -76,7 +76,7 @@ bool DebounceButton::updateState(){
             lastTimePressed = currentTime;
             if(lastState == HIGH && currentPinState == LOW){
                 buttonIsPressed = false;
-                Serial.println("RELEASED");
+                //Serial.println("RELEASED");
                 ret = true;
             }
             if(lastState == LOW && currentPinState == HIGH){
@@ -87,7 +87,7 @@ bool DebounceButton::updateState(){
                 }
                 buttonIsPressed = true;
                 doubleClickedTime = currentTime;
-                Serial.println("CLICK");
+                //Serial.println("CLICK");
                 ret = true;
             }
         }

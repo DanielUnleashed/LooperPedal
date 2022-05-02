@@ -1,5 +1,7 @@
 #include "AudioPlayerWidget.h"
 
+static uint16_t color = 0x04B3;
+
 AudioPlayerWidget::AudioPlayerWidget(uint8_t x, uint8_t y, uint8_t sizeX, uint8_t sizeY) : Widget("AudioPlayer", x, y, sizeX, sizeY, 2){
 
 }
@@ -9,8 +11,8 @@ void AudioPlayerWidget::widgetDraw(){
     drawRoundFilledRectangle(0,0,100,100,0x020D);
 
     // Play button
-    drawCircle(20, 50, 14, 0x04B3);
-    drawCircumference(20, 50, 14, 0x02AA);
+    drawCircle(20, 50, 14, color);
+    //drawCircumference(20, 50, 14, 0x02AA);
     if(isSelected() && inWidgetSelection==0) 
         drawRoundRectangleByCenter(20,50,31,31,0xDD83);
 
@@ -30,4 +32,9 @@ void AudioPlayerWidget::widgetDraw(){
 
     drawText(40, 75, "0:30", TL_DATUM, 1, 0xFEFC);
     drawText(95, 75, "1:05", TR_DATUM, 1, 0xFEFC);
+}
+
+void AudioPlayerWidget::selectionFunctions(uint8_t selection){
+    Serial.println("yooo");
+    color = TFT_RED;
 }

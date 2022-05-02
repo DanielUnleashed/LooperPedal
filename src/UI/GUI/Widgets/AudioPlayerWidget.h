@@ -10,6 +10,7 @@ class AudioPlayerWidget : public Widget{
   AudioPlayerWidget(uint8_t x, uint8_t y, uint8_t sizeX, uint8_t sizeY);
 
   void widgetDraw() override;
+  void selectionFunctions(uint8_t selection) override;
 
 };
 

@@ -8,7 +8,7 @@
 
 #include "utils/Utilities.h"
 
-#define DEFAULT_DEBOUNCE_TIME 25 //ms
+#define DEFAULT_DEBOUNCE_TIME 40 //ms
 #define DEFAULT_DOUBLE_CLICK_TIME 800 //ms
 
 struct ButtonEvent{

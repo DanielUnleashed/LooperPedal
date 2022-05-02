@@ -100,86 +100,10 @@ void Widget::deleteSelectedWidget(){
     vTaskNotifyGiveFromISR(widgetEventHandle, &xHigherPriorityTaskWoken); 
 }
 
-void Widget::addWidget(Widget* w){
-    displayedWidgets.push_back(w);
-    if(MenuManager::isLaunched){
-        selectedWidget = displayedWidgets.size()-1;
-        holdingPosition = 0;
-        switchSelectionMode();
-    }
-}
-
-void Widget::removeWidget(Widget* in){
-    for(uint8_t i = 0; i < displayedWidgets.size(); i++){
-        if(displayedWidgets[i]->widgetID == in->widgetID){
-            displayedWidgets.erase(displayedWidgets.begin() + i);
-            return;
-        }
-    }
-    Utilities::debug("Couldn't delete the %s widget\n", in->widgetName.c_str());
-}
-
-void Widget::clearWidgets(){
-    displayedWidgets.clear();
-}
-
-void Widget::sortDisplayedWidgetsList(){
-    std::sort(displayedWidgets.begin(), displayedWidgets.end(), [](Widget* w1, Widget* w2)->bool{
-        uint16_t length1 = w1->tileY * TILES_X + w1->tileX;
-        uint16_t length2 = w2->tileY * TILES_X + w2->tileX;
-        if(length1 == length2) return w1->widgetID < w2->widgetID; //If they're situated in the same coords, prioritize the newer one.
-        return length1 < length2;
-    });
-}
-
-bool Widget::areTilesOverlapping(){
-    bool tileMap[TILES_X][TILES_Y];
-    memset(tileMap, 0, sizeof(tileMap));
-    for(Widget* w : displayedWidgets){
-        for(uint8_t i = 0; i < w->sizeX; i++){
-            for(uint8_t j = 0; j < w->sizeY; j++){
-                if(tileMap[w->tileX+i][w->tileY+j]) return true;
-                else tileMap[w->tileX+i][w->tileY+j] = true;
-            }
-        }
-    }
-    return false;
-}
-
-bool Widget::getTileOverlapMap(){
-    bool tileMap[TILES_X][TILES_Y];
-    memset(tileMap, 0, sizeof(tileMap));
-    memset(tileMapOverlap, 0, sizeof(tileMapOverlap));
-    bool theresOverlap = false;
-    for(Widget* w : displayedWidgets){
-        for(uint8_t i = 0; i < w->sizeX; i++){
-            for(uint8_t j = 0; j < w->sizeY; j++){
-                if(tileMap[w->tileX+i][w->tileY+j]){
-                    theresOverlap = true;
-                    tileMapOverlap[w->tileX+i][w->tileY+j] = true;
-                }else tileMap[w->tileX+i][w->tileY+j] = true;
-            }
-        }
-    }
-    return theresOverlap;
-}
-
-void Widget::redrawAll(){
-    for(Widget* w : displayedWidgets) w->needsUpdate = true;
-    displayedWidgets[0] -> redrawFromISR();
-}
-
-void Widget::startWidgets(){
-    uint16_t distX = width/TILES_X;
-    uint16_t distY = (height - TASKBAR_HEIGHT)/TILES_Y;
-    tileSize = distX<distY ? distX : distY;
-
-    Serial.printf("TileSize: %d\n", tileSize);
-
-    padX = (width - tileSize*TILES_X)/2;
-    padY = (height - TASKBAR_HEIGHT - tileSize*TILES_Y)/2;
-
-    xTaskCreatePinnedToCore(widgetEventTask, "WidgetEvents", 10000, NULL, 5, &widgetEventHandle, 0);
+void Widget::runSelectionFunction(){
+    widgetEvent = RUN_SELECTION_FUNCTION;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    vTaskNotifyGiveFromISR(widgetEventHandle, &xHigherPriorityTaskWoken); 
 }
 
 void Widget::widgetEventTask(void* funcParams){
@@ -196,7 +120,7 @@ void Widget::widgetEventTask(void* funcParams){
                 w -> recalculateRelativePoint();
                 redrawAll();
             }else{
-                w -> redrawFromISR();
+                w -> redraw();
                 if(inWidgetSelection+1 < w->inWidgetSelectables){
                     inWidgetSelection++;
                 }else{
@@ -204,7 +128,7 @@ void Widget::widgetEventTask(void* funcParams){
                     else selectedWidget = 0;
                     inWidgetSelection = 0;
                 }
-                displayedWidgets[selectedWidget] -> redrawFromISR();
+                displayedWidgets[selectedWidget] -> redraw();
             }
         }else if(widgetEvent == DECREASE_CURSOR){
             Widget* w = displayedWidgets[selectedWidget];
@@ -215,7 +139,7 @@ void Widget::widgetEventTask(void* funcParams){
                 w -> recalculateRelativePoint();
                 redrawAll();
             }else{
-                w -> redrawFromISR();
+                w -> redraw();
                 if(inWidgetSelection-1 >= 0){
                     inWidgetSelection--;
                 }else{
@@ -223,7 +147,7 @@ void Widget::widgetEventTask(void* funcParams){
                     else selectedWidget--;
                     inWidgetSelection = displayedWidgets[selectedWidget]->inWidgetSelectables-1;
                 }
-                displayedWidgets[selectedWidget] -> redrawFromISR();
+                displayedWidgets[selectedWidget] -> redraw();
             }
         }else if(widgetEvent == SWITCH_SELECTION_MODES){
             Widget* selw = displayedWidgets[selectedWidget];
@@ -302,8 +226,93 @@ void Widget::widgetEventTask(void* funcParams){
             delete w;
             selectedWidget = 0;
             switchSelectionMode();
+        }else if(widgetEvent == RUN_SELECTION_FUNCTION){
+            displayedWidgets[selectedWidget] -> selectionFunctions(inWidgetSelection);
+            displayedWidgets[selectedWidget] -> redraw();
         }
     }
+}
+
+void Widget::addWidget(Widget* w){
+    displayedWidgets.push_back(w);
+    if(MenuManager::isLaunched){
+        selectedWidget = displayedWidgets.size()-1;
+        holdingPosition = 0;
+        switchSelectionMode();
+    }
+}
+
+void Widget::removeWidget(Widget* in){
+    for(uint8_t i = 0; i < displayedWidgets.size(); i++){
+        if(displayedWidgets[i]->widgetID == in->widgetID){
+            displayedWidgets.erase(displayedWidgets.begin() + i);
+            return;
+        }
+    }
+    Utilities::debug("Couldn't delete the %s widget\n", in->widgetName.c_str());
+}
+
+void Widget::clearWidgets(){
+    displayedWidgets.clear();
+}
+
+void Widget::sortDisplayedWidgetsList(){
+    std::sort(displayedWidgets.begin(), displayedWidgets.end(), [](Widget* w1, Widget* w2)->bool{
+        uint16_t length1 = w1->tileY * TILES_X + w1->tileX;
+        uint16_t length2 = w2->tileY * TILES_X + w2->tileX;
+        if(length1 == length2) return w1->widgetID < w2->widgetID; //If they're situated in the same coords, prioritize the newer one.
+        return length1 < length2;
+    });
+}
+
+bool Widget::areTilesOverlapping(){
+    bool tileMap[TILES_X][TILES_Y];
+    memset(tileMap, 0, sizeof(tileMap));
+    for(Widget* w : displayedWidgets){
+        for(uint8_t i = 0; i < w->sizeX; i++){
+            for(uint8_t j = 0; j < w->sizeY; j++){
+                if(tileMap[w->tileX+i][w->tileY+j]) return true;
+                else tileMap[w->tileX+i][w->tileY+j] = true;
+            }
+        }
+    }
+    return false;
+}
+
+bool Widget::getTileOverlapMap(){
+    bool tileMap[TILES_X][TILES_Y];
+    memset(tileMap, 0, sizeof(tileMap));
+    memset(tileMapOverlap, 0, sizeof(tileMapOverlap));
+    bool theresOverlap = false;
+    for(Widget* w : displayedWidgets){
+        for(uint8_t i = 0; i < w->sizeX; i++){
+            for(uint8_t j = 0; j < w->sizeY; j++){
+                if(tileMap[w->tileX+i][w->tileY+j]){
+                    theresOverlap = true;
+                    tileMapOverlap[w->tileX+i][w->tileY+j] = true;
+                }else tileMap[w->tileX+i][w->tileY+j] = true;
+            }
+        }
+    }
+    return theresOverlap;
+}
+
+void Widget::redrawAll(){
+    for(Widget* w : displayedWidgets) w->needsUpdate = true;
+    displayedWidgets[0] -> redraw();
+}
+
+void Widget::startWidgets(){
+    uint16_t distX = width/TILES_X;
+    uint16_t distY = (height - TASKBAR_HEIGHT)/TILES_Y;
+    tileSize = distX<distY ? distX : distY;
+
+    Serial.printf("TileSize: %d\n", tileSize);
+
+    padX = (width - tileSize*TILES_X)/2;
+    padY = (height - TASKBAR_HEIGHT - tileSize*TILES_Y)/2;
+
+    xTaskCreatePinnedToCore(widgetEventTask, "WidgetEvents", 10000, NULL, 5, &widgetEventHandle, 0);
 }
 
 Point Widget::transformRelativePoint(uint8_t pX, uint8_t pY){

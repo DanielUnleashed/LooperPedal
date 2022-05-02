@@ -12,6 +12,7 @@ class Widget : public DisplayItem{
     static const uint8_t SWITCH_SELECTION_MODES = 3;
     static const uint8_t UNDO_WIDGET_SELECTION = 4;
     static const uint8_t DELETE_SELECTED_WIDGET = 5;
+    static const uint8_t RUN_SELECTION_FUNCTION = 6;
 
     Widget(String name, uint8_t tileX, uint8_t tileY, uint8_t sizeX, uint8_t sizeY, 
         uint8_t inWidgetSelectables);
@@ -27,6 +28,7 @@ class Widget : public DisplayItem{
     static void decreaseCursor();
     static void undoWidgetSelection();
     static void deleteSelectedWidget();
+    static void runSelectionFunction();
 
     static bool isWidgetSelectionMode;
 
@@ -53,6 +55,8 @@ class Widget : public DisplayItem{
     static void switchSelectionMode();
 
     protected:
+    virtual void selectionFunctions(uint8_t selection) = 0;
+
     static uint16_t tileSize;
     static uint16_t padX, padY;
 
