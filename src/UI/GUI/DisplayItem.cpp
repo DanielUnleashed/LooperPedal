@@ -18,7 +18,7 @@ void DisplayItem::attachEvents(){
         }
     }
     for(RotaryEncoderEvent ev : rotaryEvents) RotaryEncoder::addInterrupt(ev.pin, ev.func);
-    for(ButtonEvent ev : rotaryButtonEvents) RotaryEncoder::addButtonInterrupt(ev.pin, ev.func);
+    for(ButtonEvent ev : rotaryButtonEvents) DebounceButton::addRotaryInterrupt(ev.pin, ev.func, ev.functionalEvent);
 }
 
 void DisplayItem::addButtonEvent(uint8_t buttonIndex, std::function<void()> func){

@@ -269,6 +269,10 @@ void Widget::widgetEventTask(void* funcParams){
                     DebounceButton::addInterrupt(3, []{
                         undoWidgetSelection();
                     });
+
+                    DebounceButton::addRotaryInterrupt(0, []{
+                        switchSelectionMode();
+                    });
                     t->forceRedraw();
                 }
             }else{

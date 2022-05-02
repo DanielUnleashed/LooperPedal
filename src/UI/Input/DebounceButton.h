@@ -8,7 +8,7 @@
 
 #include "utils/Utilities.h"
 
-#define DEFAULT_DEBOUNCE_TIME 200 //ms
+#define DEFAULT_DEBOUNCE_TIME 25 //ms
 #define DEFAULT_DOUBLE_CLICK_TIME 800 //ms
 
 struct ButtonEvent{
@@ -45,6 +45,8 @@ class DebounceButton{
         // Adds an interrupt function to buttonIndex that will trigger depending on the mode.
         // @param mode CLICK, LONG_PRESS...
         // @returns False if the interrupt could not be added.
+        static bool addRotaryInterrupt(uint8_t buttonIndex, std::function<void(void)> func);
+        static bool addRotaryInterrupt(uint8_t buttonIndex, std::function<void(void)> func, uint8_t mode);
         static bool addInterrupt(uint8_t buttonIndex, std::function<void(void)> func, uint8_t mode);
         static bool addMultipleInterrupt(uint8_t* buttonIndexes, std::function<void(void)> func);
         static bool clearMultipleInterrupt(uint8_t* buttonIndexes);
@@ -62,11 +64,11 @@ class DebounceButton{
         volatile bool buttonIsPressed = false;
         volatile uint8_t repeatedPressesCount = 0;
 
-        static DebounceButton* systemButtons[TOTAL_BUTTONS];
+        static DebounceButton* systemButtons[TOTAL_BUTTONS+TOTAL_ROTARY_BUTTONS];
         // This stores all the functions of the buttons. Buttons may have several functions attached depending
         // of the input.
-        static std::vector<ButtonFunction> ISREvents[TOTAL_BUTTONS];
-        static std::vector<ButtonFunction> previousISREvents[TOTAL_BUTTONS];
+        static std::vector<ButtonFunction> ISREvents[TOTAL_BUTTONS+TOTAL_ROTARY_BUTTONS];
+        static std::vector<ButtonFunction> previousISREvents[TOTAL_BUTTONS+TOTAL_ROTARY_BUTTONS];
         bool updateState();
 
         static ButtonEvent buttonLongPressWatch;

@@ -52,7 +52,9 @@ void MenuManager::drawTask(void* funcParams){
                 isInTransition = false;
                 
                 // This reattaches the interrupts and the buttons in the taskbar.
+                isLaunched = false;
                 displayList[nextDisplay].launchDisplay();
+                isLaunched = true;
             }
         }else{
             displayList[currentDisplay].drawDisplay(canvas);

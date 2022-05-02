@@ -10,12 +10,12 @@ DemoWidget::DemoWidget(uint8_t tileX, uint8_t tileY, uint8_t sizeX, uint8_t size
 
     addRotaryButtonEvent(0, [this]{
         switchSelectionMode();
-    });
+    }, DebounceButton::LONG_PRESS);
 
     addButtonEvent(0, [this]{
         if(!Widget::isWidgetSelectionMode) MenuManager::getCurrentDisplay() -> addItem(new DemoWidget(0,0,2,2));
         else Utilities::debug("First drop the item!\n");
-    }, "New", DebounceButton::LONG_PRESS);
+    }, "New");
 }
 
 void DemoWidget::widgetDraw(){

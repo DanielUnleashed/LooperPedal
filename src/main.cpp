@@ -17,7 +17,6 @@ void setup() {
   DemoWidget* demo = new DemoWidget(0,0,2,2);
   AudioPlayerWidget* aud = new AudioPlayerWidget(0,2,4,2);
 
-
   static Display mainDisplay("Main");
   mainDisplay.addTaskbar();
   mainDisplay.addItem(demo);

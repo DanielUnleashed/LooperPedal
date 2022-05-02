@@ -2,14 +2,6 @@
 #include "UI/MenuManager.h" 
 
 SplashScreen::SplashScreen() : DisplayItem("Splashscreen"){
-    addRotaryEvent(0, [this](bool in){
-        this -> inputVariable += (in ? 1.0 : -1.0)*TWO_PI;
-    });
-
-    addRotaryButtonEvent(0, [this]{
-        this->fillPolygons = !this->fillPolygons;
-    });
-
     for(uint8_t i = 0; i < 4; i++){
         addButtonEvent(i,[this]{
             MenuManager::changeScreen("Main");
@@ -17,14 +9,6 @@ SplashScreen::SplashScreen() : DisplayItem("Splashscreen"){
     }
 
     addButtonEvent(4, [this]{
-        if(DebounceButton::twoButtonsClicked(5)){
-            this->backColor = TFT_BLACK;
-            this->color[0] = 200;   
-            this->color[1] = 200;
-            this->color[2] = 200;
-            return;    
-        }
-
         uint8_t c[3];
         for(uint8_t i = 0; i < 3; i++){
             c[i] = random(0,0x7F);
@@ -33,17 +17,25 @@ SplashScreen::SplashScreen() : DisplayItem("Splashscreen"){
     });
 
     addButtonEvent(5, [this]{
-        if(DebounceButton::twoButtonsClicked(4)){
-            this->backColor = TFT_BLACK;
-            this->color[0] = 200;   
-            this->color[1] = 200;
-            this->color[2] = 200;
-            return;    
-        }
         for(uint8_t i = 0; i < 3; i++){
             this -> color[i] = (random(0,0xFF) + 0xA0)/2;
         }
     });
+
+    addRotaryEvent(0, [this](bool in){
+        this -> inputVariable += (in ? 1.0 : -1.0)*PI;
+    });
+
+    addRotaryButtonEvent(0, [this]{
+        this->fillPolygons = !this->fillPolygons;
+    });
+
+    addRotaryButtonEvent(0, [this]{
+        this->backColor = TFT_BLACK;
+        this->color[0] = 200;   
+        this->color[1] = 200;
+        this->color[2] = 200;
+    }, DebounceButton::LONG_PRESS);
 
     // First fill the edges vector. It makes sure that the edges aren't repeated.
     uint16_t faceCount = sizeof(faces)/sizeof(faces[0]);
@@ -299,7 +291,7 @@ void SplashScreen::smoothRotation(double th, double &omega){
     if(inputVariable != lastInputVariable){
         double startAngle = th;
         startTime = millis();
-        double endAngle = th + (inputVariable-lastInputVariable);
+        double endAngle = th + inputVariable;
 
         // This has to be absolute so that the object can rotate in both directions.
         tf = abs((endAngle - startAngle)/transitionAngularVelocity);
