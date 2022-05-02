@@ -59,6 +59,8 @@ void DebounceButton::longPressTimeTask(void* funcParams){
         if(systemButtons[buttonLongPressWatch.pin]->isPressed()){
             buttonLongPressWatch.func();
             Serial.println("DONE!");
+        }else{
+            Serial.println("Released!");
         }
         buttonLongPressWatch = {0xFF, {}};
     }
@@ -130,25 +132,27 @@ DebounceButton::DebounceButton(uint8_t chipPin){
 bool DebounceButton::updateState(){
     bool currentPinState = digitalRead(pin);
     uint32_t currentTime = millis();
-    Serial.printf("Curr:%d  Last:%d  Curr:%d Last:%d -> ", currentPinState, lastState, currentTime, lastTimePressed);
-    if(currentPinState != lastState && (currentTime - lastTimePressed) > DEFAULT_DEBOUNCE_TIME){
-        lastTimePressed = currentTime;
+    //Serial.printf("Curr:%d  Last:%d  Curr:%d Last:%d -> ", currentPinState, lastState, currentTime, lastTimePressed);
+    if(currentPinState != lastState){
         bool ret = false;
-        if(lastState == HIGH && currentPinState == LOW){
-            buttonIsPressed = false;
-            Serial.println("RELEASED");
-            ret = true;
-        }
-        if(lastState == LOW && currentPinState == HIGH){
-            if((currentTime - doubleClickedTime) < DEFAULT_DOUBLE_CLICK_TIME){
-                repeatedPressesCount++;
-            }else{
-                repeatedPressesCount = 1;
+        if((currentTime - lastTimePressed) > DEFAULT_DEBOUNCE_TIME){
+            lastTimePressed = currentTime;
+            if(lastState == HIGH && currentPinState == LOW){
+                buttonIsPressed = false;
+                //Serial.println("RELEASED");
+                ret = true;
             }
-            buttonIsPressed = true;
-            doubleClickedTime = currentTime;
-            Serial.println("CLICK");
-            ret = true;
+            if(lastState == LOW && currentPinState == HIGH){
+                if((currentTime - doubleClickedTime) < DEFAULT_DOUBLE_CLICK_TIME){
+                    repeatedPressesCount++;
+                }else{
+                    repeatedPressesCount = 1;
+                }
+                buttonIsPressed = true;
+                doubleClickedTime = currentTime;
+                //Serial.println("CLICK");
+                ret = true;
+            }
         }
         lastState = currentPinState;
         return ret;

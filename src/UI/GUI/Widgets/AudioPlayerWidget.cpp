@@ -1,6 +1,6 @@
 #include "AudioPlayerWidget.h"
 
-AudioPlayerWidget::AudioPlayerWidget(uint8_t x, uint8_t y, uint8_t sizeX, uint8_t sizeY) : Widget("AudioPlayerWidget", x, y, sizeX, sizeY, 2){
+AudioPlayerWidget::AudioPlayerWidget(uint8_t x, uint8_t y, uint8_t sizeX, uint8_t sizeY) : Widget("AudioPlayer", x, y, sizeX, sizeY, 2){
 
 }
 

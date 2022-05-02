@@ -42,10 +42,12 @@ void Widget::startDraw(TFT_eSprite &canvas){
 void Widget::draw(){
     if(isWidgetSelectionMode){
         if(isSelected()) return;
-        drawFilledRect(0,0,100,100,TFT_DARKGREY);
+        drawFilledRect(0,0,100,100,0x2127);
+        drawRectangle(0,0,100,100,0x7BF6);
+        drawText(50,50,widgetName, CC_DATUM, 1, 0x7BF6);
     }else{
         widgetDraw();
-        if(isSelected()) drawRectangle(0,0,100,100, TFT_RED);
+        if(isSelected()) drawRectangle(0,0,100,100, 0xF130);
     }
 }
 

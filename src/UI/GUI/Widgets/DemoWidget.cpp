@@ -2,7 +2,7 @@
 
 #include "UI/MenuManager.h"
 
-DemoWidget::DemoWidget(uint8_t tileX, uint8_t tileY, uint8_t sizeX, uint8_t sizeY) : Widget("DemoWidget", tileX, tileY, sizeX, sizeY, 1){
+DemoWidget::DemoWidget(uint8_t tileX, uint8_t tileY, uint8_t sizeX, uint8_t sizeY) : Widget("Demo", tileX, tileY, sizeX, sizeY, 1){
     addRotaryEvent(0, [this](bool in){
         if(in) increaseCursor();
         else decreaseCursor();
