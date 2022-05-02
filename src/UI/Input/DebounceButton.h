@@ -32,6 +32,8 @@ class DebounceButton{
         uint8_t pin;
 
         bool clicked();
+        bool isPressed();
+        bool released(); 
         bool clicked(uint8_t timesPressed);
         bool doubleClicked();
         static bool twoButtonsClicked(uint8_t otherButton);

@@ -4,7 +4,7 @@ DebounceButton* DebounceButton::systemButtons[TOTAL_BUTTONS];
 IRAM_ATTR std::vector<ButtonFunction> DebounceButton::ISREvents[TOTAL_BUTTONS];
 IRAM_ATTR std::vector<ButtonFunction> DebounceButton::previousISREvents[TOTAL_BUTTONS];
 
-ButtonEvent DebounceButton::buttonLongPressWatch;
+ButtonEvent DebounceButton::buttonLongPressWatch = {0xFF, {}};
 
 TaskHandle_t DebounceButton::buttonTaskHandle = NULL;
 
@@ -29,12 +29,16 @@ void IRAM_ATTR DebounceButton::ISR_BUTTON(){
     std::vector<ButtonFunction> eventList = ISREvents[interrupt];
     for(uint8_t i = 0; i < eventList.size(); i++){
         ButtonFunction ev = eventList[i];
-        if(!ev.func) continue; //Continue if there is no function.
+        //Continue if there is no function.
+        if(!ev.func) continue; 
 
         //Switch depending on the type of input assigned to the function.
         switch(ev.functionalEvent){
             case CLICK: if(systemButtons[interrupt]->clicked()) ev.func(); break;
             case LONG_PRESS:{
+                //Continue if a long press is being processed.
+                if(interrupt == buttonLongPressWatch.pin) continue;
+
                 buttonLongPressWatch = {interrupt, ev.func};
                 BaseType_t xHigherPriorityTaskWoken = pdFALSE;
                 vTaskNotifyGiveFromISR(buttonTaskHandle, &xHigherPriorityTaskWoken); 
@@ -47,10 +51,16 @@ void IRAM_ATTR DebounceButton::ISR_BUTTON(){
 void DebounceButton::longPressTimeTask(void* funcParams){
     for(;;){
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        Serial.printf("Interrupt %d\n", buttonLongPressWatch.pin);
-        systemButtons[buttonLongPressWatch.pin]->clicked();
+        if(!systemButtons[buttonLongPressWatch.pin]->clicked()) continue;
+
         delay(1500);
-        if(systemButtons[buttonLongPressWatch.pin]->buttonIsPressed) buttonLongPressWatch.func();
+        Serial.printf("Interrupt %d\n", buttonLongPressWatch.pin);
+        
+        if(systemButtons[buttonLongPressWatch.pin]->isPressed()){
+            buttonLongPressWatch.func();
+            Serial.println("DONE!");
+        }
+        buttonLongPressWatch = {0xFF, {}};
     }
 }
 
@@ -120,26 +130,28 @@ DebounceButton::DebounceButton(uint8_t chipPin){
 bool DebounceButton::updateState(){
     bool currentPinState = digitalRead(pin);
     uint32_t currentTime = millis();
-    //Serial.printf("Curr:%d  Last:%d  Curr:%d Last:%d\n", currentPinState, lastState, currentTime, lastTimePressed);
-    if(currentPinState != lastState){
-        if((currentTime - lastTimePressed) > DEFAULT_DEBOUNCE_TIME){
-            lastTimePressed = currentTime;
-            if(lastState == HIGH && currentPinState == LOW){
-                buttonIsPressed = false;
-                return true;
+    Serial.printf("Curr:%d  Last:%d  Curr:%d Last:%d -> ", currentPinState, lastState, currentTime, lastTimePressed);
+    if(currentPinState != lastState && (currentTime - lastTimePressed) > DEFAULT_DEBOUNCE_TIME){
+        lastTimePressed = currentTime;
+        bool ret = false;
+        if(lastState == HIGH && currentPinState == LOW){
+            buttonIsPressed = false;
+            Serial.println("RELEASED");
+            ret = true;
+        }
+        if(lastState == LOW && currentPinState == HIGH){
+            if((currentTime - doubleClickedTime) < DEFAULT_DOUBLE_CLICK_TIME){
+                repeatedPressesCount++;
+            }else{
+                repeatedPressesCount = 1;
             }
-            if(lastState == LOW && currentPinState == HIGH){
-                if((currentTime - doubleClickedTime) < DEFAULT_DOUBLE_CLICK_TIME){
-                    repeatedPressesCount++;
-                }else{
-                    repeatedPressesCount = 1;
-                }
-                buttonIsPressed = true;
-                doubleClickedTime = currentTime;
-                return true;
-            }
+            buttonIsPressed = true;
+            doubleClickedTime = currentTime;
+            Serial.println("CLICK");
+            ret = true;
         }
         lastState = currentPinState;
+        return ret;
     }
     return false;
 }
@@ -148,6 +160,15 @@ bool DebounceButton::clicked(){
     // If the state hasn't been updated, then it returns false so that the code that comes
     // after this, doesn't execute.
     return updateState() && buttonIsPressed;
+}
+
+bool DebounceButton::isPressed(){
+    updateState();
+    return buttonIsPressed;
+}
+
+bool DebounceButton::released(){
+    return updateState() && !buttonIsPressed;
 }
 
 bool DebounceButton::clicked(uint8_t timesPressed){
