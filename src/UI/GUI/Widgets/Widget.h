@@ -13,30 +13,26 @@ class Widget : public DisplayItem{
     static const uint8_t UNDO_WIDGET_SELECTION = 4;
     static const uint8_t DELETE_SELECTED_WIDGET = 5;
     static const uint8_t RUN_SELECTION_FUNCTION = 6;
+    static const uint8_t RETURN_TO_PREVIOUS_INPUTS = 7;
 
     Widget(String name, uint8_t tileX, uint8_t tileY, uint8_t sizeX, uint8_t sizeY, 
         uint8_t inWidgetSelectables);
 
+    static bool areGeneralWidgetInputsAttached;
+    static void startWidgets();
+    static void attachGeneralWidgetInputs();
+
+    // Will sort the list above according to placement priorities.
+    static void sortDisplayedWidgetsList();
+
     String widgetName;
     uint16_t widgetID;
-    bool hasBeenPlaced = true;
-
-    uint8_t inWidgetSelectables;
-
-    static void startWidgets();
-    static void increaseCursor();
-    static void decreaseCursor();
-    static void undoWidgetSelection();
-    static void deleteSelectedWidget();
-    static void runSelectionFunction();
 
     static bool isWidgetSelectionMode;
 
     static void startDraw(TFT_eSprite &canvas);
     virtual void widgetDraw() = 0;
     static void finalDraw(TFT_eSprite &canvas);
-
-    static bool tileMapOverlap[TILES_X][TILES_Y];
 
     static void widgetEventTask(void* funcParams);
     static TaskHandle_t widgetEventHandle;
@@ -46,15 +42,11 @@ class Widget : public DisplayItem{
     static void addWidget(Widget* w);
     static void removeWidget(Widget* w);
     static void clearWidgets();
-    // Will sort the list above according to placement priorities.
-    static void sortDisplayedWidgetsList();
-    static bool areTilesOverlapping();
-    static bool getTileOverlapMap();
-    static void redrawAll();
-
-    static void switchSelectionMode();
 
     protected:
+    bool hasBeenPlaced = true;
+    uint8_t inWidgetSelectables;
+
     virtual void selectionFunctions(uint8_t selection) = 0;
 
     static uint16_t tileSize;
@@ -75,6 +67,19 @@ class Widget : public DisplayItem{
 
     Point transformRelativePoint(uint8_t pX, uint8_t pY);
     void recalculateRelativePoint();
+
+    static bool areTilesOverlapping();
+    static bool tileMapOverlap[TILES_X][TILES_Y];
+    static bool getTileOverlapMap();
+    static void redrawAll();
+
+    static void increaseCursor();
+    static void decreaseCursor();
+    static void undoWidgetSelection();
+    static void deleteSelectedWidget();
+    static void runSelectionFunction();
+    static void returnToPreviousInputs();
+    static void switchSelectionMode();
 
     //General draw functions
     static void drawGrid(TFT_eSprite &canvas, uint16_t color);

@@ -20,7 +20,7 @@ class Utilities{
   public:
     static PLAYBACK_TIME toPlaybackTimeStruct(uint32_t totalMillis);
     static String playBackTimeToString(PLAYBACK_TIME t);
-    
+    static String millisToString(uint32_t in);
 
     static void enterErrorState();
     static void debug(const char* x, ... );

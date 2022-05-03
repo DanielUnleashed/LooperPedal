@@ -9,13 +9,8 @@ DisplayItem::DisplayItem(String n){
 
 void DisplayItem::attachEvents(){
     for(ButtonEvent ev : buttonEvents){
-        DebounceButton::addInterrupt(ev.pin, ev.func, ev.functionalEvent);
-        if(ev.name.equals("")) continue;
-        Taskbar* t = MenuManager::getCurrentDisplay() -> getTaskbar();
-        if(t != NULL){
-            t -> addButton(ev.pin, ev.name);
-            t -> forceRedraw();
-        }
+        if(ev.name.equals("")) DebounceButton::addInterrupt(ev.pin, ev.func, ev.functionalEvent);
+        else DebounceButton::addInterrupt(ev.pin, ev.name, ev.func, ev.functionalEvent);
     }
     for(RotaryEncoderEvent ev : rotaryEvents) RotaryEncoder::addInterrupt(ev.pin, ev.func);
     for(ButtonEvent ev : rotaryButtonEvents) DebounceButton::addRotaryInterrupt(ev.pin, ev.func, ev.functionalEvent);

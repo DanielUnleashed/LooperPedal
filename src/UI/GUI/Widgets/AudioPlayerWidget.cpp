@@ -1,4 +1,5 @@
 #include "AudioPlayerWidget.h"
+#include "UI/MenuManager.h"
 
 static uint16_t color = 0x04B3;
 
@@ -17,24 +18,79 @@ void AudioPlayerWidget::widgetDraw(){
         drawRoundRectangleByCenter(20,50,31,31,0xDD83);
 
     // Full play bar
-    drawHLine(40,50, 55, 4, 0xA2AC);
+    drawHLine(40,50, 50, 4, 0xA2AC);
     drawCircle(40,50,    2, 0xA2AC);
-    drawCircle(95,50,    2, 0xA2AC);
+    drawCircle(90,50,    2, 0xA2AC);
+
+    uint8_t playedPercentage = elapsedTime*100/totalTime;
+    uint8_t playPoint = map(playedPercentage, 0, 100, 40, 90);
 
     // Elapsed play bar
-    drawHLine(40, 50, 25, 2, 0xD8E9);
     drawCircle(40,50,     1, 0xD8E9);
-    drawCircle(65,50,     1, 0xD8E9);
+    drawHLine(40,50, playPoint-40, 2, 0xD8E9);
+    //drawCircle(playPoint,50,     1, 0xD8E9); //This won't be seen
     // Dot at the end of the bar
-    drawCircle(65,50,6,0xFEFC);
+    drawCircle(playPoint,50,6,0xFEFC);
     if(isSelected() && inWidgetSelection==1) 
-        drawRoundRectangleByCenter(65,50,15,15,0xDD83);
+        drawRoundRectangleByCenter(playPoint,50,15,15,0xDD83);
 
-    drawText(40, 75, "0:30", TL_DATUM, 1, 0xFEFC);
-    drawText(95, 75, "1:05", TR_DATUM, 1, 0xFEFC);
+    String elT = Utilities::millisToString(elapsedTime);
+    String elTotal = Utilities::millisToString(totalTime);
+    drawText(40, 75, elT, TL_DATUM, 1, 0xFEFC);
+    drawText(95, 75, elTotal, TR_DATUM, 1, 0xFEFC);
 }
 
 void AudioPlayerWidget::selectionFunctions(uint8_t selection){
-    Serial.println("yooo");
-    color = TFT_RED;
+    if(selection == 0){
+        color = TFT_RED;
+    }else if(selection == 1){
+        Taskbar* t = MenuManager::getCurrentDisplay()->getTaskbar();
+        if(t != NULL) t->saveAndRemoveButtons();
+        DebounceButton::saveAndRemoveButtons();
+        RotaryEncoder::saveAndRemoveInputs();
+
+        t->addButton(0, "Start");
+        t->addButton(1, "-5s");
+        t->addButton(2, "+5s");
+        t->addButton(3, "End");
+        t->forceRedraw();
+
+        DebounceButton::addInterrupt(0, [this]{
+            elapsedTime = 0;
+            this->redrawFromISR();
+        });
+
+        DebounceButton::addInterrupt(1, [this]{
+            if(elapsedTime < 5000) elapsedTime = 0;
+            else elapsedTime -= 5000;
+            this->redrawFromISR();
+        });
+
+        DebounceButton::addInterrupt(2, [this]{
+            if(totalTime - elapsedTime < 5000) elapsedTime = totalTime;
+            else elapsedTime += 5000;
+            this->redrawFromISR();
+        });
+
+        DebounceButton::addInterrupt(3, [this]{
+            elapsedTime = totalTime;
+            this->redrawFromISR();
+        });
+
+        RotaryEncoder::addInterrupt(0, [this](bool in){
+            if(in){
+                if(totalTime - elapsedTime < 1000) elapsedTime = totalTime;
+                else elapsedTime+=1000;
+            }else{
+                if(elapsedTime < 1000) elapsedTime = 0;
+                else elapsedTime-=1000;
+            }
+            this->redrawFromISR();
+        });
+
+        DebounceButton::addRotaryInterrupt(0, [this]{
+            returnToPreviousInputs();
+        });
+    }
+
 }

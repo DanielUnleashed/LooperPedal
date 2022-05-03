@@ -42,6 +42,12 @@ class DebounceButton{
         // Adds an interrupt function to buttonIndex that will trigger when the button is clicked.
         // @returns False if the interrupt could not be added.
         static bool addInterrupt(uint8_t buttonIndex, std::function<void(void)> func);
+
+        // Adds an interrupt function to buttonIndex that will trigger when the button is clicked.
+        // Also attaches a tag to the Taskbar if available.
+        // @returns False if the interrupt could not be added.
+        static bool addInterrupt(uint8_t buttonIndex, String tagName, std::function<void(void)> func);
+        static bool addInterrupt(uint8_t buttonIndex, String tagName, std::function<void(void)> func, uint8_t mode);
         // Adds an interrupt function to buttonIndex that will trigger depending on the mode.
         // @param mode CLICK, LONG_PRESS...
         // @returns False if the interrupt could not be added.

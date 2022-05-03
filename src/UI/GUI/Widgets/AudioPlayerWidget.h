@@ -12,6 +12,10 @@ class AudioPlayerWidget : public Widget{
   void widgetDraw() override;
   void selectionFunctions(uint8_t selection) override;
 
+  private:
+  uint32_t elapsedTime = 4000;
+  uint32_t totalTime = 100000;
+
 };
 
 #endif

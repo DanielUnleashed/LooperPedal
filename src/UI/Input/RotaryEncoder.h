@@ -24,17 +24,20 @@ class RotaryEncoder{
             0,   1,  -1,  0};
 
         RotaryEncoder(uint8_t chA, uint8_t chB);
-        void addButton(uint8_t buttonPin);
 
         bool hasIncreased();
 
         static RotaryEncoder* systemEncoders[TOTAL_ROTARY_ENCODERS];
         static IRAM_ATTR std::function<void(bool)> ISREvents[TOTAL_ROTARY_ENCODERS];
+        static IRAM_ATTR std::function<void(bool)> previousISREvents[TOTAL_ROTARY_ENCODERS];
 
         static void init();
         static bool addInterrupt(uint8_t rotatoryIndex, std::function<void(bool incr)> func);
         static bool clearAll();
         static bool removeInterrupt(uint8_t rotatoryIndex);
+
+        static void saveAndRemoveInputs();
+        static void undoRemoveInputs();
 
     private:
         volatile uint32_t lastTimeChange = 0;

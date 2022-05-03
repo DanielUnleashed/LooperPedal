@@ -2,6 +2,7 @@
 
 RotaryEncoder* RotaryEncoder::systemEncoders[TOTAL_ROTARY_ENCODERS];
 std::function<void(bool)> IRAM_ATTR RotaryEncoder::ISREvents[TOTAL_ROTARY_ENCODERS];
+std::function<void(bool)> IRAM_ATTR RotaryEncoder::previousISREvents[TOTAL_ROTARY_ENCODERS];
 
 // Maybe implement with a loop with https://stackoverflow.com/questions/11081573/passing-a-variable-as-a-template-argument
 void RotaryEncoder::init(){
@@ -37,6 +38,20 @@ bool RotaryEncoder::addInterrupt(uint8_t rotatoryIndex, std::function<void(bool)
 bool RotaryEncoder::removeInterrupt(uint8_t rotatoryIndex){
     ISREvents[rotatoryIndex] = {};
     return !ISREvents[rotatoryIndex];
+}
+
+void RotaryEncoder::saveAndRemoveInputs(){
+    for(uint8_t i = 0; i < TOTAL_ROTARY_ENCODERS; i++){
+        previousISREvents[i] = ISREvents[i];
+        removeInterrupt(i);
+    }
+}
+
+void RotaryEncoder::undoRemoveInputs(){
+    for(uint8_t i = 0; i < TOTAL_ROTARY_ENCODERS; i++){
+        removeInterrupt(i);
+        addInterrupt(i, previousISREvents[i]);
+    }
 }
 
 bool RotaryEncoder::clearAll(){

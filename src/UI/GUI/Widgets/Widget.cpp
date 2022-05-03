@@ -8,6 +8,8 @@ uint16_t Widget::tileSize, Widget::padX, Widget::padY;
 
 uint8_t Widget::widgetEvent = NONE_EVENT;
 
+bool Widget::areGeneralWidgetInputsAttached = false;
+
 int8_t Widget::holdingPosition = 0, Widget::previousHoldingPosition = 0, Widget::selectedWidget = 0, Widget::inWidgetSelection = 0;
 bool Widget::isWidgetSelectionMode = false;
 
@@ -27,6 +29,8 @@ Widget::Widget(String name, uint8_t tx, uint8_t ty, uint8_t sx, uint8_t sy, uint
 
     oX = tileSize*tileX + padX;
     oY = tileSize*tileY + padY;
+
+    Serial.printf("oX:%d, oY:%d\n", oX, oY);
 
     if(MenuManager::isLaunched){
         hasBeenPlaced = false;
@@ -106,6 +110,12 @@ void Widget::runSelectionFunction(){
     vTaskNotifyGiveFromISR(widgetEventHandle, &xHigherPriorityTaskWoken); 
 }
 
+void Widget::returnToPreviousInputs(){
+    widgetEvent = RETURN_TO_PREVIOUS_INPUTS;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    vTaskNotifyGiveFromISR(widgetEventHandle, &xHigherPriorityTaskWoken); 
+}
+
 void Widget::widgetEventTask(void* funcParams){
     for(;;){
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
@@ -169,6 +179,7 @@ void Widget::widgetEventTask(void* funcParams){
                     //Substitute all the current buttons and add the custom move functions.
                     t->saveAndRemoveButtons();
                     DebounceButton::saveAndRemoveButtons();
+                    RotaryEncoder::saveAndRemoveInputs();
                     t->addButton(0, "Dim.X");
                     t->addButton(1, "Dim.Y");
                     t->addButton(2, "Erase");
@@ -178,12 +189,16 @@ void Widget::widgetEventTask(void* funcParams){
                         displayedWidgets[selectedWidget] -> sizeX++;
                         if(displayedWidgets[selectedWidget]->sizeX > TILES_X) displayedWidgets[selectedWidget]->sizeX = 1;
                         displayedWidgets[selectedWidget] -> redrawFromISR();
+                        Taskbar* t = MenuManager::getCurrentDisplay()->getTaskbar(); //Deletes the overlayed green tiles when redrawing.
+                        if(t != NULL) t->forceRedraw();
                     });
 
                     DebounceButton::addInterrupt(1, []{
                         displayedWidgets[selectedWidget] -> sizeY++;
                         if(displayedWidgets[selectedWidget]->sizeY > TILES_Y) displayedWidgets[selectedWidget]->sizeY = 1;
                         displayedWidgets[selectedWidget] -> redrawFromISR();
+                        Taskbar* t = MenuManager::getCurrentDisplay()->getTaskbar();
+                        if(t != NULL) t->forceRedraw();
                     });
 
                     DebounceButton::addInterrupt(2, []{
@@ -194,6 +209,11 @@ void Widget::widgetEventTask(void* funcParams){
                         undoWidgetSelection();
                     });
 
+                    RotaryEncoder::addInterrupt(0, [](bool in){
+                        if(in) increaseCursor();
+                        else decreaseCursor();
+                    });
+
                     DebounceButton::addRotaryInterrupt(0, []{
                         switchSelectionMode();
                     });
@@ -201,14 +221,8 @@ void Widget::widgetEventTask(void* funcParams){
                 }
             }else{
                 displayedWidgets[selectedWidget] -> hasBeenPlaced = true;
-                if(t != NULL) {
-                    // Undo the change made above.
-                    t->undoRemoveButtons();
-                    DebounceButton::undoRemoveButtons();
-                    t->forceRedraw();
-
-                    sortDisplayedWidgetsList();
-                }
+                returnToPreviousInputs();
+                sortDisplayedWidgetsList();
             }
             redrawAll();
         }else if(widgetEvent == UNDO_WIDGET_SELECTION){
@@ -228,6 +242,15 @@ void Widget::widgetEventTask(void* funcParams){
             switchSelectionMode();
         }else if(widgetEvent == RUN_SELECTION_FUNCTION){
             displayedWidgets[selectedWidget] -> selectionFunctions(inWidgetSelection);
+            displayedWidgets[selectedWidget] -> redraw();
+        }else if(widgetEvent == RETURN_TO_PREVIOUS_INPUTS){
+            DebounceButton::undoRemoveButtons();
+            RotaryEncoder::undoRemoveInputs();
+            Taskbar* t = MenuManager::getCurrentDisplay()->getTaskbar();
+            if(t != NULL) {
+                t->undoRemoveButtons();
+                t->forceRedraw();
+            }
             displayedWidgets[selectedWidget] -> redraw();
         }
     }
@@ -313,6 +336,29 @@ void Widget::startWidgets(){
     padY = (height - TASKBAR_HEIGHT - tileSize*TILES_Y)/2;
 
     xTaskCreatePinnedToCore(widgetEventTask, "WidgetEvents", 10000, NULL, 5, &widgetEventHandle, 0);
+}
+
+void Widget::attachGeneralWidgetInputs(){
+    DebounceButton::addInterrupt(0, "New", []{
+        if(!Widget::isWidgetSelectionMode){
+            //OPEN WIDGET MENU???
+        }
+        else Utilities::debug("First drop the item!\n");
+    });
+
+    RotaryEncoder::addInterrupt(0, [](bool in){
+        if(in) increaseCursor();
+        else decreaseCursor();
+    });
+
+    DebounceButton::addRotaryInterrupt(0, []{
+        runSelectionFunction();
+    });
+
+    DebounceButton::addRotaryInterrupt(0, []{
+        switchSelectionMode();
+    }, DebounceButton::LONG_PRESS);
+    areGeneralWidgetInputsAttached = true;
 }
 
 Point Widget::transformRelativePoint(uint8_t pX, uint8_t pY){

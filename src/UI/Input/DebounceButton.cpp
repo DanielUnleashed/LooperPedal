@@ -1,4 +1,5 @@
 #include "DebounceButton.h"
+#include "UI/MenuManager.h"
 
 DebounceButton* DebounceButton::systemButtons[TOTAL_BUTTONS+TOTAL_ROTARY_BUTTONS];
 IRAM_ATTR std::vector<ButtonFunction> DebounceButton::ISREvents[TOTAL_BUTTONS+TOTAL_ROTARY_BUTTONS];
@@ -55,10 +56,16 @@ void IRAM_ATTR DebounceButton::ISR_BUTTON(){
 void DebounceButton::longPressTimeTask(void* funcParams){
     for(;;){
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        delay(1000);
-    
-        if(systemButtons[buttonLongPressWatch.pin]->isPressed()){
-            Serial.println("long!");
+
+        uint8_t i;
+        for(i = 0; i < 5; i++){
+            delay(200);
+            if(!systemButtons[buttonLongPressWatch.pin]->isPressed()){
+                break;
+            }
+        }
+
+        if(i == 5){
             buttonLongPressWatch.func();
         }
         buttonLongPressWatch.pin = 0xFF;
@@ -143,6 +150,24 @@ void DebounceButton::undoRemoveButtons(){
 
 bool DebounceButton::addInterrupt(uint8_t buttonIndex, std::function<void(void)> func){
     return addInterrupt(buttonIndex, func, CLICK);
+}
+
+bool DebounceButton::addInterrupt(uint8_t buttonIndex, String tagName, std::function<void(void)> func){
+    Display* d = MenuManager::getCurrentDisplay();
+    if(d!=NULL){
+        Taskbar* t = d->getTaskbar();
+        if(t!=NULL) t->addButton(buttonIndex, tagName);
+    }
+    return addInterrupt(buttonIndex, func, CLICK);
+}
+
+bool DebounceButton::addInterrupt(uint8_t buttonIndex, String tagName, std::function<void(void)> func, uint8_t mode){
+    Display* d = MenuManager::getCurrentDisplay();
+    if(d!=NULL){
+        Taskbar* t = d->getTaskbar();
+        if(t!=NULL) t->addButton(buttonIndex, tagName);
+    }
+    return addInterrupt(buttonIndex, func, mode);
 }
 
 bool DebounceButton::addRotaryInterrupt(uint8_t buttonIndex, std::function<void(void)> func){

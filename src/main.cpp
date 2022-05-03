@@ -14,8 +14,8 @@ void setup() {
 
   MenuManager::init();
 
-  DemoWidget* demo = new DemoWidget(0,0,2,2);
-  AudioPlayerWidget* aud = new AudioPlayerWidget(0,2,4,2);
+  DemoWidget* demo = new DemoWidget(0,2,2,2);
+  AudioPlayerWidget* aud = new AudioPlayerWidget(0,0,4,2);
 
   static Display mainDisplay("Main");
   mainDisplay.addTaskbar();
