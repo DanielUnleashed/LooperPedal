@@ -21,7 +21,6 @@ void Display::forceDraw(){
 void Display::addItem(DisplayItem *item){
     itemList.push_back(item);
     if(item->itemName.equals("Widget")){
-        if(!Widget::areGeneralWidgetInputsAttached) Widget::attachGeneralWidgetInputs();
         Widget::addWidget((Widget*) item);
     }
     if(MenuManager::isLaunched){

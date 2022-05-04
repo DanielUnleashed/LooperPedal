@@ -127,20 +127,20 @@ void SplashScreen::startParameters(TFT_eSprite *spr){
     lastTime = nowT;
 
     // Rotate around the Y axis.
-    double rotMatrix[4][4] = {{cos(th), 0, sin(th), 0},
+    double rotMatrix1[4][4] = {{cos(th), 0, sin(th), 0},
                                 {0, 1, 0, 0},
                                 {-sin(th), 0, cos(th), 0},
                                 {0, 0, 0, 1}};
-    /*double rotMatrix2[4][4] = {{cos(th), sin(th), 0, 0},
+    double rotMatrix2[4][4] = {{cos(th), sin(th), 0, 0},
                             {-sin(th), cos(th), 0, 0},
                             {0,0,1,0},
                             {0, 0, 0, 1}};
     double rotMatrix[4][4];
-    multMatrix(rotMatrix1, rotMatrix2, rotMatrix);*/
+    multMatrix(rotMatrix1, rotMatrix2, rotMatrix);
 
-    double scaleMatrix[4][4] = {{5, 0, 0, 0},
-                                {0, 5, 0, 0},
-                                {0, 0, 5, 0},
+    double scaleMatrix[4][4] = {{8, 0, 0, 0},
+                                {0, 8, 0, 0},
+                                {0, 0, 8, 0},
                                 {0, 0, 0, 1}};
 
     double translationMatrix[4][4] = {{1, 0, 0, 0},
@@ -179,16 +179,16 @@ void SplashScreen::startParameters(TFT_eSprite *spr){
     std::fill_n(drawEdges, edges.size(), false);
     for(uint16_t index = 0; index < totalFaces; index++){
         double norm[3]; //Normal of the face
-        multMatrix(normals[index], rotMatrix, norm);
+        multMatrix(normals[normalIndexes[index]-1], rotMatrix, norm);
         double toFace[3]; //Vector to any vertex in the face from the camera.
         multMatrix(vertex[faces[index][0]-1], scaleMatrix, toFace);
         multMatrix(toFace, rotMatrix, toFace);
         multMatrix(toFace, translationMatrix, toFace);
 
         //If the angle between the camera and the face is equal or greater than 90º,
-        //that is v·w > 0, then it's not facing the camera.
+        //that is v·w >= 0, then it's not facing the camera.
         double dot = norm[0]*toFace[0] + norm[1]*toFace[1] + norm[2]*toFace[2];
-        if(dot > 0) continue; //If not visible, continue
+        if(dot >= 0) continue; //If not visible, continue
 
         uint16_t totalEdges = getEdgesCount(index);
         if(fillPolygons){
@@ -318,6 +318,20 @@ void SplashScreen::smoothRotation(double th, double &omega){
 
 // inVector * matrix = outVector
 void SplashScreen::multMatrix(double inVector[3], double matrix[4][4], double outVector[3]){
+    double in[4] = {inVector[0], inVector[1], inVector[2], 1.0};
+    double out[4] = {0,0,0,0};
+    for(uint8_t i = 0; i < 4; i++){
+        for(uint8_t j = 0; j < 4; j++){
+            out[i] += in[j]*matrix[j][i];
+        }
+    }
+    outVector[0] = out[0];
+    outVector[1] = out[1];
+    outVector[2] = out[2];
+}
+
+// inVector * matrix = outVector
+void SplashScreen::multMatrix(const double inVector[3], double matrix[4][4], double outVector[3]){
     double in[4] = {inVector[0], inVector[1], inVector[2], 1.0};
     double out[4] = {0,0,0,0};
     for(uint8_t i = 0; i < 4; i++){

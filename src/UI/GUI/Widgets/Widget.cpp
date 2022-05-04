@@ -30,8 +30,6 @@ Widget::Widget(String name, uint8_t tx, uint8_t ty, uint8_t sx, uint8_t sy, uint
     oX = tileSize*tileX + padX;
     oY = tileSize*tileY + padY;
 
-    Serial.printf("oX:%d, oY:%d\n", oX, oY);
-
     if(MenuManager::isLaunched){
         hasBeenPlaced = false;
     }
