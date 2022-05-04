@@ -66,7 +66,9 @@ void DebounceButton::longPressTimeTask(void* funcParams){
         }
 
         if(i == 5){
-            buttonLongPressWatch.func();
+            // This function could be null if another program had taken the control of the input. Then the 
+            // function would be deleted.
+            if(buttonLongPressWatch.func) buttonLongPressWatch.func();
         }
         buttonLongPressWatch.pin = 0xFF;
         buttonLongPressWatch.func = {};
@@ -132,6 +134,7 @@ bool DebounceButton::twoButtonsClicked(uint8_t otherButton){
 }
 
 void DebounceButton::saveAndRemoveButtons(){
+    buttonLongPressWatch.func = {};
     for(uint8_t i = 0; i < TOTAL_BUTTONS+TOTAL_ROTARY_BUTTONS; i++){
         previousISREvents[i] = ISREvents[i];
         removeInterrupt(i);

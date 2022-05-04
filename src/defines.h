@@ -3,7 +3,7 @@
 
 //#define LAUNCH_CONSOLE
 
-// Still not implemented...
+// Still not fully implemented...
 //#define USE_BOTH_ADC_CHANNELS
 
 // Branch inside AudioPlayer.cpp
@@ -12,7 +12,8 @@
 //#define LAUNCH_SPLASHSCREEN_AT_BOOT_UP
 
 // If left defined all animatoins will play, functionality of everything else will remain
-// untouched. If left undefined, DisplayOverlay animations will not play.
+// untouched. If left undefined, DisplayOverlay animations will not play and all "good-looking"
+// animations will be disabled.
 #define ENABLE_DISPLAY_ANIMATIONS
 
 #define PLAY_FREQUENCY 16000
