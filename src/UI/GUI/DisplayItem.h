@@ -18,7 +18,7 @@ struct Point{
     uint16_t x, y;
 };
 
-class  DisplayItem {
+class DisplayItem {
     public:
     DisplayItem(String name); //Full screen item
     
@@ -57,6 +57,7 @@ class  DisplayItem {
     void startAnimation();
     void redraw();
     void redrawFromISR();
+    void animationRedraw();
     void endAnimation();
     uint32_t startAnimationTime;
 

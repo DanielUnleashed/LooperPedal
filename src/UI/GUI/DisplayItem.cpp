@@ -66,6 +66,12 @@ void DisplayItem::redraw(){
     MenuManager::wakeUpDrawTask();
 }
 
+void DisplayItem::animationRedraw(){
+#ifdef ENABLE_DISPLAY_ANIMATIONS
+    redraw();
+#endif
+}
+
 void DisplayItem::redrawFromISR(){
     needsUpdate = true;
     MenuManager::wakeUpDrawTaskFromISR();

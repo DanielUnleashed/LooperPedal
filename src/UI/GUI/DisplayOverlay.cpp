@@ -139,7 +139,7 @@ void DisplayOverlay::draw(){
         animationQueue.clear();
         animationQueuePalette.clear();
         MenuManager::wakeUpDrawTask();
-    }else redraw();
+    }else animationRedraw();
 }
 // Idea "leased" from https://www.geogebra.org/m/cXXGKUQk
 // Since TFT screen's coords are Y flipped, take that in mind during the dessign!

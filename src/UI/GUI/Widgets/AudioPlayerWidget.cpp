@@ -29,8 +29,10 @@ void AudioPlayerWidget::widgetDraw(){
     drawCircle(40,50,     1, 0xD8E9);
     drawHLine(40,50, playPoint-40, 2, 0xD8E9);
     //drawCircle(playPoint,50,     1, 0xD8E9); //This won't be seen
-    // Dot at the end of the bar
+
+    // Dot at the end of the elapsed bar
     drawCircle(playPoint,50,6,0xFEFC);
+    drawCircle(playPoint,50,3,0xE73F); //Inner grayer dot.
     if(isSelected() && inWidgetSelection==1) 
         drawRoundRectangleByCenter(playPoint,50,15,15,0xDD83);
 

@@ -76,7 +76,7 @@ void SplashScreen::draw(){
     startParameters(canvas);
 
     //pushSprite(spr, (width-w)/2, 0);
-    redraw();
+    animationRedraw();
 }
 
 void SplashScreen::startParameters(TFT_eSprite *spr){

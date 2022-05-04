@@ -189,7 +189,7 @@ void Widget::widgetEventTask(void* funcParams){
                         displayedWidgets[selectedWidget] -> sizeX++;
                         if(displayedWidgets[selectedWidget]->sizeX > TILES_X) displayedWidgets[selectedWidget]->sizeX = 1;
                         displayedWidgets[selectedWidget] -> redrawFromISR();
-                        Taskbar* t = MenuManager::getCurrentDisplay()->getTaskbar(); //Deletes the overlayed green tiles when redrawing.
+                        Taskbar* t = MenuManager::getCurrentDisplay()->getTaskbar(); //Deletes the overlayed green tiles over the taskbar when redrawing.
                         if(t != NULL) t->forceRedraw();
                     });
 
@@ -501,13 +501,29 @@ void Widget::pushSprite(TFT_eSprite &sp, uint16_t x, uint16_t y){
 }
 
 void Widget::fillTile(TFT_eSprite &canvas, uint8_t x, uint8_t y, uint16_t color){
+    const uint8_t lineSeparation = 4;
+    
     uint16_t oX = padX + x*tileSize;
     uint16_t oY = padY + y*tileSize;
 
+    // This is used so that lines in diferent tiles connect between each other. The trick is that if all lines,
+    // starting from (0,0) are separated "lineSeparation" between each other and they're diagonal, then, the sum
+    // of both the coordinates, X and Y, always sum a multiple of "lineSeparation". For example, with a separation 
+    // of 4, take the line starting from (4,0) -> (3,1) -> (2,2) -> (1,3) -> (0,4). They always sum 4!
+    // So when taking a coordinate in the edge of the tile, you just have to round to the upper or bottom multiple of
+    // "lineSeparation" (depending if you're drawing from left to right or vice-versa) and start making lines from there
+    // on. Now you see it too!
+    uint16_t startO = lineSeparation - (oX+oY)%lineSeparation; //Remainder till multiple of lineSeparation
+    // Start from upper left corner to the right
+    for(uint8_t i = startO; i < tileSize; i+=lineSeparation){
+        canvas.drawLine(oX + i, oY, oX, oY + i, color);
+    }
+
     uint16_t mX = oX + tileSize-1;
     uint16_t mY = oY + tileSize-1;
-    for(uint8_t i = 1; i < tileSize; i+=4){
-        canvas.drawLine(oX + i, oY, oX, oY + i, color);
+    uint16_t startM = (oX+oY)%lineSeparation;
+    // Start from bottom right corner to the left
+    for(uint8_t i = startM; i < tileSize; i+=lineSeparation){
         canvas.drawLine(mX - i, mY, mX, mY - i, color);
     }
 }

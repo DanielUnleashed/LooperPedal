@@ -51,7 +51,6 @@ void MenuManager::drawTask(void* funcParams){
             if(!dispOverlay.needsToRedraw()){ //Ended display overlay animation
                 isInTransition = false;
                 
-                // This reattaches the interrupts and the buttons in the taskbar.
                 isLaunched = false;
                 displayList[nextDisplay].launchDisplay();
                 isLaunched = true;
@@ -94,16 +93,22 @@ void MenuManager::removeDisplay(String displayName){
 }
 
 bool MenuManager::changeScreen(String displayName){
-    std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN_LEFT, DisplayOverlay::ANIM_SWEEP_OUT_LEFT};
-    const std::vector<uint16_t> c{TFT_GOLD, TFT_GOLD};
-    dispOverlay.drawMultipleAnimation(v, c);
-
     DebounceButton::clearAll();
     RotaryEncoder::clearAll();
 
     nextDisplay = getDisplayByName(displayName);
 
+#ifdef ENABLE_DISPLAY_ANIMATIONS
+    std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN_LEFT, DisplayOverlay::ANIM_SWEEP_OUT_LEFT};
+    const std::vector<uint16_t> c{TFT_GOLD, TFT_GOLD};
+    dispOverlay.drawMultipleAnimation(v, c);
+
     isInTransition = true;
+#else
+    isLaunched = false;
+    displayList[nextDisplay].launchDisplay();
+    isLaunched = true;
+#endif
     return true;
 }
 
