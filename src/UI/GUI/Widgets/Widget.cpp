@@ -337,12 +337,12 @@ void Widget::startWidgets(){
 }
 
 void Widget::attachGeneralWidgetInputs(){
-    DebounceButton::addInterrupt(0, "New", []{
+    /*DebounceButton::addInterrupt(0, "New", []{
         if(!Widget::isWidgetSelectionMode){
             //OPEN WIDGET MENU???
         }
         else Utilities::debug("First drop the item!\n");
-    });
+    });*/
 
     RotaryEncoder::addInterrupt(0, [](bool in){
         if(in) increaseCursor();
@@ -519,7 +519,7 @@ void Widget::fillTile(TFT_eSprite &canvas, uint8_t x, uint8_t y, uint16_t color)
 
     uint16_t mX = oX + tileSize-1;
     uint16_t mY = oY + tileSize-1;
-    uint16_t startM = (oX+oY)%lineSeparation;
+    uint16_t startM = (mX+mY)%lineSeparation;
     // Start from bottom right corner to the left
     for(uint8_t i = startM; i < tileSize; i+=lineSeparation){
         canvas.drawLine(mX - i, mY, mX, mY - i, color);

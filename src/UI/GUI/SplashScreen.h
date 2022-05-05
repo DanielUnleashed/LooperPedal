@@ -25,8 +25,8 @@ const uint8_t normalIndexes[80] PROGMEM = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,1
 std::vector<std::array<uint16_t, 2>> edges;
 
     volatile bool fillPolygons = true;
-    const double angularVelocity = HALF_PI;
-    const double transitionAngularVelocity = PI;
+    const double angularVelocity = PI/4.0;
+    const double transitionAngularVelocity = HALF_PI;
     volatile uint8_t color[3] = {200,200,200};
     volatile uint16_t backColor = TFT_BLACK;
 
