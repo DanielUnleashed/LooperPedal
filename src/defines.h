@@ -9,7 +9,7 @@
 // Branch inside AudioPlayer.cpp
 #define PASS_AUDIO_INPUT_DURING_RECORDING
 
-#define LAUNCH_SPLASHSCREEN_AT_BOOT_UP
+//#define LAUNCH_SPLASHSCREEN_AT_BOOT_UP
 
 // If left defined all animatoins will play, functionality of everything else will remain
 // untouched. If left undefined, DisplayOverlay animations will not play and all "good-looking"

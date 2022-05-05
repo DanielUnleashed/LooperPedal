@@ -4,6 +4,7 @@
 #include "UI/GUI/Widgets/DemoWidget.h"
 #include "UI/GUI/Widgets/AudioPlayerWidget.h"
 #include "UI/Display.h"
+#include "UI/GUI/Menu.h"
 
 void setup() {
   Serial.begin(115200);
@@ -18,9 +19,10 @@ void setup() {
   AudioPlayerWidget* aud = new AudioPlayerWidget(0,0,4,2);
 
   static Display mainDisplay("Main");
-  mainDisplay.addTaskbar();
+  /*mainDisplay.addTaskbar();
   mainDisplay.addItem(demo);
-  mainDisplay.addItem(aud);
+  mainDisplay.addItem(aud);*/
+  mainDisplay.addItem(new Menu("Main Menu"));
 
   MenuManager::addDisplay(mainDisplay);
   MenuManager::launch();
