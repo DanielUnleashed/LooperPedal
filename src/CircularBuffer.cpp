@@ -42,17 +42,13 @@ void CircularBuffer::get(uint16_t* outBuffer, uint16_t size){
 }
 
 uint16_t CircularBuffer::getFreeSpace(){
-  uint16_t dist = 0;
-  if(writeIndex < readIndex) dist = readIndex - writeIndex;
-  else dist = MAX_BUFFER_LENGTH - writeIndex + readIndex;
-  return dist;
+  if(writeIndex < readIndex) return readIndex - writeIndex;
+  else return MAX_BUFFER_LENGTH - writeIndex + readIndex;
 }
 
 uint16_t CircularBuffer::getWrittenSpace(){
-  uint16_t dist = 0;
-  if(writeIndex < readIndex) dist = MAX_BUFFER_LENGTH - readIndex + writeIndex;
-  else dist = writeIndex - readIndex;
-  return dist;
+  if(writeIndex < readIndex) return MAX_BUFFER_LENGTH - readIndex + writeIndex;
+  else return writeIndex - readIndex;
 }
 
 uint16_t CircularBuffer::getWriteIndex(){

@@ -25,9 +25,9 @@ void SDAudioFile::calculateTotalIteration(uint32_t maxFileSize){
 }
 
 uint16_t SDAudioFile::getSample(){
-  /* If it's the case that inside the circular buffer it's the end of the song
-     then, the file will be tagged as 'ended' and so, in the next iteration, if
-     it remains as such state, it will return silence.   
+  /* If the end of the song is reached inside the circular buffer,
+     then the file will be tagged as 'ended' and so, if in the next iteration 
+     it remains tagged as such, it will return silence.   
   */
   if(buf.getReadIndex() == finalReadIndexOfFile){
     if(currentIteration < maxIterations){
@@ -47,7 +47,9 @@ uint16_t SDAudioFile::getSample(){
 }
 
 void SDAudioFile::refreshBuffer(){
+  // If this audio file has its buffer with content, then, there's no need to refreshen it.
   if(buf.getFreeSpace() < BUFFER_REFRESH) return;
+  
   dataFile.seek(fileDirectionToBuffer);
   
   uint32_t remainingBytes = fileSize - fileDirectionToBuffer;

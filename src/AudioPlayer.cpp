@@ -26,8 +26,9 @@ void AudioPlayer::begin(){
   dac.begin();
   adc.begin();
 
-  delay(10);
+  delay(10); // Wait for chip initialization
 
+  // Input interrupts setup.
   DebounceButton::addInterrupt(0, []{
     if(isPlaying) pause();
     else play();
@@ -52,12 +53,13 @@ void AudioPlayer::begin(){
   // Audio processing and signal managing task running on core 0
   xTaskCreatePinnedToCore(statusMonitorTask, "MonitorTask", 10000, NULL, 1, &statusMonitorTaskHandle, 0);
   vTaskSuspend(statusMonitorTaskHandle);
- #endif 
+#endif 
 
   // Memory task running on core 1
   xTaskCreatePinnedToCore(memoryTask, "MemoryTask", 10000, NULL, 5, &memoryTaskHandle, 1);
   vTaskSuspend(memoryTaskHandle);
 
+  // Start the sampling/playing timer.
   timer = timerBegin(0, 8, true);
   timerAttachInterrupt(timer, frequencyTimer, true);
   timerAlarmWrite(timer, 10000000/PLAY_FREQUENCY, true); //This timer will be called in CORE1.
@@ -87,13 +89,18 @@ void AudioPlayer::pause(){
 
 void AudioPlayer::memoryTask(void* funcParams){ 
   for(;;){
+    // Wait for timer notification.
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
     if(!isPlaying || channelsUsed == 0) continue;
 
+    // Tells all the audio buffers to refresh their contents. If the buffers have already been
+    // refreshened then the loop will continue.
     for(uint8_t i = 0; i < channelsUsed; i++) audioChannels[i]->refreshBuffer();
 
-    uint16_t totalIt = globalBuf.getFreeSpace();
-    for(uint16_t i = 0; i < totalIt; i++){
+    // Mix all the buffers into the final output.
+    uint16_t globalBufLength = globalBuf.getFreeSpace();
+    for(uint16_t i = 0; i < globalBufLength; i++){
       uint32_t samples = 0;
       for(uint8_t i = 0; i < channelsUsed; i++){
         samples += audioChannels[i]->getSample() >> 4;
