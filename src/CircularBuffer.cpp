@@ -46,8 +46,6 @@ uint16_t CircularBuffer::get(){
 }
 
 void CircularBuffer::get(uint16_t* outBuffer, uint16_t size){
-//  for(uint16_t i = 0; i < size; i++)
-//    outBuffer[i] = get();
   if(readIndex + size/2 >= MAX_BUFFER_LENGTH){
     uint16_t spaceLeft = (MAX_BUFFER_LENGTH - readIndex) << 1;
     memmove(outBuffer, buf+readIndex, spaceLeft);
@@ -56,6 +54,22 @@ void CircularBuffer::get(uint16_t* outBuffer, uint16_t size){
     readIndex = remainingBytes/2;
   }else{
     memmove(outBuffer, buf+readIndex, size);
+    readIndex += size/2;
+  }
+}
+
+void CircularBuffer::copyToFile(File* file, uint16_t size){
+  if(readIndex + size/2 >= MAX_BUFFER_LENGTH){
+    uint16_t spaceLeft = (MAX_BUFFER_LENGTH - readIndex) << 1;
+    file->write((uint8_t*) (buf+readIndex), spaceLeft);
+
+    file->seek(file->position() + spaceLeft);
+
+    uint16_t remainingBytes = size - spaceLeft;
+    file->write((uint8_t*)buf, remainingBytes);
+    readIndex = remainingBytes/2;
+  }else{
+    file->write((uint8_t*)(buf+readIndex), size);
     readIndex += size/2;
   }
 }

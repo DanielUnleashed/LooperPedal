@@ -30,13 +30,22 @@ class RECAudioFile : public AudioFile {
         ADC* adc;
         bool adcChannel;
 
+        /* Stores the buffer data of the last and past mixed recordings:
+            - 0: Last recording.
+            - 1: Past mixed recordings.
+        */
         CircularBuffer recBuf[2];
-        File recFiles[2];
+
+        /* Files of the last and past mixed recordings:
+            - 0: Last recording.
+            - 1: Past mixed recordings.
+            - 2: Last mixed recording, will close when file 1 is mixed.
+        */
+        File recFiles[3];
         File tempMixingChannel;
 
-        // Stores the current recording.
+        // This is the recording that is being played at the moment.
         File currentRecording;
-        uint32_t recordingStartingDirection = 0;
 
         uint8_t recordingCount = 0;
 
@@ -50,7 +59,10 @@ class RECAudioFile : public AudioFile {
         String generateFileName(uint8_t chA, uint8_t chB);
         void readFromSD(uint8_t channel);
         void readFromSD(uint8_t channel, uint32_t dir, uint16_t dataLength);
-        void mixFromSD(uint8_t channel);
+
+        /*Mixes two audio files. Let current iteration be i, then this function will mix (i-2) with
+        (i-3). Iteration i-3 stores the mixing of recordings from i = 0 to i-3.*/
+        void mixFromSD();
         void generateNewRECLayer();
 
 };

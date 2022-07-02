@@ -17,41 +17,44 @@ RECAudioFile::RECAudioFile(bool channel, ADC* inputADC){
 
 uint16_t RECAudioFile::getSample(){
     if(recordingCount == 0) return 0x8000;
+
     fileDirectionToBuffer += 2;
-    if(recordingCount>0 && fileDirectionToBuffer >= fileSize) fileDirectionToBuffer = 0;
+    if(recordingCount>0 && fileDirectionToBuffer >= fileSize){
+        fileDirectionToBuffer = 0;
+        // Stop the recording! 
+        stopRecording();
+    }
     return buf.get();
 }
 
 void RECAudioFile::refreshBuffer(){
+    // If stopRecording() has been called, the recording that has been stored into currentRecording
+    // will be copied to recBuf[0] and the other recordings (recBuf[0 and 1]) will be mixed and stored
+    // into recBuf[1].
     if(stopRecordingFlag) generateNewRECLayer();
-    // Will save diferent files for each recording. 
-    // Then it will mix them later, that's made so that the last change can be 
-    // undone and later done.
+
+    // While recording, save to the SD file the stored ADC buffer.
     if(isRecording) writeToFile();
 
+    // Refresh the buffers of the last recording made.
     if(recordingCount > 0) readFromSD(0);
-    
-    if(recordingCount > 1) mixFromSD(1);
+
+    // Refresh the buffers of the mixed iterations before the last recording.
+    if(recordingCount > 1) mixFromSD();
 
     if(buf.getFreeSpace() < BUFFER_REFRESH) return;
-
+ 
+    uint8_t mixedChannels = (recordingCount > 0 && playLastRecording) + (recordingCount>1);
     for(uint16_t i = 0; i < BUFFER_REFRESH; i++){
-        uint32_t mix = 0;
-        uint8_t mixedChannels = 0;
+        if(mixedChannels == 0){
+            buf.put(0x8000);
+        }else{
+            uint32_t mix = 0;
+            if(recordingCount > 0 && playLastRecording) mix += recBuf[0].get();
+            if(recordingCount > 1) mix += recBuf[1].get();
 
-        if(recordingCount > 0){
-            if(playLastRecording){
-                mix += recBuf[0].get();
-                mixedChannels++;
-            }
+            buf.put(mix/mixedChannels);
         }
-        if(recordingCount > 1){
-            mix += recBuf[1].get();
-            mixedChannels++;
-        }
-        
-        if(mixedChannels == 0) buf.put(0x8000);
-        else buf.put(mix/mixedChannels);
     }
 }
 
@@ -70,11 +73,12 @@ void RECAudioFile::readFromSD(uint8_t channel, uint32_t dir, uint16_t dataLength
     recBuf[channel].put(&recFiles[channel], buffSize);
 }
 
-void RECAudioFile::mixFromSD(uint8_t channel){
-    if(recBuf[channel].getFreeSpace() < BUFFER_REFRESH) return;
+void RECAudioFile::mixFromSD(){
+    if(recBuf[1].getFreeSpace() < BUFFER_REFRESH) return;
     if(laterPrevHasBeenMixed) return readFromSD(1);
 
-    recFiles[channel].seek(fileDirectionToBuffer);
+    recFiles[1].seek(fileDirectionToBuffer);
+    recFiles[2].seek(fileDirectionToBuffer);
 
     uint32_t remainingBytes = fileSize - fileDirectionToBuffer;
     uint16_t buffSize = BUFFER_REFRESH<<1;
@@ -84,19 +88,30 @@ void RECAudioFile::mixFromSD(uint8_t channel){
     }
     uint8_t bufAData[buffSize];
     uint8_t bufBData[buffSize];
-    recFiles[channel].read(bufAData, buffSize);
-    recFiles[channel+1].read(bufBData, buffSize);
+    recFiles[1].read(bufAData, buffSize);
+    recFiles[2].read(bufBData, buffSize);
 
     for(uint16_t i = 0; i < buffSize; i+=2){
         uint16_t chA = bufAData[i] | (bufAData[i+1] << 8);
         uint16_t chB = bufBData[i] | (bufBData[i+1] << 8);
         uint16_t mix = ((uint32_t)(chA+chB)) >> 1;
-        recBuf[channel].put(mix);
+        recBuf[1].put(mix);
     }
 
-    uint16_t toWriteBuff[buffSize>>1];
-    recBuf[channel].get(toWriteBuff, buffSize>>1);
-    tempMixingChannel.write((uint8_t*)toWriteBuff, buffSize);
+    recBuf[1].copyToFile(&tempMixingChannel, buffSize);
+
+    if(laterPrevHasBeenMixed){
+        recFiles[2].close();
+        
+        String fname = tempMixingChannel.name();
+        String path = tempMixingChannel.path();
+        if(!fname.startsWith("/") && !path.endsWith("/")) {
+            path += "/";
+        }
+        path += fname;
+        recFiles[1].close();
+        recFiles[1] = SD.open(path, FILE_READ);
+    }
 }
 
 void RECAudioFile::writeToFile(){
@@ -109,28 +124,17 @@ void RECAudioFile::writeToFile(){
         endOfFileFlag = true;
     }
 
-    bool loopEndedFlag = false;
-    if(recordingCount>0 && (fileDirectionToBuffer + totalW)>=recordingStartingDirection){
-        totalW = recordingStartingDirection - fileDirectionToBuffer;
-        loopEndedFlag = true;
-    }
+    adc->getLastReadings(/*Channel = */0).copyToFile(&currentRecording, totalW<<1);
 
-    uint16_t arr[totalW];
-    adc->getLastReadings(adcChannel, arr, totalW);
-    currentRecording.write((uint8_t*)arr, totalW<<1);
-
-    if(loopEndedFlag){
-        generateNewRECLayer();
-        return;
+    if(endOfFileFlag){
+        stopRecording();
     }
-    if(endOfFileFlag) currentRecording.seek(0);
 }
 
 void RECAudioFile::startRecording(){
     isRecording = true;
     if(recordingCount > 0){
         currentRecording.seek(fileDirectionToBuffer);
-        recordingStartingDirection = fileDirectionToBuffer;
     }
     // Delete the last recording.
     if(!playLastRecording) recordingCount--;
@@ -146,24 +150,22 @@ void RECAudioFile::generateNewRECLayer(){
     
     currentRecording.close(); 
 
+    recFiles[2] = recFiles[1];
     recFiles[1] = recFiles[0];
     recFiles[0] = SD.open(fileLoc, FILE_READ);
     if(recordingCount == 0){
         fileSize = recFiles[0].size();
         Utilities::debug("REC size: %d\n", fileSize);
     }
-    
-    //WavFile::processToWavFile(this);
 
-    /*recordingCount++;
-    currentRecording = SD.open(generateFileName(recordingCount), FILE_WRITE);
-
-    if(recordingCount > 2){
+    if(recordingCount > 1){
         tempMixingChannel = SD.open(generateFileName(recordingCount-2, recordingCount-1), FILE_WRITE);
         laterPrevHasBeenMixed = false;
-    }*/
+    }
+
     stopRecordingFlag = false;
     Serial.println("Stopped recording\n");
+    recordingCount++;
 }
 
 String RECAudioFile::generateFileName(uint8_t number){

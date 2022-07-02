@@ -19,7 +19,7 @@ class ADC{
         void readFromISR(bool channel);
         uint16_t read(bool channel);
 
-        void getLastReadings(bool channel, uint16_t* buff, uint16_t size);
+        CircularBuffer getLastReadings(bool channel);
         uint16_t getSavedReadingsCount(bool channel);
     private:
 
