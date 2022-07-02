@@ -66,14 +66,8 @@ void RECAudioFile::readFromSD(uint8_t channel, uint32_t dir, uint16_t dataLength
     uint32_t remainingBytes = fileSize - fileDirectionToBuffer;
     uint16_t buffSize = dataLength<<1;
     if(remainingBytes < buffSize) buffSize = remainingBytes;
-    uint8_t bufData[buffSize];
-    recFiles[channel].read(bufData, buffSize);
-
-    //Serial.printf("rem: %d,  buffs: %d", remainingBytes, buffSize);
     
-    recBuf[channel].put(bufData, buffSize);
-
-    //if(buffSize != dataLength<<1) readFromSD(channel, 0, dataLength-(buffSize>>1));
+    recBuf[channel].put(&recFiles[channel], buffSize);
 }
 
 void RECAudioFile::mixFromSD(uint8_t channel){

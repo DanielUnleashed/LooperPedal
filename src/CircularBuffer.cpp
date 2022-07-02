@@ -20,6 +20,25 @@ void CircularBuffer::put(uint8_t* data, uint16_t size){
   }
 }
 
+void CircularBuffer::put(File* file, uint16_t size){
+  if(writeIndex + size/2 >= MAX_BUFFER_LENGTH){ // If the circular buffer overflows, then...
+    // Save the beggining bytes at the end of the buffer.
+    uint16_t spaceLeft = (MAX_BUFFER_LENGTH - writeIndex)<<1;
+    file->read((uint8_t*)(buf+writeIndex), (size_t) spaceLeft);
+    
+    // Go to the position where the read array left off.
+    file->seek(file->position() + spaceLeft);
+
+    // Continue reading and writing to the beggining of the circular buffer.
+    uint16_t remainingBytes = size - spaceLeft;
+    file->read((uint8_t*)(buf), (size_t) remainingBytes);
+    writeIndex = remainingBytes/2;
+  }else{
+    file->read((uint8_t*)(buf+writeIndex), (size_t) size);
+    writeIndex += size/2;
+  }
+}
+
 uint16_t CircularBuffer::get(){
   uint16_t data = buf[readIndex++];
   if(readIndex == MAX_BUFFER_LENGTH) readIndex = 0;
