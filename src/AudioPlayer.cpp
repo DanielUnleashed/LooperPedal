@@ -17,6 +17,7 @@ bool AudioPlayer::isRecording = false;
 portMUX_TYPE AudioPlayer::timerMux = portMUX_INITIALIZER_UNLOCKED;
 DAC AudioPlayer::dac(CS_DAC);
 ADC AudioPlayer::adc(CS_ADC);
+Metronome AudioPlayer::metronome;
 TaskHandle_t AudioPlayer::audioProcessingTaskHandle;
 TaskHandle_t AudioPlayer::statusMonitorTaskHandle;
 TaskHandle_t AudioPlayer::memoryTaskHandle;
@@ -28,6 +29,9 @@ void AudioPlayer::begin(){
 
   delay(10); // Wait for chip initialization
 
+  metronome.start();
+  metronome.pause();
+
   // Input interrupts setup.
   DebounceButton::addInterrupt(0, []{
     if(isPlaying) pause();
@@ -37,7 +41,10 @@ void AudioPlayer::begin(){
   DebounceButton::addInterrupt(1, []{  
     for(uint8_t i = 0; i < recChannelsUsed; i++){
       RECAudioFile* currCh = getRECAudioFile(i);
-      if(isRecording) currCh -> stopRecording();
+      // This is so that when the stop recording button is pressed, the audio is cut exactly at the end of the beat,
+      // which is the same as doing it at the beginning of the beat (beat 0).
+      if(isRecording) metronome.doAtBeginningOfBeat([currCh](){currCh -> stopRecording();}); 
+      // The same is not done while starting a recording as music can start out of the marks of the metronome, for example, an upbeat.
       else currCh -> startRecording();
     }
     isRecording = !isRecording;
@@ -58,6 +65,12 @@ void AudioPlayer::begin(){
   // Memory task running on core 1
   xTaskCreatePinnedToCore(memoryTask, "MemoryTask", 10000, NULL, 5, &memoryTaskHandle, 1);
   vTaskSuspend(memoryTaskHandle);
+  xTaskCreatePinnedToCore([](void* funcParams){
+    for(;;){
+      AudioPlayer::metronome.update();
+      delay(10);
+    }
+  }, "MetronomeTask", 4096, NULL, 5, NULL, 1);
 
   // Start the sampling/playing timer.
   timer = timerBegin(0, 8, true);
@@ -75,6 +88,7 @@ void AudioPlayer::play(){
   vTaskResume(statusMonitorTaskHandle);
 #endif
   setAllTo(SD_FILE_ID, AudioFile::FILE_PLAYING);
+  metronome.resume();
   timerAlarmEnable(timer);
   Serial.println("Play");
 }
@@ -84,6 +98,7 @@ void AudioPlayer::pause(){
   vTaskSuspend(memoryTaskHandle);
   isPlaying = false;
   setAllTo(SD_FILE_ID, AudioFile::FILE_PAUSED);
+  metronome.pause();
   Serial.println("Pause");
 }
 
@@ -164,7 +179,7 @@ void AudioPlayer::statusMonitorTask(void* funcParams){
       debug("\n*********** CHANNEL STATUS: %s ************\n", stat.c_str());
     }
 
-    vTaskDelay(5000 / portTICK_PERIOD_MS);
+    delay(5000);
   }
   vTaskDelete(NULL);
 }

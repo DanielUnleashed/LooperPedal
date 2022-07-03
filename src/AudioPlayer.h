@@ -11,6 +11,8 @@
 #include "chip/DAC.h"
 #include "chip/ADC.h"
 
+#include "Metronome.h"
+
 #include "UI/Input/DebounceButton.h"
 
 class AudioPlayer{
@@ -49,6 +51,8 @@ class AudioPlayer{
 
     static DAC dac;
     static ADC adc;
+
+    static Metronome metronome;
 
     static TaskHandle_t audioProcessingTaskHandle;
     static TaskHandle_t statusMonitorTaskHandle;

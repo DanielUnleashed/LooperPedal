@@ -35,6 +35,8 @@ void RECAudioFile::refreshBuffer(){
 
     // While recording, save to the SD file the stored ADC buffer.
     if(isRecording) writeToFile();
+    // If not recording, write silence to the file.
+    else if(recordingCount > 0) writeSilenceToFile();
 
     // Refresh the buffers of the last recording made.
     if(recordingCount > 0) readFromSD(0);
@@ -77,8 +79,12 @@ void RECAudioFile::mixFromSD(){
     if(recBuf[1].getFreeSpace() < BUFFER_REFRESH) return;
     if(laterPrevHasBeenMixed) return readFromSD(1);
 
-    recFiles[1].seek(fileDirectionToBuffer);
-    recFiles[2].seek(fileDirectionToBuffer);
+    // The previous file may have been cut before the background layer ended, and so, the remaining length of this
+    // track must be layered above the background music as silence (is the same as not being layered at all).
+    bool rec1ok = recFiles[1].seek(fileDirectionToBuffer);
+    // There is no need for this bool because recFiles[2] will allways match the file size, and so, every direction
+    // that is thrown will be reachable.
+    /*bool rec2ok = */ recFiles[2].seek(fileDirectionToBuffer);
 
     uint32_t remainingBytes = fileSize - fileDirectionToBuffer;
     uint16_t buffSize = BUFFER_REFRESH<<1;
@@ -86,20 +92,38 @@ void RECAudioFile::mixFromSD(){
         buffSize = remainingBytes;
         laterPrevHasBeenMixed = true;
     }
-    uint8_t bufAData[buffSize];
-    uint8_t bufBData[buffSize];
-    recFiles[1].read(bufAData, buffSize);
-    recFiles[2].read(bufBData, buffSize);
 
-    for(uint16_t i = 0; i < buffSize; i+=2){
-        uint16_t chA = bufAData[i] | (bufAData[i+1] << 8);
-        uint16_t chB = bufBData[i] | (bufBData[i+1] << 8);
-        uint16_t mix = ((uint32_t)(chA+chB)) >> 1;
-        recBuf[1].put(mix);
+    if(rec1ok){
+        uint8_t bufAData[buffSize];
+        recFiles[1].read(bufAData, buffSize);
+        
+        // Quick hack. Don't wanna fill my code with lots of ifs.
+        // If layer1 ends before buffSize, fill with silence its array and mix. Could be done in a different
+        // conditional sentence, but as I said before... I'd like to be clean.
+        uint8_t bufBData[buffSize];
+        uint32_t rec1Size = recFiles[1].size();
+        if(fileDirectionToBuffer + buffSize > rec1Size){
+            uint32_t realSize = rec1Size - buffSize;
+            recFiles[2].read(bufBData, realSize);
+            std::fill_n(bufBData+realSize, buffSize-realSize, 0x8000);
+        }
+
+        for(uint16_t i = 0; i < buffSize; i+=2){
+            uint16_t chA = bufAData[i] | (bufAData[i+1] << 8);
+            uint16_t chB = bufBData[i] | (bufBData[i+1] << 8);
+            uint16_t mix = ((uint32_t)(chA+chB)) >> 1;
+            recBuf[1].put(mix);
+        }
+
+        recBuf[1].copyToFile(&tempMixingChannel, buffSize);
+    }else{
+        // As there's no information un layer1, just move the data from the background layer.
+        uint8_t bufData[buffSize];
+        recFiles[2].read(bufData, buffSize);
+        tempMixingChannel.write(bufData, buffSize);
     }
 
-    recBuf[1].copyToFile(&tempMixingChannel, buffSize);
-
+    // If the layers have just been mixed...
     if(laterPrevHasBeenMixed){
         recFiles[2].close();
         
@@ -119,7 +143,7 @@ void RECAudioFile::writeToFile(){
     if(totalW < BUFFER_REFRESH) return;
     
     bool endOfFileFlag = false;
-    if(recordingCount>0 && fileDirectionToBuffer + totalW > fileSize){
+    if(recordingCount>0 && fileDirectionToBuffer + (totalW<<1) > fileSize){
         totalW = fileSize - fileDirectionToBuffer;
         endOfFileFlag = true;
     }
@@ -131,11 +155,38 @@ void RECAudioFile::writeToFile(){
     }
 }
 
+void RECAudioFile::writeSilenceToFile(){
+    static uint32_t lastWriteDirection = 0;
+    static uint16_t lastRecordingCount = 0;
+
+    // The file has already been filled with silence while waiting for user input to start recording.
+    if(lastRecordingCount == recordingCount) return;
+
+    uint32_t totalW = fileDirectionToBuffer - lastWriteDirection;
+    if(totalW < BUFFER_REFRESH) return;
+    
+    bool endOfFileFlag = false;
+    if(recordingCount>0 && fileDirectionToBuffer + (totalW<<1) > fileSize){
+        totalW = fileSize - fileDirectionToBuffer;
+        endOfFileFlag = true;
+    }
+
+    uint16_t tempZeroBuffer[totalW];
+    std::fill_n(tempZeroBuffer, totalW>>1, 0x8000);
+    currentRecording.write((uint8_t*)tempZeroBuffer, totalW);
+
+    if(endOfFileFlag){
+        stopRecording();
+        lastWriteDirection = 0;
+        lastRecordingCount = recordingCount;
+    }
+
+    lastWriteDirection = fileDirectionToBuffer;
+}
+
 void RECAudioFile::startRecording(){
     isRecording = true;
-    if(recordingCount > 0){
-        currentRecording.seek(fileDirectionToBuffer);
-    }
+    if(recordingCount > 0) currentRecording.seek(fileDirectionToBuffer);
     // Delete the last recording.
     if(!playLastRecording) recordingCount--;
     Serial.println("Now recording...");

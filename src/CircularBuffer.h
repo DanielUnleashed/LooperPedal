@@ -4,7 +4,7 @@
 #include "Arduino.h"
 #include "FS.h"
 
-// The buffer will refresh when the distance between read and written bytes are greater than thee.
+// The buffer will refresh when the distance between read and written uint16_t (2 bytes) are greater than thee.
 #define BUFFER_REFRESH 1024
 // Length of the circular buffer in uint16_t.
 #define MAX_BUFFER_LENGTH 4096
