@@ -49,8 +49,8 @@ void Metronome::update(){
 
     currentBeat = convertToCompassType(currentBeat);
     nextBeat = convertToCompassType(nextBeat);
-    uint8_t trans = getTransition(currentBeat, nextBeat, animationTiming(tempoProgressDouble));
-    lightLEDs(trans);
+    /*uint8_t trans = getTransition(currentBeat, nextBeat, animationTiming(tempoProgressDouble));
+    lightLEDs(trans);*/
 
     if(currentBeat == 0 && beginningFunc){
         beginningFunc();
