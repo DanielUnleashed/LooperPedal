@@ -6,10 +6,6 @@
 #include "UI/Display.h"
 #include "UI/GUI/Menu.h"
 
-#include "Metronome.h"
-
-Metronome met(4,120,4,4);
-
 void setup() {
   Serial.begin(115200);
   Utilities::debug("\n*********************************************\n");
@@ -19,26 +15,22 @@ void setup() {
 
   MenuManager::init();
 
-  /*DemoWidget* demo = new DemoWidget(0,2,2,2);
+  DemoWidget* demo = new DemoWidget(0,2,2,2);
   AudioPlayerWidget* aud = new AudioPlayerWidget(0,0,4,2);
 
   static Display mainDisplay("Main");
   mainDisplay.addTaskbar();
   mainDisplay.addItem(demo);
   mainDisplay.addItem(aud);
-  mainDisplay.addItem(new Menu("Main Menu"));
+  //mainDisplay.addItem(new Menu("Main Menu"));
 
   MenuManager::addDisplay(mainDisplay);
-  MenuManager::launch();*/
+  MenuManager::launch();
 
   AudioPlayer::begin();
   AudioPlayer::addSDAudioFile("/tereza.wav");
   AudioPlayer::addRECAudioFile(0);
-
-  met.start();
 }
 
 void loop() {
-  met.update();
-  delay(10);
 }
