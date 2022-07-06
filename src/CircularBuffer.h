@@ -2,7 +2,7 @@
 #define CircularBuffer_h
 
 #include "Arduino.h"
-#include "FS.h"
+#include "SD.h"
 
 // The buffer will refresh when the distance between read and written bytes are greater than thee.
 #define BUFFER_REFRESH 1024

@@ -15,21 +15,21 @@ void setup() {
 
   MenuManager::init();
 
-  DemoWidget* demo = new DemoWidget(0,2,2,2);
+  /*DemoWidget* demo = new DemoWidget(0,2,2,2);
   AudioPlayerWidget* aud = new AudioPlayerWidget(0,0,4,2);
 
   static Display mainDisplay("Main");
-  /*mainDisplay.addTaskbar();
+  mainDisplay.addTaskbar();
   mainDisplay.addItem(demo);
-  mainDisplay.addItem(aud);*/
+  mainDisplay.addItem(aud);
   mainDisplay.addItem(new Menu("Main Menu"));
 
   MenuManager::addDisplay(mainDisplay);
-  MenuManager::launch();
+  MenuManager::launch();*/
 
-  /*AudioPlayer::begin();
-  //AudioPlayer::addSDAudioFile("/tereza.wav");
-  AudioPlayer::addRECAudioFile(0);*/
+  AudioPlayer::begin();
+  AudioPlayer::addSDAudioFile("/tereza.wav");
+  AudioPlayer::addRECAudioFile(0);
 }
 
 void loop() {}

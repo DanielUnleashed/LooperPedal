@@ -104,13 +104,8 @@ void RECAudioFile::mixFromSD(){
         recFiles[2].close();
         
         String fname = tempMixingChannel.name();
-        String path = tempMixingChannel.path();
-        if(!fname.startsWith("/") && !path.endsWith("/")) {
-            path += "/";
-        }
-        path += fname;
         recFiles[1].close();
-        recFiles[1] = SD.open(path, FILE_READ);
+        recFiles[1] = SD.open(fname, FILE_READ);
     }
 }
 
