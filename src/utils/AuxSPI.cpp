@@ -31,8 +31,9 @@ void AuxSPI::begin(SPIClass* spiref){
 void AuxSPI::SPI2_Sender(void* funcParams){
     for(;;){
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        
         portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
-        taskENTER_CRITICAL(&timerMux);
+        portENTER_CRITICAL(&timerMux);
         printRealFrequency(0xFFFF);
         for(uint8_t i = 0; i < holdPacketCount; i++){
             if(holdPackets[i].needsResponse){
@@ -42,7 +43,7 @@ void AuxSPI::SPI2_Sender(void* funcParams){
             }
         }
         holdPacketCount = 0; // Clear all packets.
-        taskEXIT_CRITICAL(&timerMux);
+        portENTER_CRITICAL(&timerMux);
     }
     vTaskDelete(NULL);
 }
