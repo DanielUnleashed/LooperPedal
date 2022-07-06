@@ -128,6 +128,7 @@ void RECAudioFile::mixFromSD(){
         recFiles[2].close();
         
         String fname = tempMixingChannel.name();
+        recFiles[1].close();
         recFiles[1] = SD.open(fname, FILE_READ);
     }
 }
