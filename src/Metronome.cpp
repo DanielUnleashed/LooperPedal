@@ -8,6 +8,15 @@ Metronome::Metronome(uint8_t tU, uint16_t t, uint8_t totalB, uint8_t beatUn){
 }
 
 void Metronome::start(){
+    digitalWrite(csPin, LOW);
+    pinMode(csPin, OUTPUT);
+    AuxSPI::begin();
+    AuxSPI::sendToLEDs(csPin, 0);
+    
+    resume();
+}
+
+void Metronome::resume(){
     double timePerTempoUnit = 60000.0/tempo; //Working on ms
 
     if(totalBeats > 3 && totalBeats%3==0) isTerniary = true;
@@ -19,15 +28,18 @@ void Metronome::start(){
     
     //Serial.printf("tb: %d, tB: %d, rf:%d\n", timePerBeatUnit, timePerBar, isTerniary*3);
 
-    digitalWrite(csPin, LOW);
-    pinMode(csPin, OUTPUT);
-    AuxSPI::begin();
-    AuxSPI::sendToLEDs(csPin, 0);
-
     startTime = millis();
+
+    isPaused = false;
+}
+
+void Metronome::pause(){
+    isPaused = true;
 }
 
 void Metronome::update(){
+    if(isPaused) return;
+
     uint32_t currentTime = (millis()-startTime) % timePerBar;
     double tempoProgressDouble = ((double)currentTime)/timePerBeatUnit;
 
@@ -37,11 +49,19 @@ void Metronome::update(){
 
     currentBeat = convertToCompassType(currentBeat);
     nextBeat = convertToCompassType(nextBeat);
-    uint8_t trans = getTransition(currentBeat, nextBeat, animationTiming(tempoProgressDouble));
-    lightLEDs(trans);
+    /*uint8_t trans = getTransition(currentBeat, nextBeat, animationTiming(tempoProgressDouble));
+    lightLEDs(trans);*/
+
+    if(currentBeat == 0 && beginningFunc){
+        beginningFunc();
+        beginningFunc = {};
+    }
     //Serial.printf("a: %d, sub:%d, trans:%d\n", currentBeat, subdivisionProgress, trans);
 }
 
+void IRAM_ATTR Metronome::doAtBeginningOfBeat(std::function<void(void)> func){
+    beginningFunc = func;
+}
 
 /* Coverts the tempo progress decimals to [0,3] with desired timing.*/
 uint8_t Metronome::animationTiming(double tempo){
