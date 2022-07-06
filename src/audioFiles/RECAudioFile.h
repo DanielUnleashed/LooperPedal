@@ -24,6 +24,9 @@ class RECAudioFile : public AudioFile {
         void startRecording();
         void stopRecording();
         void undoRedoLastRecording();
+        // If it's not recording, there has to be silence (0x8000) being written to the SD.
+        void writeSilenceToFile();
+        // If it's recording, save the ADC buffer to the currentRecording file.
         void writeToFile();
 
     private:
