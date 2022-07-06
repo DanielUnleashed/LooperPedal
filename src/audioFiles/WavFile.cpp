@@ -1,55 +1,137 @@
 #include "WavFile.h"
 
-WavFile::WavFile(File f){
-    wavFile = f;
+WavFile::WavFile(String fileLoc){
+    wavLoc = fileLoc;
+
+    if(!SD.exists(fileLoc)){
+        Utilities::error("File '%s' doesn't exist!\n", fileLoc.c_str());
+    }
+
+    wavFile = SD.open(fileLoc, FILE_READ);
+    if (!wavFile) {
+        Utilities::error("Failed to open file '%s' for reading/writing\n", fileLoc.c_str());
+    }
+
+    wavFileDataSize = wavFile.size();
+    if(wavFileDataSize == 0){
+        Utilities::error("File %s is empty!\n", fileLoc.c_str());
+    }
+    
     getHeader();
 }
 
-File WavFile::processToRawFile(){
-    SD.mkdir("/proc");
-    String fileName = String(wavFile.name());
-    fileName = fileName.substring(0, fileName.length()-4);
+WAV_FILE_INFO WavFile::processToRawFile(){
+    String procFolder = "/proc";
+    SD.mkdir(procFolder);
+    String fileName  = wavLoc.substring(0, wavLoc.length()-4);
     fileName.concat(PLAY_FREQUENCY);
     fileName.concat(".raw");
-    String fileLoc = "/proc";
-    fileLoc.concat(fileName);
+    procFolder.concat(fileName);
+    
+    String procFile = String(procFolder);
 
-    File transformedFile = SD.open(fileLoc, FILE_READ);
-    if(transformedFile.size() > 0){ //Maybe do something more sophisticated like CRC (?)
-        wavFile.close();
-        return transformedFile;
-    }else{
-        Utilities::debug("File %s exists, but is empty!\n", fileLoc.c_str());
+    if(SD.exists(procFile)){
+        File transformedFile = SD.open(procFile, FILE_READ);
+        uint32_t transformedFileSize = transformedFile.size();
+        if(transformedFileSize > 0){ //Maybe do something more sophisticated like CRC (?)
+            wavFile.close();
+            transformedFile.close();
+            WAV_FILE_INFO ret = {procFile, transformedFileSize};
+            return ret;
+        }else{
+            Utilities::debug("File %s exists, but is empty!\n", procFile.c_str());
+        }
+        transformedFile.close();
     }
 
-    transformedFile.close();
-    transformedFile = SD.open(fileLoc, FILE_WRITE);
+    File transformedFile = SD.open(procFile, FILE_WRITE);
 
-    Utilities::debug("File %s (%d bytes) will be parsed into %s\n", wavFile.name(), wavFile.size(), fileLoc.c_str());
-    if(!processAudioData(transformedFile)) Serial.printf("Something happened parsing %s\n", wavFile.name());
+    Utilities::debug("File %s (%d bytes) will be parsed into %s\n", wavLoc.c_str(), wavFileDataSize, procFile.c_str());
+    if(!processAudioData(transformedFile)) Utilities::error("Something happened parsing %s\n", procFile.c_str());
+    
     wavFile.close();
+    transformedFile.flush();
+    uint32_t transformedFileSize = transformedFile.size();
     transformedFile.close();
-    transformedFile = SD.open(fileLoc, FILE_READ);
-    return transformedFile;
+    WAV_FILE_INFO ret = {procFile, transformedFileSize};
+    return ret;
+}
+
+void WavFile::processToWavFile(AudioFile* rawFile){
+    const char* riff_tag = "RIFF";
+    const char* wave_tag = "WAVE";
+    const char* fmt_tag = "fmt ";
+    const char* data_tag = "data";
+
+    WAV_HEADER wavHeader;
+    for(uint8_t i = 0; i < 4; i++) wavHeader.RIFF_ID[i] = riff_tag[i];
+    for(uint8_t i = 0; i < 4; i++) wavHeader.RIFF_TYPE_ID[i] = wave_tag[i];
+    for(uint8_t i = 0; i < 4; i++) wavHeader.fmt_ID[i] = fmt_tag[i];
+    wavHeader.fmt_DataSize =  16;
+    wavHeader.fmt_FormatTag = 1;
+    wavHeader.channelNum = 1;
+    wavHeader.sampleRate = PLAY_FREQUENCY;
+    wavHeader.byteRate = PLAY_FREQUENCY*BIT_RES/8;
+    wavHeader.blockAlign = BIT_RES/8;
+    wavHeader.bitsPerSample = BIT_RES;
+    for(uint8_t i = 0; i < 4; i++) wavHeader.data_ID[i] = data_tag[i];
+
+    wavHeader.RIFF_DataSize = rawFile->getFileSize();
+    wavHeader.data_DataSize = wavHeader.RIFF_DataSize + 36;
+
+    String outFileDir = "/out";
+    SD.mkdir(outFileDir);
+    String fileName  = rawFile -> getFileName();
+    fileName = fileName.substring(0, fileName.length()-4);
+    fileName.concat(".wav");
+    outFileDir.concat(fileName);
+
+    File outFile = SD.open(outFileDir, FILE_WRITE);
+
+    //Print the header to the file
+    uint8_t* headerP = (uint8_t*)&wavHeader;
+    outFile.write(headerP, 44);
+
+    File rawDataFile = SD.open(rawFile->getFileLocation(), FILE_READ);
+    //Print the audio data
+    uint32_t directionPointer = 0;
+    uint32_t rawByteSize = rawFile->getFileSize()>>1;
+    rawDataFile.seek(0);
+    while(directionPointer < rawByteSize){
+        //Fetch
+        uint8_t bufferSize = 128;
+        if(rawByteSize - directionPointer < bufferSize) bufferSize = rawByteSize - directionPointer;
+        uint16_t rawData[128];
+        rawDataFile.read((uint8_t*)&rawData, bufferSize<<1);
+
+        //Process
+        for(uint8_t i = 0; i < bufferSize; i++) rawData[i] -= 0x8000;
+
+        //Save
+        outFile.write((uint8_t*)&rawData, bufferSize<<1);
+
+        directionPointer+=bufferSize;
+    }
+
+    outFile.close();
+    Utilities::debug("Saved to file %s\n", outFileDir.c_str());
 }
 
 void WavFile::getHeader(){
-    WAV_HEADER wavHeader = {
-        //TODO: This could be done better...
-        .RIFF_ID = readBytes(4),
-        .RIFF_DataSize = read32(),
-        .RIFF_TYPE_ID = readBytes(4),
-        .fmt_ID = readBytes(4),
-        .fmt_DataSize = read32(),
-        .fmt_FormatTag = read16(),
-        .channelNum = read16(),
-        .sampleRate = read32(),
-        .byteRate = read32(),
-        .blockAlign = read16(),
-        .bitsPerSample = read16(),
-        .data_ID = readBytes(4),
-        .data_DataSize = read32(),
-    };
+    WAV_HEADER wavHeader;
+    for(uint8_t i = 0; i < 4; i++) wavHeader.RIFF_ID[i] = readByte();
+    wavHeader.RIFF_DataSize = read32();
+    for(uint8_t i = 0; i < 4; i++) wavHeader.RIFF_TYPE_ID[i] = readByte();
+    for(uint8_t i = 0; i < 4; i++) wavHeader.fmt_ID[i] = readByte();
+    wavHeader.fmt_DataSize = read32();
+    wavHeader.fmt_FormatTag = read16();
+    wavHeader.channelNum = read16();
+    wavHeader.sampleRate = read32();
+    wavHeader.byteRate = read32();
+    wavHeader.blockAlign = read16();
+    wavHeader.bitsPerSample = read16();
+    for(uint8_t i = 0; i < 4; i++) wavHeader.data_ID[i] = readByte();
+    wavHeader.data_DataSize = read32();
     wavInfo = wavHeader;
 }
 
@@ -66,7 +148,7 @@ bool WavFile::processAudioData(File outFile){
     uint16_t maxProcessedBufferSize = ceil(DATA_COPY_BUFFER_SIZE/freqRatio);
     uint32_t startTime = millis();
 
-    uint32_t totalIt = wavFile.size()/DATA_COPY_BUFFER_SIZE/2;
+    uint32_t totalIt = wavFileDataSize/DATA_COPY_BUFFER_SIZE/2;
     uint32_t dir = 40;
     uint32_t it = 0;
 
@@ -76,7 +158,7 @@ bool WavFile::processAudioData(File outFile){
 
     while(true){
         uint16_t bufLength = DATA_COPY_BUFFER_SIZE;
-        if((dir + DATA_COPY_BUFFER_SIZE*2) > wavFile.size()) bufLength = (wavFile.size() - dir)/2;
+        if((dir + DATA_COPY_BUFFER_SIZE*2) > wavFileDataSize) bufLength = (wavFileDataSize - dir)/2;
         else dir += DATA_COPY_BUFFER_SIZE*2;
 
         uint16_t dataToBuffer[bufLength];
@@ -127,7 +209,8 @@ bool WavFile::processAudioData(File outFile){
     }
 
     uint32_t ellapsed = millis() - startTime;
-    Serial.printf("That took %d ms\n", ellapsed);
+    double speed = ((double)wavFileDataSize)/ellapsed;  
+    Serial.printf("That took %d ms (%0.2f KB/s)\n", ellapsed, speed);
     return true;
 }
 
@@ -136,13 +219,13 @@ bool WavFile::directCopy(File outFile){
     wavFile.seek(40);
     uint32_t startTime = millis();
 
-    uint32_t totalIt = wavFile.size()/DATA_COPY_BUFFER_SIZE/2;
+    uint32_t totalIt = wavFileDataSize/DATA_COPY_BUFFER_SIZE/2;
     uint32_t dir = 40;
     uint32_t it = 0;
 
     while(true){
         uint16_t bufLength = DATA_COPY_BUFFER_SIZE;
-        if((dir + DATA_COPY_BUFFER_SIZE*2) > wavFile.size()) bufLength = (wavFile.size() - dir)/2;
+        if((dir + DATA_COPY_BUFFER_SIZE*2) > wavFileDataSize) bufLength = (wavFileDataSize - dir)/2;
         else dir += DATA_COPY_BUFFER_SIZE*2;
 
         uint16_t dataToBuffer[bufLength];
@@ -163,7 +246,8 @@ bool WavFile::directCopy(File outFile){
     }
 
     uint32_t ellapsed = millis() - startTime;
-    Serial.printf("That took %d ms\n", ellapsed);
+    double speed = ((double)wavFileDataSize)/ellapsed;  
+    Serial.printf("That took %d ms (%0.2f KB/s)\n", ellapsed, speed);
     return true;
 }
 
@@ -192,10 +276,9 @@ void WavFile::printHeader(File outFile){
     outFile.close();
 }
 
-uint8_t* WavFile::readBytes(uint8_t length){
-    uint8_t* ret;
-    ret = (uint8_t*) malloc(4);
-    wavFile.read(ret, 4);
+uint8_t WavFile::readByte(){
+    uint8_t ret;
+    wavFile.read(&ret, 1);
     return ret;
 }
 

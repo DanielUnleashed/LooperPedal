@@ -25,6 +25,17 @@ String Utilities::playBackTimeToString(PLAYBACK_TIME t){
   return ret;
 }
 
+String Utilities::millisToString(uint32_t time){
+  PLAYBACK_TIME t = toPlaybackTimeStruct(time);
+  String min = String(t.minutesElapsedPlayback);
+  String sec = String(t.secondsElapsedPlayback);
+  String ret = min;
+  ret.concat(":");
+  if(sec.length() == 1) ret.concat("0");
+  ret.concat(sec);
+  return ret;
+}
+
 void Utilities::enterErrorState(){
   pinMode(ERROR_LED, OUTPUT);
   xTaskCreatePinnedToCore(

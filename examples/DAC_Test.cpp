@@ -1,4 +1,4 @@
-/*#include "chip/dac.h"
+#include "chip/dac.h"
 
 DAC dac(15);
 hw_timer_t*   timer;
@@ -22,4 +22,4 @@ void IRAM_ATTR frequencyTimer(){
 }
 
 void loop(){
-}*/
+}

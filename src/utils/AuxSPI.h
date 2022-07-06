@@ -5,7 +5,6 @@
 #include "Arduino.h"
 #include "freertos/task.h"
 
-#define SPI_CLK 20000000
 #define MAX_HOLDOUT_PACKETS 3 
 
 /* A HOLDOUT_PACKET will store the data to be sended to the chip when
@@ -25,20 +24,26 @@ struct HOLDOUT_PACKET{
 class AuxSPI{
     public:
         static void begin();
+        static void begin(SPIClass* ref);
         static HOLDOUT_PACKET* writeFromISR(uint8_t chipSelect, uint8_t* data);
         static void write(uint8_t chipSelect, uint8_t* data);
         static HOLDOUT_PACKET* writeAndReadFromISR(uint8_t chipSelect, uint8_t* dataOut, uint8_t* dataInBuff);
         static void writeAndRead(uint8_t chipSelect, uint8_t* dataOut, uint8_t* dataInBuff);
+        static void sendToLEDs(uint8_t chipSelect, uint8_t data);
+
+        static void wakeSPI();
+
+        static void printRealFrequency(uint16_t sampleCount);
+        static void chrono(uint16_t sampleCount, uint32_t startTime);
+    
     private:
         static SPIClass* SPI2;
         static HOLDOUT_PACKET* holdPackets;
         static volatile uint8_t holdPacketCount;
         static bool alreadyDefined;
-        static TaskHandle_t SPI2_Task;
+        static TaskHandle_t SPI2_TaskHandler;
 
         static void SPI2_Sender(void* funcParams);
 };
-
-//extern SPIClass SPI2;
 
 #endif

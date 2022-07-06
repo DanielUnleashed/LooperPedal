@@ -22,5 +22,5 @@ void DAC::write(uint16_t data){
     // 0x3000 is the header config for the DAC (see datasheet)
     uint16_t out = 0x3000 | (data & 0x0FFF);
     uint8_t buf[2] = {out>>8, out};
-    AuxSPI::write(chipSelect, (uint8_t*)&out);
+    AuxSPI::write(chipSelect, buf);
 }
