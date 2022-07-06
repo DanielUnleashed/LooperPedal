@@ -194,7 +194,8 @@ void RECAudioFile::stopRecording(){
 void RECAudioFile::generateNewRECLayer(){
     isRecording = false;
     
-    currentRecording.close(); 
+    currentRecording.close();
+    tempMixingChannel.close();
 
     recFiles[2] = recFiles[1];
     recFiles[1] = recFiles[0];

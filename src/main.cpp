@@ -32,5 +32,4 @@ void setup() {
   AudioPlayer::addRECAudioFile(0);
 }
 
-void loop() {
-}
+void loop() {}
