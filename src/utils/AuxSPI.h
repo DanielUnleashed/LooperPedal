@@ -13,9 +13,10 @@ requested and store the given value in the responseBuffer.
 Only one HOLDOUT_PACKET will be stored for each CS, that way there will
 be no need to keep controlling the number of requests made. Furthermore, there 
 wouldn't be much reason to store different commands to be sent to the same chip
-in the same instant. The data released will be the last to be added. */
+in the same instant. The data released will be the first to be added. */
 struct HOLDOUT_PACKET{
-    uint8_t* dataOut;           // Command to send to the chip.
+    uint32_t dataOut;           // Command to send to the chip (maximum 4 bytes)
+    uint8_t outLength;          // Number of bytes to send.
     uint8_t pin;                // Chip select (CS)
     uint32_t SPI_speed;
     uint8_t responseType;
@@ -30,10 +31,13 @@ class AuxSPI{
 
         static void begin();
         static void begin(SPIClass* ref);
-        static HOLDOUT_PACKET* writeFromISR(uint8_t chipSelect, uint32_t spiSpeed, uint8_t* data);
-        static void write(uint8_t chipSelect, uint32_t spiSpeed, uint8_t* data);
-        static HOLDOUT_PACKET* writeAndReadFromISR(uint8_t chipSelect, uint32_t spiSpeed, uint8_t* dataOut, uint8_t* dataInBuff);
-        static void writeAndRead(uint8_t chipSelect, uint32_t spiSpeed, uint8_t* dataOut, uint8_t* dataInBuff);
+
+        static HOLDOUT_PACKET* writeFromISR(uint8_t chipSelect, uint32_t spiSpeed, uint8_t* data, uint8_t dataLength);
+        static void write(HOLDOUT_PACKET packet, uint8_t* dataOut);
+
+        static HOLDOUT_PACKET* writeAndReadFromISR(uint8_t chipSelect, uint32_t spiSpeed, uint8_t* dataOut, uint8_t dataLength, uint8_t* dataInBuff);
+        static void writeAndRead(HOLDOUT_PACKET packet, uint8_t* dataOut);
+
         static HOLDOUT_PACKET* sendToLEDsFromISR(uint8_t csPin, uint8_t* data);
         static void sendToLEDs(uint8_t chipSelect, uint8_t* data);
         

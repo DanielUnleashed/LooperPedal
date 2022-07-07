@@ -19,7 +19,7 @@
 // animations will be disabled.
 #define ENABLE_DISPLAY_ANIMATIONS
 
-#define PLAY_FREQUENCY 16000
+#define PLAY_FREQUENCY 22050
 #define BIT_RES 16
 
 #define SCREEN_FPS 50.0

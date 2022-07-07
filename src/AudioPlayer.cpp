@@ -118,10 +118,10 @@ void AudioPlayer::memoryTask(void* funcParams){
     for(uint16_t i = 0; i < globalBufLength; i++){
       uint32_t samples = 0;
       for(uint8_t i = 0; i < channelsUsed; i++){
-        samples += audioChannels[i]->getSample() >> 4;
+        samples += audioChannels[i]->getSample();
       }
       uint16_t finalMix = samples/channelsUsed;
-      globalBuf.put(finalMix);
+      globalBuf.put(finalMix>>4);
     
       if(audioChannels[longestChannel]->hasFileEnded()){
         setAllTo(SD_FILE_ID, AudioFile::FILE_PLAYING);
@@ -134,23 +134,24 @@ void AudioPlayer::memoryTask(void* funcParams){
 void IRAM_ATTR AudioPlayer::frequencyTimer(){
   if(!isPlaying) return;
 
-  portENTER_CRITICAL(&timerMux);
+  portENTER_CRITICAL_ISR(&timerMux);
   #ifdef PASS_AUDIO_INPUT_DURING_RECORDING
     uint16_t adcRead = adc.updateReadings();
     uint32_t mix;
-    /*if(isRecording)*/ mix = (globalBuf.get() + adcRead)>>1;
-    //else mix = globalBuf.get();
+    mix = (globalBuf.get() + adcRead)>>1;
     dac.writeFromISR(mix);
   #else
-    adc.updateReadings();
+    if(isRecording) adc.updateReadings();
     dac.writeFromISR(globalBuf.get());
   #endif
+
+  AuxSPI::wakeSPI();
 
   if(globalBuf.getFreeSpace() > BUFFER_REFRESH){
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     vTaskNotifyGiveFromISR(memoryTaskHandle, &xHigherPriorityTaskWoken);
   }
-  portEXIT_CRITICAL(&timerMux);
+  portEXIT_CRITICAL_ISR(&timerMux);
 }
 
 void AudioPlayer::statusMonitorTask(void* funcParams){
