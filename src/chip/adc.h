@@ -11,6 +11,8 @@
 
 class ADC{
     public:
+        static const uint32_t SPI_Speed = 2000000;
+
         ADC(uint8_t cs);
         void begin();
 

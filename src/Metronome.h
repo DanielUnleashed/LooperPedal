@@ -30,8 +30,10 @@ class Metronome {
 
         uint8_t csPin = CS_METRONOME;
 
-        // 
         bool isPaused = false;
+
+        // Stores the LED(s) to be iluminated (each bit represents one LED).
+        uint8_t lightLEDs = 0;
 
         uint8_t tempoUnit;
         uint16_t tempo;
@@ -46,7 +48,6 @@ class Metronome {
         uint8_t animationTiming(double subd);
         uint8_t getTransition(uint8_t i, uint8_t j, uint8_t t);
         uint8_t convertToCompassType(uint8_t tempoProgress);
-        void lightLEDs(uint8_t ledCode);
 };
 
 #endif

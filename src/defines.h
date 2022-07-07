@@ -7,9 +7,12 @@
 //#define USE_BOTH_ADC_CHANNELS
 
 // Branch inside AudioPlayer.cpp
-#define PASS_AUDIO_INPUT_DURING_RECORDING
+//#define PASS_AUDIO_INPUT_DURING_RECORDING
 
 //#define LAUNCH_SPLASHSCREEN_AT_BOOT_UP
+
+// Will add LED animations (makes the pedal way to slow, maybe the problem happens only when connected to PC because low power?).
+//#define METRONOME_LEDS
 
 // If left defined all animatoins will play, functionality of everything else will remain
 // untouched. If left undefined, DisplayOverlay animations will not play and all "good-looking"

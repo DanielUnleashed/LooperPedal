@@ -6,6 +6,8 @@
 
 class DAC {
     public:
+        static const uint32_t SPI_Speed = 20000000;
+
         DAC(uint8_t cs);
         void begin();
         void write(uint16_t data);

@@ -32,17 +32,19 @@ void AuxSPI::SPI2_Sender(void* funcParams){
     for(;;){
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
-        taskENTER_CRITICAL(&timerMux);
+        portENTER_CRITICAL(&timerMux);
         printRealFrequency(0xFFFF);
         for(uint8_t i = 0; i < holdPacketCount; i++){
-            if(holdPackets[i].needsResponse){
-                writeAndRead(holdPackets[i].pin, holdPackets[i].dataOut, holdPackets[i].responseBuffer);
-            }else{
-                write(holdPackets[i].pin, holdPackets[i].dataOut);
+            if(holdPackets[i].responseType == HOLDOUT_WRITE_READ){
+                writeAndRead(holdPackets[i].pin, holdPackets[i].SPI_speed, holdPackets[i].dataOut, holdPackets[i].responseBuffer);
+            }else if(holdPackets[i].responseType == HOLDOUT_ONLY_READ){
+                write(holdPackets[i].pin, holdPackets[i].SPI_speed, holdPackets[i].dataOut);
+            }else if(holdPackets[i].responseType == HOLDOUT_LEDS){
+                sendToLEDs(holdPackets[i].pin, holdPackets[i].dataOut);
             }
         }
         holdPacketCount = 0; // Clear all packets.
-        taskEXIT_CRITICAL(&timerMux);
+        portEXIT_CRITICAL(&timerMux);
     }
     vTaskDelete(NULL);
 }
@@ -52,7 +54,7 @@ void AuxSPI::wakeSPI(){
     vTaskNotifyGiveFromISR(SPI2_TaskHandler, &xHigherPriorityTaskWoken); 
 }
 
-HOLDOUT_PACKET* AuxSPI::writeFromISR(uint8_t chipSelect, uint8_t* data){
+HOLDOUT_PACKET* AuxSPI::writeFromISR(uint8_t chipSelect, uint32_t spiSpeed, uint8_t* data){
     // Search if a packet already exists.
     for(uint8_t i = 0; i < holdPacketCount; i++){
         if(holdPackets[i].pin == chipSelect){
@@ -60,44 +62,52 @@ HOLDOUT_PACKET* AuxSPI::writeFromISR(uint8_t chipSelect, uint8_t* data){
             return &holdPackets[i]; //SPI2_Task will already be notified when it gets here.
         }
     }
+
     // Add a new packet
     holdPackets[holdPacketCount++] = {
         .dataOut = data,
         .pin = chipSelect,
-        .needsResponse = false,
+        .SPI_speed = spiSpeed,
+        .responseType = HOLDOUT_ONLY_READ,
     };
     wakeSPI();
     return &holdPackets[holdPacketCount-1];
 }
 
-HOLDOUT_PACKET* AuxSPI::writeAndReadFromISR(uint8_t chipSelect, uint8_t* dataOut, uint8_t* dataInBuff){
-    HOLDOUT_PACKET* pack = writeFromISR(chipSelect, dataOut);
-    pack -> needsResponse = true;
+HOLDOUT_PACKET* AuxSPI::writeAndReadFromISR(uint8_t chipSelect, uint32_t spiSpeed, uint8_t* dataOut, uint8_t* dataInBuff){
+    HOLDOUT_PACKET* pack = writeFromISR(chipSelect, spiSpeed, dataOut);
+    pack -> responseType = HOLDOUT_WRITE_READ;
     pack -> responseBuffer = dataInBuff;
     return pack;
 }
 
-void AuxSPI::writeAndRead(uint8_t chipSelect, uint8_t* dataOut, uint8_t* dataInBuff){
+void AuxSPI::writeAndRead(uint8_t chipSelect, uint32_t spiSpeed, uint8_t* dataOut, uint8_t* dataInBuff){
     if(dataOut == NULL) return;
-    SPI2 -> beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0)); //If substituted by sett, it implodes (doesn't work)
+    SPI2 -> beginTransaction(SPISettings(spiSpeed, MSBFIRST, SPI_MODE0));
     digitalWrite(chipSelect, LOW);
     SPI2 -> transferBytes(dataOut, dataInBuff, sizeof(dataOut));
     digitalWrite(chipSelect, HIGH);
     SPI2 -> endTransaction();
 }
 
-void AuxSPI::write(uint8_t chipSelect, uint8_t* data){
+void AuxSPI::write(uint8_t chipSelect, uint32_t spiSpeed, uint8_t* data){
     if(data == NULL) return;
-    SPI2 -> beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
+    SPI2 -> beginTransaction(SPISettings(spiSpeed, MSBFIRST, SPI_MODE0));
     digitalWrite(chipSelect, LOW);
     SPI2 -> writeBytes(data, sizeof(data));
     digitalWrite(chipSelect, HIGH);  
     SPI2 -> endTransaction();
 }
 
-void AuxSPI::sendToLEDs(uint8_t csPin, uint8_t data){
+HOLDOUT_PACKET* AuxSPI::sendToLEDsFromISR(uint8_t chipSelect, uint8_t* dataOut){
+    HOLDOUT_PACKET* pack = writeFromISR(chipSelect, 5000, dataOut);
+    pack -> responseType = HOLDOUT_LEDS;
+    return pack;
+}
+
+void AuxSPI::sendToLEDs(uint8_t csPin, uint8_t* data){
     SPI2 -> beginTransaction(SPISettings(5000, MSBFIRST, SPI_MODE0));
-    SPI2 -> write(data);
+    SPI2 -> writeBytes(data, 1);
     SPI2 -> endTransaction();
     digitalWrite(csPin, HIGH);
     delayMicroseconds(500);

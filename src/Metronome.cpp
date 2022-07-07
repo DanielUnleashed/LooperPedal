@@ -10,10 +10,13 @@ Metronome::Metronome(uint8_t tU, uint16_t t, uint8_t totalB, uint8_t beatUn){
 void Metronome::start(){
     digitalWrite(csPin, LOW);
     pinMode(csPin, OUTPUT);
+
+    lightLEDs = 0;
+
+#ifdef METRONOME_LEDS
     AuxSPI::begin();
-    AuxSPI::sendToLEDs(csPin, 0);
-    
-    resume();
+    AuxSPI::sendToLEDs(csPin, &lightLEDs);
+#endif
 }
 
 void Metronome::resume(){
@@ -49,8 +52,13 @@ void Metronome::update(){
 
     currentBeat = convertToCompassType(currentBeat);
     nextBeat = convertToCompassType(nextBeat);
-    /*uint8_t trans = getTransition(currentBeat, nextBeat, animationTiming(tempoProgressDouble));
-    lightLEDs(trans);*/
+
+#ifdef METRONOME_LEDS
+    // Animation. Calculating the LED to be lit.
+    uint8_t trans = getTransition(currentBeat, nextBeat, animationTiming(tempoProgressDouble));
+    lightLEDs = 1<<trans;
+    AuxSPI::sendToLEDsFromISR(csPin, &lightLEDs);
+#endif
 
     if(currentBeat == 0 && beginningFunc){
         beginningFunc();
@@ -92,8 +100,4 @@ uint8_t Metronome::getTransition(uint8_t i, uint8_t j, uint8_t t){
     }else{
         return transitions[4*i+j][t-2];
     }
-}
-
-void Metronome::lightLEDs(uint8_t ledCode){
-    AuxSPI::sendToLEDs(csPin, 1<<ledCode);
 }
