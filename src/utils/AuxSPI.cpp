@@ -107,17 +107,16 @@ void AuxSPI::write(HOLDOUT_PACKET p, uint8_t* dataOut){
 }
 
 HOLDOUT_PACKET* AuxSPI::sendToLEDsFromISR(uint8_t chipSelect, uint8_t* dataOut){
-    HOLDOUT_PACKET* pack = writeFromISR(chipSelect, 5000, dataOut, 1);
+    HOLDOUT_PACKET* pack = writeFromISR(chipSelect, 20000000, dataOut, 1);
     pack -> responseType = HOLDOUT_LEDS;
     return pack;
 }
 
 void AuxSPI::sendToLEDs(uint8_t csPin, uint8_t* data){
-    SPI2 -> beginTransaction(SPISettings(5000, MSBFIRST, SPI_MODE0));
+    SPI2 -> beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
     SPI2 -> writeBytes(data, 1);
     SPI2 -> endTransaction();
     digitalWrite(csPin, HIGH);
-    delayMicroseconds(500);
     digitalWrite(csPin, LOW);  
 }
 
