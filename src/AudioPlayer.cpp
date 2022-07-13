@@ -63,8 +63,9 @@ void AudioPlayer::begin(){
 #endif 
 
   // Memory task running on core 1
-  xTaskCreatePinnedToCore(memoryTask, "MemoryTask", 10000, NULL, 5, &memoryTaskHandle, 1);
+  xTaskCreatePinnedToCore(memoryTask, "MemoryTask", 16000, NULL, 5, &memoryTaskHandle, 1);
   vTaskSuspend(memoryTaskHandle);
+  
   xTaskCreatePinnedToCore([](void* funcParams){
     for(;;){
       AudioPlayer::metronome.update();

@@ -1,5 +1,11 @@
 #include "CircularBuffer.h"
 
+void CircularBuffer::testPut(uint16_t data){
+  buf[writeIndex++] = data;
+  Serial.println(data);
+  if(writeIndex == MAX_BUFFER_LENGTH) writeIndex = 0;
+}
+
 void CircularBuffer::put(uint16_t data){
   buf[writeIndex++] = data;
   if(writeIndex == MAX_BUFFER_LENGTH) writeIndex = 0;
@@ -67,10 +73,10 @@ void CircularBuffer::copyToFile(File* file, uint16_t size){
 
     uint16_t remainingBytes = size - spaceLeft;
     file->write((uint8_t*)buf, remainingBytes);
-    readIndex = remainingBytes/2;
+    readIndex = remainingBytes>>1;
   }else{
     file->write((uint8_t*)(buf+readIndex), size);
-    readIndex += size/2;
+    readIndex += size>>1;
   }
 }
 

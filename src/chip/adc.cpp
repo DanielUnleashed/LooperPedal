@@ -42,11 +42,9 @@ uint16_t ADC::updateReadings(){
     lastReadings[1].put(chB);
     return ((uint32_t)(chA+chB))>>1;
 #else
-    uint16_t reading = readValue;       
-    if(reading == 0) reading = 0x8000;  // This is so no popping occurs. Dire situations need dire solutions...
-    lastReadings.put(reading);
     readFromISR(0);
-    return reading;
+    // This value is the last sampled value, there's a delay of 1/PLAY_FREQUENCY (almost nothing!).
+    return readValue;
 #endif
 }
 
@@ -57,7 +55,12 @@ void ADC::readFromISR(bool channel){
     AuxSPI::writeAndReadFromISR(chipSelect, data, readBuffer[channel]);
     return readValue[channel];
 #else
+    // Fetch the last reading from the pointer. If everything works ok, then there should be new data here.
     readValue = ((readBuffer[1] & 0x0F) << 8) | readBuffer[2];
+    if(readValue == 0) readValue = 0x8000;  // This is so no popping occurs
+    // Save the value to be played in the circular buffer.
+    lastReadings.testPut(readValue);
+    // Sample new data when the ISR ends.
     AuxSPI::writeAndReadFromISR(chipSelect, SPI_Speed, data, 3, readBuffer);
 #endif
 }

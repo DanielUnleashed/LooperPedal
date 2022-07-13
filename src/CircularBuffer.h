@@ -11,6 +11,8 @@
 
 class CircularBuffer{
   public:
+    void testPut(uint16_t data);
+
     // Puts single item inside the circular buffer.
     void put(uint16_t data);
     // Puts an array inside the circular buffer (optimized).

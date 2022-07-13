@@ -23,8 +23,8 @@ class ADC{
 
         CircularBuffer getLastReadings(bool channel);
         uint16_t getSavedReadingsCount(bool channel);
-    private:
 
+    private:
 #ifdef USE_BOTH_ADC_CHANNELS
         uint8_t readBuffer[2][3] = {{0,0,0},{0,0,0}};
         uint16_t readValue[2] = {0,0};

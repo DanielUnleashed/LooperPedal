@@ -16,13 +16,12 @@ RECAudioFile::RECAudioFile(bool channel, ADC* inputADC){
 }
 
 uint16_t RECAudioFile::getSample(){
-    if(recordingCount == 0) return 0x8000;
+    // If we're at the beginning of the playback or the recording has been set to be stop and be rewinded, go back.
+    if(recordingCount == 0 || stopRecordingFlag) return 0x8000;
 
     fileDirectionToBuffer += 2;
     if(recordingCount>0 && fileDirectionToBuffer >= fileSize){
         fileDirectionToBuffer = 0;
-        // Stop the recording! 
-        stopRecording();
     }
     return buf.get();
 }
@@ -137,13 +136,14 @@ void RECAudioFile::writeToFile(){
     uint16_t totalW = adc->getSavedReadingsCount(adcChannel);
     if(totalW < BUFFER_REFRESH) return;
     
+    totalW = totalW << 1; //To bytes
     bool endOfFileFlag = false;
-    if(recordingCount>0 && fileDirectionToBuffer + (totalW<<1) > fileSize){
+    if(recordingCount>0 && fileDirectionToBuffer + totalW > fileSize){
         totalW = fileSize - fileDirectionToBuffer;
         endOfFileFlag = true;
     }
 
-    adc->getLastReadings(/*Channel = */0).copyToFile(&currentRecording, totalW<<1);
+    adc->getLastReadings(/*Channel = */0).copyToFile(&currentRecording, totalW);
 
     if(endOfFileFlag){
         stopRecording();
@@ -171,7 +171,7 @@ void RECAudioFile::writeSilenceToFile(){
     currentRecording.write((uint8_t*)tempZeroBuffer, totalW);
 
     if(endOfFileFlag){
-        stopRecording();
+        Serial.println("File was filled with silence, waiting to record on it.");
         lastWriteDirection = 0;
         lastRecordingCount = recordingCount;
     }
@@ -192,6 +192,8 @@ void RECAudioFile::stopRecording(){
 }
 
 void RECAudioFile::generateNewRECLayer(){
+    Serial.printf("Saving REC %d\n", recordingCount);
+
     isRecording = false;
     
     currentRecording.close();
@@ -224,7 +226,7 @@ String RECAudioFile::generateFileName(uint8_t number){
 
 String RECAudioFile::generateFileName(uint8_t chA, uint8_t chB){
     char newFileName[35];
-    snprintf(newFileName, 35, "%s%s_MIX_%03d-%03d.raw", REC_FOLDER, fileLoc.c_str(), chA, chB);
+    snprintf(newFileName, 35, "%s%s_MIX_%03d-%03d.raw", REC_FOLDER, recordingName.c_str(), chA, chB);
     return String(newFileName);
 }
 

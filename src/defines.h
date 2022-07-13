@@ -7,7 +7,7 @@
 //#define USE_BOTH_ADC_CHANNELS
 
 // Branch inside AudioPlayer.cpp
-//#define PASS_AUDIO_INPUT_DURING_RECORDING
+#define PASS_AUDIO_INPUT_DURING_RECORDING
 
 //#define LAUNCH_SPLASHSCREEN_AT_BOOT_UP
 

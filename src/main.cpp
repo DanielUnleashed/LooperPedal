@@ -28,7 +28,7 @@ void setup() {
   MenuManager::launch();*/
 
   AudioPlayer::begin();
-  AudioPlayer::addSDAudioFile("/tereza.wav");
+  //AudioPlayer::addSDAudioFile("/tereza.wav");
   AudioPlayer::addRECAudioFile(0);
 }
 
