@@ -2,7 +2,6 @@
 
 void CircularBuffer::testPut(uint16_t data){
   buf[writeIndex++] = data;
-  Serial.println(data);
   if(writeIndex == MAX_BUFFER_LENGTH) writeIndex = 0;
 }
 
@@ -65,6 +64,7 @@ void CircularBuffer::get(uint16_t* outBuffer, uint16_t size){
 }
 
 void CircularBuffer::copyToFile(File* file, uint16_t size){
+  Serial.printf("Size %d\n", size);
   if(readIndex + size/2 >= MAX_BUFFER_LENGTH){
     uint16_t spaceLeft = (MAX_BUFFER_LENGTH - readIndex) << 1;
     file->write((uint8_t*) (buf+readIndex), spaceLeft);

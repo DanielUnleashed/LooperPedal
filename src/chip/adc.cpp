@@ -18,11 +18,11 @@ uint16_t ADC::getLastReading(bool channel){
 #endif
 }
 
-CircularBuffer ADC::getLastReadings(bool channel){
+void ADC::saveLastReadingsToFile(bool channel, File* file, uint16_t size){
 #ifdef USE_BOTH_ADC_CHANNELS 
-    return lastReadings[channel];
+    lastReadings[channel].copyToFile(file, size);
 #else
-    return lastReadings;
+    lastReadings.copyToFile(file, size);
 #endif
 }
 

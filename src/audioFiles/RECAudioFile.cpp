@@ -143,7 +143,7 @@ void RECAudioFile::writeToFile(){
         endOfFileFlag = true;
     }
 
-    adc->getLastReadings(/*Channel = */0).copyToFile(&currentRecording, totalW);
+    adc->saveLastReadingsToFile(/*Channel = */0, &currentRecording, totalW);
 
     if(endOfFileFlag){
         stopRecording();

@@ -21,7 +21,7 @@ class ADC{
         void readFromISR(bool channel);
         uint16_t read(bool channel);
 
-        CircularBuffer getLastReadings(bool channel);
+        void saveLastReadingsToFile(bool channel, File* file, uint16_t size);
         uint16_t getSavedReadingsCount(bool channel);
 
     private:
