@@ -53,7 +53,6 @@ void RECAudioFile::refreshBuffer(){
             uint32_t mix = 0;
             if(recordingCount > 0 && playLastRecording) mix += recBuf[0].get();
             if(recordingCount > 1) mix += recBuf[1].get();
-
             buf.put(mix/mixedChannels);
         }
     }

@@ -137,7 +137,7 @@ void IRAM_ATTR AudioPlayer::frequencyTimer(){
 
   portENTER_CRITICAL_ISR(&timerMux);
   #ifdef PASS_AUDIO_INPUT_DURING_RECORDING
-    uint16_t adcRead = adc.updateReadings();
+    uint16_t adcRead = adc.updateReadings()>>4;
     uint32_t mix;
     mix = (globalBuf.get() + adcRead)>>1;
     dac.writeFromISR(mix);

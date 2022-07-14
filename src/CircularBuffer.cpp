@@ -1,9 +1,5 @@
 #include "CircularBuffer.h"
 
-void CircularBuffer::testPut(uint16_t data){
-  buf[writeIndex++] = data;
-  if(writeIndex == MAX_BUFFER_LENGTH) writeIndex = 0;
-}
 
 void CircularBuffer::put(uint16_t data){
   buf[writeIndex++] = data;
@@ -63,6 +59,20 @@ void CircularBuffer::get(uint16_t* outBuffer, uint16_t size){
   }
 }
 
+void CircularBuffer::testPut(uint16_t data){
+  buf[writeIndex++] = data;
+  //if(writeIndex > 9 && writeIndex < 21) Serial.printf("in: %d -> %d\n", writeIndex, data);
+  if(writeIndex == MAX_BUFFER_LENGTH) writeIndex = 0;
+}
+
+void CircularBuffer::printall(){
+  portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+  portENTER_CRITICAL(&mux);
+  Serial.println("***********************************");
+  for(uint16_t i = 10; i < 20; i++) Serial.println(buf[i]);
+  portEXIT_CRITICAL(&mux);
+}
+
 void CircularBuffer::copyToFile(File* file, uint16_t size){
   Serial.printf("Size %d\n", size);
   if(readIndex + size/2 >= MAX_BUFFER_LENGTH){
@@ -75,6 +85,7 @@ void CircularBuffer::copyToFile(File* file, uint16_t size){
     file->write((uint8_t*)buf, remainingBytes);
     readIndex = remainingBytes>>1;
   }else{
+    //if(readIndex == 0) printall();
     file->write((uint8_t*)(buf+readIndex), size);
     readIndex += size>>1;
   }

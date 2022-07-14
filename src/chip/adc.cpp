@@ -57,7 +57,8 @@ void ADC::readFromISR(bool channel){
 #else
     // Fetch the last reading from the pointer. If everything works ok, then there should be new data here.
     readValue = ((readBuffer[1] & 0x0F) << 8) | readBuffer[2];
-    if(readValue == 0) readValue = 0x8000;  // This is so no popping occurs
+    // Value above is 12 bits long, have to move it to 16 bit so that everything is mixed together ok.
+    readValue = readValue << 4;
     // Save the value to be played in the circular buffer.
     lastReadings.testPut(readValue);
     // Sample new data when the ISR ends.
