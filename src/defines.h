@@ -9,7 +9,7 @@
 // Branch inside AudioPlayer.cpp
 #define PASS_AUDIO_INPUT_DURING_RECORDING
 
-//#define LAUNCH_SPLASHSCREEN_AT_BOOT_UP
+#define LAUNCH_SPLASHSCREEN_AT_BOOT_UP
 
 // Will add LED animations (makes the pedal way to slow, maybe the problem happens only when connected to PC because low power?).
 #define METRONOME_LEDS
@@ -31,7 +31,7 @@
 // If more were to be added, add to the init() method inside DebounceButton.cpp
 // another call to attachInterrupt with the correspondant number.
 #define TOTAL_BUTTONS 6
-static const uint8_t PUSH_BUTTON[TOTAL_BUTTONS] = {34,35,36,39, 33,4};
+static const uint8_t PUSH_BUTTON[TOTAL_BUTTONS] = {34,35,36,39, 32,4};
 
 // Same as before. If more rotary encoders were to be added, go to RotaryEncoder.cpp
 // It only differs that two interrupts have to be added, one for each
@@ -41,14 +41,14 @@ static const uint8_t PUSH_BUTTON[TOTAL_BUTTONS] = {34,35,36,39, 33,4};
 // and are treated as such.
 #define TOTAL_ROTARY_ENCODERS 1
 #define TOTAL_ROTARY_BUTTONS 1
-static const uint8_t ROTARY_ENCODERS[TOTAL_ROTARY_ENCODERS<<1] = {16,21};
+static const uint8_t ROTARY_ENCODERS[TOTAL_ROTARY_ENCODERS<<1] = {16,17};
 static const uint8_t ROTARY_BUTTONS[TOTAL_ROTARY_ENCODERS] = {22};
 
 // IO Pins
 #define CS_DAC 25
 #define CS_ADC 26
 
-#define CS_METRONOME 32
+#define CS_METRONOME 33
 
 //Audio Player defines.
 #define MAX_AUDIO_CHANNELS 6
