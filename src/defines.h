@@ -33,6 +33,17 @@
 #define TOTAL_BUTTONS 6
 static const uint8_t PUSH_BUTTON[TOTAL_BUTTONS] = {34,35,36,39, 32,4};
 
+#define ANALOG_INPUT_PIN 4
+// With current version, max numer of analog buttons is 9, because base ten is used in the string.
+// If more were to be added, simply change the base of the code that is added to the iterative function
+// to identify the button code.
+#define TOTAL_ANALOG_BUTTONS 4
+// The maximum number of buttons that can be pressed at any time.
+#define MAX_ANALOG_COMBINATIONS 3
+static const uint32_t INPUT_RESISTANCE =  1e3;
+static const uint32_t ANALOG_RESISTANCES[TOTAL_ANALOG_BUTTONS] = {10,100,1000,10000};
+
+
 // Same as before. If more rotary encoders were to be added, go to RotaryEncoder.cpp
 // It only differs that two interrupts have to be added, one for each
 // channel of the rotary encoder. 

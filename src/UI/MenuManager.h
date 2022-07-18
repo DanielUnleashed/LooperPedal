@@ -8,6 +8,7 @@
 #include "utils/AuxSPI.h"
 #include "UI/Input/RotaryEncoder.h"
 #include "UI/Input/DebounceButton.h"
+#include "UI/Input/AnalogButton.h"
 
 #include "UI/Display.h"
 #include "UI/GUI/DisplayOverlay.h"

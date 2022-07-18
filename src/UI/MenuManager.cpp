@@ -18,8 +18,15 @@ void MenuManager::init(){
     startTFT();
     DisplayItem::startDisplayItems(width, height);
     Widget::startWidgets();
+#if TOTAL_BUTTONS
     DebounceButton::init();
+#endif
+#if TOTAL_ROTARY_ENCODERS > 0
     RotaryEncoder::init();
+#endif
+#if TOTAL_ANALOG_BUTTONS > 0
+    AnalogButton::init();
+#endif
 
 #ifdef LAUNCH_SPLASHSCREEN_AT_BOOT_UP
     static SplashScreen sp;

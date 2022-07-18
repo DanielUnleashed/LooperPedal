@@ -27,7 +27,7 @@ void DebounceButton::init(){
 
 template <int interrupt>
 void IRAM_ATTR DebounceButton::ISR_BUTTON(){
-    systemButtons[interrupt]->eventEvaluation(interrupt);
+    systemButtons[interrupt]->eventEvaluation();
 }
 
 void DebounceButton::saveAndRemoveButtons(){

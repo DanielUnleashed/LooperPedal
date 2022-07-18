@@ -7,7 +7,10 @@ ButtonInput* ButtonInput::buttonLongPressWatch = NULL;
 TaskHandle_t ButtonInput::buttonTaskHandle = NULL;
 
 void ButtonInput::startButtons(){
-    xTaskCreatePinnedToCore(longPressTimeTask, "WidgetEvents", 10000, NULL, 5, &buttonTaskHandle, 0);
+    static bool started = false;
+    if(started) return;
+    xTaskCreatePinnedToCore(longPressTimeTask, "LongPressButton Task", 10000, NULL, 5, &buttonTaskHandle, 0);
+    started = true;
 }
 
 bool ButtonInput::updateState(){
@@ -66,7 +69,7 @@ void ButtonInput::longPressTimeTask(void* funcParams){
     }
 }
 
-void ButtonInput::eventEvaluation(int buttonIndex){
+void ButtonInput::eventEvaluation(){
     bool input = clicked();
     for(uint8_t i = 0; i < eventFunction.size(); i++){
         ButtonFunction ev = eventFunction[i];
@@ -78,7 +81,7 @@ void ButtonInput::eventEvaluation(int buttonIndex){
             if(input) ev.func();
         }else if(ev.functionalEvent == LONG_PRESS) {
             //Continue if a long press is being processed or if the button is released.
-            if((buttonLongPressWatch!=NULL && buttonIndex == buttonLongPressWatch->pin) || !input) continue;
+            if((buttonLongPressWatch!=NULL && pin == buttonLongPressWatch->pin) || !input) continue;
 
             buttonLongPressWatch = this;
 

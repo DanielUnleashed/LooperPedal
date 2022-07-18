@@ -65,7 +65,7 @@ class ButtonInput{
 
         static ButtonInput* buttonLongPressWatch;
         // Runs the event functions depending on the type of input (short, long press...)
-        void eventEvaluation(int buttonIndex);
+        void eventEvaluation();
 
         virtual bool fetchInput() = 0;
 
