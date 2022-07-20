@@ -1,10 +1,12 @@
 #include "SplashScreen.h"
-#include "UI/MenuManager.h" 
+#include "UI/MenuManager.h"
+#include "AudioPlayer.h"
 
 SplashScreen::SplashScreen() : DisplayItem("Splashscreen"){
     for(uint8_t i = 0; i < 4; i++){
         addButtonEvent(i,[this]{
             MenuManager::changeScreen("Main");
+            AudioPlayer::begin();
         });
     }
 

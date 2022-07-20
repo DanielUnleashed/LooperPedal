@@ -34,7 +34,7 @@ void AuxSPI::SPI2_Sender(void* funcParams){
 
         portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
         portENTER_CRITICAL(&timerMux);
-        printRealFrequency(0xFFFF);
+        //printRealFrequency(0xFFFF);
         for(uint8_t i = 0; i < holdPacketCount; i++){
             HOLDOUT_PACKET p = holdPackets[i];
             uint8_t* data= (uint8_t*)&p.dataOut;
@@ -45,6 +45,9 @@ void AuxSPI::SPI2_Sender(void* funcParams){
                 write(p, data);
             }else if(p.responseType == HOLDOUT_LEDS){
                 sendToLEDs(p.pin, data);
+            }else if(p.responseType == HOLDOUT_SCREEN){
+                sendToTFT(p);
+                // TODO: No borrar aquello que no se ha mandado. Comprobar que holdPacketCount se resetea o no...
             }
         }
         holdPacketCount = 0; // Clear all packets.
@@ -92,7 +95,7 @@ void AuxSPI::writeAndRead(HOLDOUT_PACKET p, uint8_t* dataOut){
     if(dataOut == NULL) return;
     SPI2 -> beginTransaction(SPISettings(p.SPI_speed, MSBFIRST, SPI_MODE0));
     digitalWrite(p.pin, LOW);
-    SPI2 -> transferBytes(dataOut, p.responseBuffer, p.outLength);
+    SPI2 -> transferBytes(dataOut, (uint8_t*)p.responseBuffer, p.outLength);
     digitalWrite(p.pin, HIGH);
     SPI2 -> endTransaction();
 }
@@ -118,6 +121,17 @@ void AuxSPI::sendToLEDs(uint8_t csPin, uint8_t* data){
     SPI2 -> endTransaction();
     digitalWrite(csPin, HIGH);
     digitalWrite(csPin, LOW);  
+}
+
+HOLDOUT_PACKET* AuxSPI::sendToTFTFromISR(TFT_eSprite* spr){
+    holdPackets[holdPacketCount].responseBuffer = spr;
+    holdPackets[holdPacketCount].responseType = HOLDOUT_SCREEN;
+    return &holdPackets[holdPacketCount++];
+}
+
+void AuxSPI::sendToTFT(HOLDOUT_PACKET packet){
+    Serial.println("here");
+    ((TFT_eSprite*)packet.responseBuffer)->pushSprite(0,0);
 }
 
 void AuxSPI::printRealFrequency(uint16_t sampleCount){

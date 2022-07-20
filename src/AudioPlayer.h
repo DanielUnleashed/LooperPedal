@@ -26,11 +26,13 @@ class AudioPlayer{
     static void statusMonitorTask(void* funcParams);
     static void audioProcessingTask(void* funcParams);
     static void begin();
+
+    static void SDBoot();
+
+    static bool isPlaying;
+    static bool isRecording;
     
   private:
-    static const uint8_t PLAY_ONCE     = 2;
-    static const uint8_t PLAY_LOOP     = 3;
-
     static AudioFile* audioChannels[MAX_TOTAL_CHANNELS];
     static uint8_t channelsUsed;    // Total sum of channels.
 
@@ -45,9 +47,6 @@ class AudioPlayer{
 
     static portMUX_TYPE timerMux;
     static hw_timer_t *timer;
-    static uint8_t playMode;
-    static bool isPlaying;
-    static bool isRecording;
 
     static DAC dac;
     static ADC adc;
@@ -58,7 +57,6 @@ class AudioPlayer{
     static TaskHandle_t statusMonitorTaskHandle;
     static TaskHandle_t memoryTaskHandle;
 
-    static void SDBoot();
     static void setAllTo(const uint8_t audioFileID, const uint8_t state);
 
     static void IRAM_ATTR frequencyTimer();

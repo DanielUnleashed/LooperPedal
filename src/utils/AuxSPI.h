@@ -5,7 +5,9 @@
 #include "Arduino.h"
 #include "freertos/task.h"
 
-#define MAX_HOLDOUT_PACKETS 3 
+#include <TFT_eSPI.h>
+
+#define MAX_HOLDOUT_PACKETS 4
 
 /* A HOLDOUT_PACKET will store the data to be sended to the chip when
 the ISR ends. It will also wait for a response from the chip if it is 
@@ -19,8 +21,8 @@ struct HOLDOUT_PACKET{
     uint8_t outLength;          // Number of bytes to send.
     uint8_t pin;                // Chip select (CS)
     uint32_t SPI_speed;
-    uint8_t responseType;
-    uint8_t* responseBuffer;
+    uint8_t responseType;       // One of the constants below. Indicate the type of the HOLDOUT_PACKET.
+    void* responseBuffer;
 };
 
 class AuxSPI{
@@ -28,6 +30,7 @@ class AuxSPI{
         static const uint8_t HOLDOUT_ONLY_READ = 0;
         static const uint8_t HOLDOUT_WRITE_READ = 1;
         static const uint8_t HOLDOUT_LEDS = 2;
+        static const uint8_t HOLDOUT_SCREEN = 3;
 
         static void begin();
         static void begin(SPIClass* ref);
@@ -41,6 +44,8 @@ class AuxSPI{
         static HOLDOUT_PACKET* sendToLEDsFromISR(uint8_t csPin, uint8_t* data);
         static void sendToLEDs(uint8_t chipSelect, uint8_t* data);
         
+        static HOLDOUT_PACKET* sendToTFTFromISR(TFT_eSprite* canvas);
+        static void sendToTFT(HOLDOUT_PACKET packet);
 
         static void wakeSPI();
 

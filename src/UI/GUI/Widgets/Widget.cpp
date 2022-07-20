@@ -328,7 +328,7 @@ void Widget::startWidgets(){
     uint16_t distY = (height - TASKBAR_HEIGHT)/TILES_Y;
     tileSize = distX<distY ? distX : distY;
 
-    Serial.printf("TileSize: %d\n", tileSize);
+    //Serial.printf("TileSize: %d\n", tileSize);
 
     padX = (width - tileSize*TILES_X)/2;
     padY = (height - TASKBAR_HEIGHT - tileSize*TILES_Y)/2;

@@ -1,4 +1,5 @@
 #include "AudioPlayer.h"
+#include "UI/MenuManager.h"
 
 AudioFile* AudioPlayer::audioChannels[MAX_TOTAL_CHANNELS];
 uint8_t AudioPlayer::channelsUsed = 0;
@@ -11,9 +12,10 @@ uint8_t AudioPlayer::recChannelsUsed = 0;
 
 uint8_t AudioPlayer::longestChannel = 0;
 CircularBuffer AudioPlayer::globalBuf;
-uint8_t AudioPlayer::playMode = 0; 
+
 bool AudioPlayer::isPlaying = false;
 bool AudioPlayer::isRecording = false;
+
 portMUX_TYPE AudioPlayer::timerMux = portMUX_INITIALIZER_UNLOCKED;
 DAC AudioPlayer::dac(CS_DAC);
 ADC AudioPlayer::adc(CS_ADC);
@@ -23,7 +25,6 @@ TaskHandle_t AudioPlayer::statusMonitorTaskHandle;
 TaskHandle_t AudioPlayer::memoryTaskHandle;
 
 void AudioPlayer::begin(){
-  SDBoot();
   dac.begin();
   adc.begin();
 
@@ -33,28 +34,37 @@ void AudioPlayer::begin(){
   metronome.pause();
 
   // Input interrupts setup.
-  DebounceButton::addInterrupt(0, []{
-    if(isPlaying) pause();
-    else play();
+  DebounceButton::addInterrupt(4, []{
+    if(isPlaying){
+      pause();
+      MenuManager::launchPauseAnimation();
+    }else{
+      play();
+      MenuManager::launchPlayAnimation();
+    }
   });
 
-  DebounceButton::addInterrupt(1, []{  
+  DebounceButton::addInterrupt(5, []{  
     for(uint8_t i = 0; i < recChannelsUsed; i++){
       RECAudioFile* currCh = getRECAudioFile(i);
       // This is so that when the stop recording button is pressed, the audio is cut exactly at the end of the beat,
       // which is the same as doing it at the beginning of the beat (beat 0).
-      if(isRecording) metronome.doAtBeginningOfBeat([currCh](){currCh -> stopRecording();}); 
-      // The same is not done while starting a recording as music can start out of the marks of the metronome, for example, an upbeat.
-      else currCh -> startRecording();
+      if(isRecording){
+        metronome.doAtBeginningOfBeat([currCh](){currCh -> stopRecording();}); 
+        MenuManager::launchStopAnimation();
+      }else{ // The same is not done while starting a recording as music can start out of the marks of the metronome, for example, an upbeat.
+        currCh -> startRecording();
+        MenuManager::launchRecordAnimation();
+      }
     }
     isRecording = !isRecording;
     if(!isPlaying) play();
   });
 
-  DebounceButton::addInterrupt(2, []{  
-    for(uint8_t i = 0; i < recChannelsUsed; i++)
-      getRECAudioFile(i) -> undoRedoLastRecording();
-  });
+  // DebounceButton::addInterrupt(2, []{  
+  //   for(uint8_t i = 0; i < recChannelsUsed; i++)
+  //     getRECAudioFile(i) -> undoRedoLastRecording();
+  // });
 
 #ifdef LAUNCH_CONSOLE
   // Audio processing and signal managing task running on core 0
@@ -231,8 +241,6 @@ void AudioPlayer::addRECAudioFile(bool channel){
 }
 
 void AudioPlayer::SDBoot(){  
-  playMode = PLAY_ONCE;
-  
   if (!SD.begin()) error("Card Mount Failed\n");
   
   uint8_t cardType = SD.cardType();

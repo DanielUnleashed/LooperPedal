@@ -17,6 +17,8 @@
 
 #include "defines.h"
 
+#include "AudioPlayer.h"
+
 #define DRAW_MS 1000/SCREEN_FPS 
 
 class MenuManager {
@@ -36,6 +38,13 @@ class MenuManager {
 
     static bool isLaunched;
 
+    static void launchPlayAnimation();
+    static void launchStopAnimation();
+    static void launchPauseAnimation();
+    static void launchRecordAnimation();
+    static void launchWarningAnimation(String text);
+    static void launchErrorAnimation(String text);
+
     private:
     static TFT_eSPI tft;
     static uint16_t width, height;
@@ -53,13 +62,6 @@ class MenuManager {
 
     static uint8_t nextDisplay;
     static bool isInTransition;
-
-    static void launchPlayAnimation();
-    static void launchStopAnimation();
-    static void launchPauseAnimation();
-    static void launchRecordAnimation();
-    static void launchWarningAnimation(String text);
-    static void launchErrorAnimation(String text);
     
 };
 

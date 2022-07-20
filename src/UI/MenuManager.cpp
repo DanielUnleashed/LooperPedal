@@ -25,7 +25,7 @@ void MenuManager::init(){
     RotaryEncoder::init();
 #endif
 #if TOTAL_ANALOG_BUTTONS > 0
-    AnalogButton::init();
+    //AnalogButton::init();
 #endif
 
 #ifdef LAUNCH_SPLASHSCREEN_AT_BOOT_UP
@@ -67,7 +67,8 @@ void MenuManager::drawTask(void* funcParams){
         }
 
         // Pushes the sprite to the screen.
-        canvas.pushSprite(0, 0);
+        AuxSPI::sendToTFTFromISR(&canvas);
+        if(!AudioPlayer::isPlaying) AuxSPI::wakeSPI();
 
         // Waits for desired minimum FPS
         delay(DRAW_MS);

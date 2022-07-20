@@ -13,6 +13,7 @@ void setup() {
   Utilities::debug("*********************************************\n");
   delay(50);
 
+  AudioPlayer::SDBoot();
   MenuManager::init();
 
   DemoWidget* demo = new DemoWidget(0,2,2,2);
@@ -27,9 +28,12 @@ void setup() {
   MenuManager::addDisplay(mainDisplay);
   MenuManager::launch();
 
-  // AudioPlayer::begin();
+  AudioPlayer::addRECAudioFile(0);
   //AudioPlayer::addSDAudioFile("/tereza.wav");
-  // AudioPlayer::addRECAudioFile(0);
+
+  #ifndef LAUNCH_SPLASHSCREEN_AT_BOOT_UP
+    AudioPlayer::begin();
+  #endif
 }
 
 void loop() {}
