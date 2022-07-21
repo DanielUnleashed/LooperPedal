@@ -59,24 +59,24 @@ void AudioPlayerWidget::selectionFunctions(uint8_t selection){
 
         DebounceButton::addInterrupt(0, [this]{
             elapsedTime = 0;
-            this->redrawFromISR();
+            this->redraw();
         });
 
         DebounceButton::addInterrupt(1, [this]{
             if(elapsedTime < 5000) elapsedTime = 0;
             else elapsedTime -= 5000;
-            this->redrawFromISR();
+            this->redraw();
         });
 
         DebounceButton::addInterrupt(2, [this]{
             if(totalTime - elapsedTime < 5000) elapsedTime = totalTime;
             else elapsedTime += 5000;
-            this->redrawFromISR();
+            this->redraw();
         });
 
         DebounceButton::addInterrupt(3, [this]{
             elapsedTime = totalTime;
-            this->redrawFromISR();
+            this->redraw();
         });
 
         RotaryEncoder::addInterrupt(0, [this](bool in){
@@ -87,7 +87,7 @@ void AudioPlayerWidget::selectionFunctions(uint8_t selection){
                 if(elapsedTime < 1000) elapsedTime = 0;
                 else elapsedTime-=1000;
             }
-            this->redrawFromISR();
+            this->redraw();
         });
 
         DebounceButton::addRotaryInterrupt(0, [this]{

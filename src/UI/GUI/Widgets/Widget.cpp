@@ -186,7 +186,7 @@ void Widget::widgetEventTask(void* funcParams){
                     DebounceButton::addInterrupt(0, []{
                         displayedWidgets[selectedWidget] -> sizeX++;
                         if(displayedWidgets[selectedWidget]->sizeX > TILES_X) displayedWidgets[selectedWidget]->sizeX = 1;
-                        displayedWidgets[selectedWidget] -> redrawFromISR();
+                        displayedWidgets[selectedWidget] -> redraw();
                         Taskbar* t = MenuManager::getCurrentDisplay()->getTaskbar(); //Deletes the overlayed green tiles over the taskbar when redrawing.
                         if(t != NULL) t->forceRedraw();
                     });
@@ -194,7 +194,7 @@ void Widget::widgetEventTask(void* funcParams){
                     DebounceButton::addInterrupt(1, []{
                         displayedWidgets[selectedWidget] -> sizeY++;
                         if(displayedWidgets[selectedWidget]->sizeY > TILES_Y) displayedWidgets[selectedWidget]->sizeY = 1;
-                        displayedWidgets[selectedWidget] -> redrawFromISR();
+                        displayedWidgets[selectedWidget] -> redraw();
                         Taskbar* t = MenuManager::getCurrentDisplay()->getTaskbar();
                         if(t != NULL) t->forceRedraw();
                     });

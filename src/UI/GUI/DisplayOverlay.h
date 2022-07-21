@@ -43,6 +43,9 @@ class DisplayOverlay : public DisplayItem{
     uint16_t diagonalRadius;
     uint8_t animationID = 0;
 
+    uint8_t currentAnimationIndex = 0;
+    uint8_t animationQueueSize = 0;
+
     private:
     uint16_t animationColor;
     void setPalette();
@@ -51,7 +54,6 @@ class DisplayOverlay : public DisplayItem{
     bool hasMultipleAnimation = false;
     std::vector<uint8_t> animationQueue;
     std::vector<uint16_t> animationQueuePalette;
-    uint8_t currentAnimationIndex = 0;
 
     bool drawNGon(uint8_t sides, double rotAngle, double sizeTweak);
 

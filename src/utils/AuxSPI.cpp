@@ -2,9 +2,10 @@
 
 SPIClass* AuxSPI::SPI2 = NULL;
 HOLDOUT_PACKET* AuxSPI::holdPackets = NULL;
-volatile uint8_t AuxSPI::holdPacketCount = 0;
 bool AuxSPI::alreadyDefined = false;
 TaskHandle_t AuxSPI::SPI2_TaskHandler = NULL;
+
+SemaphoreHandle_t AuxSPI::renderedSemaphore = NULL;
 
 void printRealFrequency();
 
@@ -35,22 +36,26 @@ void AuxSPI::SPI2_Sender(void* funcParams){
         portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
         portENTER_CRITICAL(&timerMux);
         //printRealFrequency(0xFFFF);
-        for(uint8_t i = 0; i < holdPacketCount; i++){
+        for(uint8_t i = 0; i < MAX_HOLDOUT_PACKETS; i++){
             HOLDOUT_PACKET p = holdPackets[i];
-            uint8_t* data= (uint8_t*)&p.dataOut;
+            
+            // For each type there's an assigned cell in the holdPackets array. If it is 
+            // empty, then, continue.
+            if(p.isEmpty) continue;
 
             if(p.responseType == HOLDOUT_WRITE_READ){
-                writeAndRead(p, data);
+                writeAndRead(p, (uint8_t*)&p.dataOut);
             }else if(p.responseType == HOLDOUT_ONLY_READ){
-                write(p, data);
+                write(p, (uint8_t*)&p.dataOut);
             }else if(p.responseType == HOLDOUT_LEDS){
-                sendToLEDs(p.pin, data);
+                sendToLEDs(p.pin, (uint8_t*)&p.dataOut);
             }else if(p.responseType == HOLDOUT_SCREEN){
+                uint32_t t = micros();
                 sendToTFT(p);
-                // TODO: No borrar aquello que no se ha mandado. Comprobar que holdPacketCount se resetea o no...
+                chrono(20, t);
             }
+            p.isEmpty = true;
         }
-        holdPacketCount = 0; // Clear all packets.
         portEXIT_CRITICAL(&timerMux);
     }
     vTaskDelete(NULL);
@@ -62,31 +67,33 @@ void AuxSPI::wakeSPI(){
 }
 
 HOLDOUT_PACKET* AuxSPI::writeFromISR(uint8_t chipSelect, uint32_t spiSpeed, uint8_t* data, uint8_t dataLength){
+    return writeFromISR(HOLDOUT_ONLY_READ, chipSelect, spiSpeed, data, dataLength);
+}
+
+HOLDOUT_PACKET* AuxSPI::writeFromISR(uint8_t type, uint8_t chipSelect, uint32_t spiSpeed, uint8_t* data, uint8_t dataLength){
     // Search if a packet already exists, if so return.
     // Data will not be updated, it will send the FIRST data to receive.
-    for(uint8_t i = 0; i < holdPacketCount; i++){
-        if(holdPackets[i].pin == chipSelect){
-            return &holdPackets[i]; //SPI2_Task will already be notified when it gets here.
-        }
+    if(holdPackets[type].pin == chipSelect){
+        return &holdPackets[type]; //SPI2_Task will already be notified when it gets here.
     }
 
     // Add a new packet
-    holdPackets[holdPacketCount] = {
+    holdPackets[type] = {
+        .isEmpty = false,
         .dataOut = 0,
         .outLength = dataLength,
         .pin = chipSelect,
         .SPI_speed = spiSpeed,
-        .responseType = HOLDOUT_ONLY_READ,
+        .responseType = type,
     };
     for(int i = dataLength-1; i >= 0; i--){
-        holdPackets[holdPacketCount].dataOut = (holdPackets[holdPacketCount].dataOut<<8) | data[i];
+        holdPackets[type].dataOut = (holdPackets[type].dataOut<<8) | data[i];
     }
-    return &holdPackets[holdPacketCount++];
+    return &holdPackets[type];
 }
 
 HOLDOUT_PACKET* AuxSPI::writeAndReadFromISR(uint8_t chipSelect, uint32_t spiSpeed, uint8_t* dataOut, uint8_t dataLength, uint8_t* dataInBuff){
-    HOLDOUT_PACKET* pack = writeFromISR(chipSelect, spiSpeed, dataOut, dataLength);
-    pack -> responseType = HOLDOUT_WRITE_READ;
+    HOLDOUT_PACKET* pack = writeFromISR(HOLDOUT_WRITE_READ, chipSelect, spiSpeed, dataOut, dataLength);
     pack -> responseBuffer = dataInBuff; // Out buffer will be updated to the latest (more secure?).
     return pack;
 }
@@ -110,8 +117,7 @@ void AuxSPI::write(HOLDOUT_PACKET p, uint8_t* dataOut){
 }
 
 HOLDOUT_PACKET* AuxSPI::sendToLEDsFromISR(uint8_t chipSelect, uint8_t* dataOut){
-    HOLDOUT_PACKET* pack = writeFromISR(chipSelect, 20000000, dataOut, 1);
-    pack -> responseType = HOLDOUT_LEDS;
+    HOLDOUT_PACKET* pack = writeFromISR(HOLDOUT_LEDS, chipSelect, 20000000, dataOut, 1);
     return pack;
 }
 
@@ -123,15 +129,19 @@ void AuxSPI::sendToLEDs(uint8_t csPin, uint8_t* data){
     digitalWrite(csPin, LOW);  
 }
 
-HOLDOUT_PACKET* AuxSPI::sendToTFTFromISR(TFT_eSprite* spr){
-    holdPackets[holdPacketCount].responseBuffer = spr;
-    holdPackets[holdPacketCount].responseType = HOLDOUT_SCREEN;
-    return &holdPackets[holdPacketCount++];
+HOLDOUT_PACKET* AuxSPI::sendToTFTFromISR(TFT_eSprite* spr, SemaphoreHandle_t renderSemaphore){
+    holdPackets[HOLDOUT_SCREEN].isEmpty = false;
+    holdPackets[HOLDOUT_SCREEN].responseBuffer = spr;
+    holdPackets[HOLDOUT_SCREEN].responseType = HOLDOUT_SCREEN;
+    renderedSemaphore = renderSemaphore;
+    return &holdPackets[HOLDOUT_SCREEN];
 }
 
 void AuxSPI::sendToTFT(HOLDOUT_PACKET packet){
-    Serial.println("here");
-    ((TFT_eSprite*)packet.responseBuffer)->pushSprite(0,0);
+    if(packet.responseBuffer!=NULL){
+        ((TFT_eSprite*)packet.responseBuffer)->pushSprite(0,0);
+        if(renderedSemaphore!=NULL) xSemaphoreGive(renderedSemaphore);
+    }
 }
 
 void AuxSPI::printRealFrequency(uint16_t sampleCount){

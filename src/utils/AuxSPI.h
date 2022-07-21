@@ -17,6 +17,7 @@ be no need to keep controlling the number of requests made. Furthermore, there
 wouldn't be much reason to store different commands to be sent to the same chip
 in the same instant. The data released will be the first to be added. */
 struct HOLDOUT_PACKET{
+    bool isEmpty;
     uint32_t dataOut;           // Command to send to the chip (maximum 4 bytes)
     uint8_t outLength;          // Number of bytes to send.
     uint8_t pin;                // Chip select (CS)
@@ -36,6 +37,7 @@ class AuxSPI{
         static void begin(SPIClass* ref);
 
         static HOLDOUT_PACKET* writeFromISR(uint8_t chipSelect, uint32_t spiSpeed, uint8_t* data, uint8_t dataLength);
+        static HOLDOUT_PACKET* writeFromISR(uint8_t type, uint8_t chipSelect, uint32_t spiSpeed, uint8_t* data, uint8_t dataLength);
         static void write(HOLDOUT_PACKET packet, uint8_t* dataOut);
 
         static HOLDOUT_PACKET* writeAndReadFromISR(uint8_t chipSelect, uint32_t spiSpeed, uint8_t* dataOut, uint8_t dataLength, uint8_t* dataInBuff);
@@ -44,7 +46,7 @@ class AuxSPI{
         static HOLDOUT_PACKET* sendToLEDsFromISR(uint8_t csPin, uint8_t* data);
         static void sendToLEDs(uint8_t chipSelect, uint8_t* data);
         
-        static HOLDOUT_PACKET* sendToTFTFromISR(TFT_eSprite* canvas);
+        static HOLDOUT_PACKET* sendToTFTFromISR(TFT_eSprite* canvas, SemaphoreHandle_t renderSemaphore);
         static void sendToTFT(HOLDOUT_PACKET packet);
 
         static void wakeSPI();
@@ -55,11 +57,12 @@ class AuxSPI{
     private:
         static SPIClass* SPI2;
         static HOLDOUT_PACKET* holdPackets;
-        static volatile uint8_t holdPacketCount;
         static bool alreadyDefined;
         static TaskHandle_t SPI2_TaskHandler;
 
         static void SPI2_Sender(void* funcParams);
+
+        static SemaphoreHandle_t renderedSemaphore;
 };
 
 #endif

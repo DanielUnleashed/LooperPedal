@@ -174,16 +174,19 @@ void DisplayOverlay::drawMultipleAnimation(std::vector<uint8_t> q){
     animationQueue = q;
     animationID = animationQueue[0];
     currentAnimationIndex = 0;
+    animationQueueSize = q.size();
     setPalette();
     startAnimation();
 }
 
 void DisplayOverlay::drawMultipleAnimation(std::vector<uint8_t> q, std::vector<uint16_t> colors){
+    if(q.size() != colors.size()) Serial.println("Animation count and color pallete aren't the same size");
     hasMultipleAnimation = true;
     animationQueue = q;
     animationQueuePalette = colors;
     animationID = animationQueue[0];
     currentAnimationIndex = 0;
+    animationQueueSize = q.size();
     setPalette();
     startAnimation();
 }

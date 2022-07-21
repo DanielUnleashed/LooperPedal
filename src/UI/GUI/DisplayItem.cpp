@@ -63,18 +63,14 @@ void DisplayItem::render(TFT_eSprite &c){
 
 void DisplayItem::redraw(){
     needsUpdate = true;
-    MenuManager::wakeUpDrawTask();
+    if(xPortInIsrContext()) MenuManager::wakeUpDrawTask();
+    else MenuManager::wakeUpDrawTaskFromISR();
 }
 
 void DisplayItem::animationRedraw(){
 #ifdef ENABLE_DISPLAY_ANIMATIONS
     redraw();
 #endif
-}
-
-void DisplayItem::redrawFromISR(){
-    needsUpdate = true;
-    MenuManager::wakeUpDrawTaskFromISR();
 }
 
 void DisplayItem::endAnimation(){
@@ -90,5 +86,5 @@ void DisplayItem::forceRedraw(){
 }
 
 uint32_t DisplayItem::getTickTime(){
-    return (micros() - startAnimationTime)*FPS_DESIGN/SCREEN_FPS/10000.0;
+    return (micros() - startAnimationTime)/10000.0;
 }

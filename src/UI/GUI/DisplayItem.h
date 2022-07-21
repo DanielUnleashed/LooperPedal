@@ -56,7 +56,6 @@ class DisplayItem {
     //Graphics
     void startAnimation();
     void redraw();
-    void redrawFromISR();
     void animationRedraw();
     void endAnimation();
     uint32_t startAnimationTime;

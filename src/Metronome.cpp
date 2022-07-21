@@ -15,7 +15,7 @@ void Metronome::start(){
 
 #ifdef METRONOME_LEDS
     AuxSPI::begin();
-    AuxSPI::sendToLEDs(csPin, &lightLEDs);
+    AuxSPI::sendToLEDsFromISR(csPin, &lightLEDs);
 #endif
 }
 

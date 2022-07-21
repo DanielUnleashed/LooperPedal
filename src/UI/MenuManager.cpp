@@ -45,16 +45,23 @@ void MenuManager::launch(){
 
 void MenuManager::drawTask(void* funcParams){
     static TFT_eSprite canvas = TFT_eSprite(&tft);
+    static SemaphoreHandle_t drawRendered = NULL;
+    drawRendered = xSemaphoreCreateMutex();
+    xSemaphoreGive(drawRendered);
+
     canvas.createSprite(width, height);
     canvas.fillSprite(TFT_BLACK);
 
     for(;;){
         if(isInTransition){
-            displayList[currentDisplay].forceDraw();
-            displayList[currentDisplay].drawDisplay(canvas);
+            if(dispOverlay.currentAnimationIndex == 0 || dispOverlay.animationID == DisplayOverlay::ANIM_SWEEP_OUT_LEFT){
+                displayList[currentDisplay].forceDraw();
+                displayList[currentDisplay].drawDisplay(canvas);
+            }
             dispOverlay.render(canvas);
 
-            if(dispOverlay.animationID == DisplayOverlay::ANIM_SWEEP_OUT_LEFT) currentDisplay = nextDisplay;
+            if(dispOverlay.currentAnimationIndex == dispOverlay.animationQueueSize-1) currentDisplay = nextDisplay;
+            
             if(!dispOverlay.needsToRedraw()){ //Ended display overlay animation
                 isInTransition = false;
                 
@@ -66,9 +73,10 @@ void MenuManager::drawTask(void* funcParams){
             displayList[currentDisplay].drawDisplay(canvas);
         }
 
-        // Pushes the sprite to the screen.
-        AuxSPI::sendToTFTFromISR(&canvas);
-        if(!AudioPlayer::isPlaying) AuxSPI::wakeSPI();
+        // Pushes the sprite to the screen if the latter frame has been rendered. It is given a 10 ticks margin. If that
+        // frame doesn't get rendered, then it skips it.
+        if(xSemaphoreTake(drawRendered, (TickType_t) 10)) AuxSPI::sendToTFTFromISR(&canvas, drawRendered);
+        AuxSPI::wakeSPI();
 
         // Waits for desired minimum FPS
         delay(DRAW_MS);
@@ -157,7 +165,8 @@ void MenuManager::launchPlayAnimation(){
                         DisplayOverlay::ANIM_SWEEP_IN_RIGHT};
     const std::vector<uint16_t> c{TFT_GREEN, TFT_WHITE, TFT_BLACK};
     dispOverlay.drawMultipleAnimation(v, c);
-    displayList[currentDisplay].forceDraw();   
+    displayList[currentDisplay].forceDraw();
+    isInTransition = true;
 }
 
 void MenuManager::launchStopAnimation(){
@@ -167,6 +176,7 @@ void MenuManager::launchStopAnimation(){
     const std::vector<uint16_t> c{TFT_RED, TFT_WHITE, TFT_BLACK};
     dispOverlay.drawMultipleAnimation(v, c);
     displayList[currentDisplay].forceDraw();     
+    isInTransition = true;
 }
 
 void MenuManager::launchPauseAnimation(){
@@ -176,6 +186,7 @@ void MenuManager::launchPauseAnimation(){
     const std::vector<uint16_t> c{TFT_BLUE, TFT_WHITE, TFT_BLACK};
     dispOverlay.drawMultipleAnimation(v, c);
     displayList[currentDisplay].forceDraw();  
+    isInTransition = true;
 }
 
 void MenuManager::launchRecordAnimation(){
@@ -185,6 +196,7 @@ void MenuManager::launchRecordAnimation(){
     const std::vector<uint16_t> c{TFT_RED, TFT_WHITE, TFT_BLACK};
     dispOverlay.drawMultipleAnimation(v, c);
     displayList[currentDisplay].forceDraw();  
+    isInTransition = true;
 }
 
 void MenuManager::launchWarningAnimation(String text){
@@ -199,6 +211,7 @@ void MenuManager::launchWarningAnimation(String text){
     dispOverlay.setAnimationText(text);
 
     displayList[currentDisplay].forceDraw();  
+    isInTransition = true;
 }
 
 void MenuManager::launchErrorAnimation(String text){
@@ -213,4 +226,6 @@ void MenuManager::launchErrorAnimation(String text){
     dispOverlay.setAnimationText(text);
 
     displayList[currentDisplay].forceDraw();  
+
+    isInTransition = true;
 }
