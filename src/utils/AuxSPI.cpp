@@ -1,4 +1,5 @@
 #include "AuxSPI.h"
+#include "AudioPlayer.h"
 
 SPIClass* AuxSPI::SPI2 = NULL;
 HOLDOUT_PACKET* AuxSPI::holdPackets = NULL;
@@ -14,7 +15,7 @@ void AuxSPI::begin(){
     
     SPI2 = new SPIClass(HSPI);
     SPI2 -> begin();
-    holdPackets = (HOLDOUT_PACKET*) malloc(MAX_HOLDOUT_PACKETS*sizeof(HOLDOUT_PACKET));
+    holdPackets = (HOLDOUT_PACKET*) calloc(MAX_HOLDOUT_PACKETS, sizeof(HOLDOUT_PACKET));
     xTaskCreatePinnedToCore(SPI2_Sender, "AuxSPISender", 10000, NULL, 10, &SPI2_TaskHandler, 0);
     alreadyDefined = true;
 }
@@ -37,24 +38,20 @@ void AuxSPI::SPI2_Sender(void* funcParams){
         portENTER_CRITICAL(&timerMux);
         //printRealFrequency(0xFFFF);
         for(uint8_t i = 0; i < MAX_HOLDOUT_PACKETS; i++){
-            HOLDOUT_PACKET p = holdPackets[i];
-            
             // For each type there's an assigned cell in the holdPackets array. If it is 
             // empty, then, continue.
-            if(p.isEmpty) continue;
+            if(holdPackets[i].isEmpty) continue;
+            uint8_t packetType = holdPackets[i].packetType;
 
-            if(p.responseType == HOLDOUT_WRITE_READ){
-                writeAndRead(p, (uint8_t*)&p.dataOut);
-            }else if(p.responseType == HOLDOUT_ONLY_READ){
-                write(p, (uint8_t*)&p.dataOut);
-            }else if(p.responseType == HOLDOUT_LEDS){
-                sendToLEDs(p.pin, (uint8_t*)&p.dataOut);
-            }else if(p.responseType == HOLDOUT_SCREEN){
-                uint32_t t = micros();
-                sendToTFT(p);
-                chrono(20, t);
+            if(packetType == HOLDOUT_WRITE_READ){
+                writeAndRead(holdPackets[i]);
+            }else if(packetType == HOLDOUT_ONLY_READ){
+                write(holdPackets[i]);
+            }else if(packetType == HOLDOUT_LEDS){
+                sendToLEDs(holdPackets[i]);
+            }else if(packetType == HOLDOUT_SCREEN){
+                sendToTFT(holdPackets[i]);
             }
-            p.isEmpty = true;
         }
         portEXIT_CRITICAL(&timerMux);
     }
@@ -62,8 +59,10 @@ void AuxSPI::SPI2_Sender(void* funcParams){
 }
 
 void AuxSPI::wakeSPI(){
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    vTaskNotifyGiveFromISR(SPI2_TaskHandler, &xHigherPriorityTaskWoken); 
+    if(xPortInIsrContext()){
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        vTaskNotifyGiveFromISR(SPI2_TaskHandler, &xHigherPriorityTaskWoken); 
+    }else xTaskNotifyGive(SPI2_TaskHandler);
 }
 
 HOLDOUT_PACKET* AuxSPI::writeFromISR(uint8_t chipSelect, uint32_t spiSpeed, uint8_t* data, uint8_t dataLength){
@@ -73,8 +72,8 @@ HOLDOUT_PACKET* AuxSPI::writeFromISR(uint8_t chipSelect, uint32_t spiSpeed, uint
 HOLDOUT_PACKET* AuxSPI::writeFromISR(uint8_t type, uint8_t chipSelect, uint32_t spiSpeed, uint8_t* data, uint8_t dataLength){
     // Search if a packet already exists, if so return.
     // Data will not be updated, it will send the FIRST data to receive.
-    if(holdPackets[type].pin == chipSelect){
-        return &holdPackets[type]; //SPI2_Task will already be notified when it gets here.
+    if(!holdPackets[type].isEmpty){
+        return &holdPackets[type];
     }
 
     // Add a new packet
@@ -84,7 +83,8 @@ HOLDOUT_PACKET* AuxSPI::writeFromISR(uint8_t type, uint8_t chipSelect, uint32_t 
         .outLength = dataLength,
         .pin = chipSelect,
         .SPI_speed = spiSpeed,
-        .responseType = type,
+        .packetType = type,
+        .responseBuffer = NULL,
     };
     for(int i = dataLength-1; i >= 0; i--){
         holdPackets[type].dataOut = (holdPackets[type].dataOut<<8) | data[i];
@@ -98,22 +98,22 @@ HOLDOUT_PACKET* AuxSPI::writeAndReadFromISR(uint8_t chipSelect, uint32_t spiSpee
     return pack;
 }
 
-void AuxSPI::writeAndRead(HOLDOUT_PACKET p, uint8_t* dataOut){
-    if(dataOut == NULL) return;
+void AuxSPI::writeAndRead(HOLDOUT_PACKET &p){
     SPI2 -> beginTransaction(SPISettings(p.SPI_speed, MSBFIRST, SPI_MODE0));
     digitalWrite(p.pin, LOW);
-    SPI2 -> transferBytes(dataOut, (uint8_t*)p.responseBuffer, p.outLength);
+    SPI2 -> transferBytes((uint8_t*)&p.dataOut, (uint8_t*)p.responseBuffer, p.outLength);
     digitalWrite(p.pin, HIGH);
     SPI2 -> endTransaction();
+    p.isEmpty = true;
 }
 
-void AuxSPI::write(HOLDOUT_PACKET p, uint8_t* dataOut){
-    if(dataOut == NULL) return;
+void AuxSPI::write(HOLDOUT_PACKET &p){
     SPI2 -> beginTransaction(SPISettings(p.SPI_speed, MSBFIRST, SPI_MODE0));
     digitalWrite(p.pin, LOW);
-    SPI2 -> writeBytes(dataOut, p.outLength);
+    SPI2 -> writeBytes((uint8_t*)&p.dataOut, p.outLength);
     digitalWrite(p.pin, HIGH);  
     SPI2 -> endTransaction();
+    p.isEmpty = true;
 }
 
 HOLDOUT_PACKET* AuxSPI::sendToLEDsFromISR(uint8_t chipSelect, uint8_t* dataOut){
@@ -121,26 +121,49 @@ HOLDOUT_PACKET* AuxSPI::sendToLEDsFromISR(uint8_t chipSelect, uint8_t* dataOut){
     return pack;
 }
 
-void AuxSPI::sendToLEDs(uint8_t csPin, uint8_t* data){
+void AuxSPI::sendToLEDs(HOLDOUT_PACKET &p){
     SPI2 -> beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
-    SPI2 -> writeBytes(data, 1);
+    SPI2 -> writeBytes((uint8_t*)&p.dataOut, 1);
     SPI2 -> endTransaction();
-    digitalWrite(csPin, HIGH);
-    digitalWrite(csPin, LOW);  
+    digitalWrite(p.pin, HIGH);
+    digitalWrite(p.pin, LOW);
+    p.isEmpty = true;  
 }
 
 HOLDOUT_PACKET* AuxSPI::sendToTFTFromISR(TFT_eSprite* spr, SemaphoreHandle_t renderSemaphore){
     holdPackets[HOLDOUT_SCREEN].isEmpty = false;
     holdPackets[HOLDOUT_SCREEN].responseBuffer = spr;
-    holdPackets[HOLDOUT_SCREEN].responseType = HOLDOUT_SCREEN;
+    holdPackets[HOLDOUT_SCREEN].packetType = HOLDOUT_SCREEN;
     renderedSemaphore = renderSemaphore;
     return &holdPackets[HOLDOUT_SCREEN];
 }
 
-void AuxSPI::sendToTFT(HOLDOUT_PACKET packet){
-    if(packet.responseBuffer!=NULL){
-        ((TFT_eSprite*)packet.responseBuffer)->pushSprite(0,0);
-        if(renderedSemaphore!=NULL) xSemaphoreGive(renderedSemaphore);
+void AuxSPI::sendToTFT(HOLDOUT_PACKET &p){
+    const uint8_t tileSize = 8;
+    static uint8_t tileX = 0, tileY = 0;
+
+    if(p.responseBuffer!=NULL){
+        TFT_eSprite* spr = (TFT_eSprite*)p.responseBuffer;
+        if(AudioPlayer::isPlaying){
+            uint8_t maxTileX = spr->width()/tileSize + (spr->width()%tileSize>0);
+            uint8_t maxTileY = spr->height()/tileSize + (spr->height()%tileSize>0);
+
+            spr->pushSprite(tileX*tileSize,tileY*tileSize, tileX*tileSize,tileY*tileSize, tileSize, tileSize);
+            tileX++;
+            tileY += tileX==maxTileX;
+            if(tileY == maxTileY){
+                if(renderedSemaphore!=NULL) xSemaphoreGive(renderedSemaphore);
+                tileX = 0;
+                tileY = 0;
+                p.isEmpty = true;
+            }else{
+                tileX %= maxTileX;
+            }
+        }else{
+            spr->pushSprite(0,0);
+            p.isEmpty = true;
+            if(renderedSemaphore!=NULL) xSemaphoreGive(renderedSemaphore);
+        }
     }
 }
 

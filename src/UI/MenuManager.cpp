@@ -73,10 +73,10 @@ void MenuManager::drawTask(void* funcParams){
             displayList[currentDisplay].drawDisplay(canvas);
         }
 
-        // Pushes the sprite to the screen if the latter frame has been rendered. It is given a 10 ticks margin. If that
-        // frame doesn't get rendered, then it skips it.
-        if(xSemaphoreTake(drawRendered, (TickType_t) 10)) AuxSPI::sendToTFTFromISR(&canvas, drawRendered);
-        AuxSPI::wakeSPI();
+        // Pushes the sprite to the screen if the latter frame has been rendered. It is given a 15 ticks margin. If that
+        // frame doesn't get rendered, then it skips it. Normally, it will render in 13 ms.
+        if(xSemaphoreTake(drawRendered, (TickType_t) 15)) AuxSPI::sendToTFTFromISR(&canvas, drawRendered);
+        if(!AudioPlayer::isPlaying) AuxSPI::wakeSPI();
 
         // Waits for desired minimum FPS
         delay(DRAW_MS);
@@ -123,6 +123,7 @@ bool MenuManager::changeScreen(String displayName){
 #else
     isLaunched = false;
     displayList[nextDisplay].launchDisplay();
+    currentDisplay = nextDisplay;
     isLaunched = true;
 #endif
     return true;
@@ -151,14 +152,19 @@ void MenuManager::startTFT(){
     AuxSPI::begin(spi2);
 
     tft.setRotation(1);
-    tft.fillScreen(TFT_BLACK);
 
     width = tft.width();
     height = tft.height();
 
+    tft.fillScreen(TFT_BLACK);
+    tft.setTextDatum(CC_DATUM);
+    tft.drawString("Stargaze Looper Pedal", width/2, 3*height/6);
+    tft.drawString("Initializing...", width/2, 4*height/6);
+
     Serial.printf("TFT(%dx%d tiles). w=%d  h=%d\n", TILES_X, TILES_Y, width, height);
 }
 
+#ifdef ENABLE_DISPLAY_ANIMATIONS
 void MenuManager::launchPlayAnimation(){
     const std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN_LEFT, 
                         DisplayOverlay::ANIM_PLAY_TRIANGLE, 
@@ -229,3 +235,12 @@ void MenuManager::launchErrorAnimation(String text){
 
     isInTransition = true;
 }
+
+#else
+    void MenuManager::launchPlayAnimation(){}
+    void MenuManager::launchStopAnimation(){}
+    void MenuManager::launchPauseAnimation(){}
+    void MenuManager::launchRecordAnimation(){}
+    void MenuManager::launchWarningAnimation(String text){}
+    void MenuManager::launchErrorAnimation(String text){}
+#endif

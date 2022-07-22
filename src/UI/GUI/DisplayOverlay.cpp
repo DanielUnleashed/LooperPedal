@@ -57,7 +57,7 @@ void DisplayOverlay::draw(){
                 canvas->drawFastHLine(width-t+j, i+j, barWidth, animationColor);
                 canvas->drawFastHLine(width-t+j, i-j, barWidth, animationColor);
             }
-            canvas->fillRect(width-t+barWidth, 0, 20,height, animationColor);
+            canvas->fillRect(width-t+barWidth, 0, t,height, animationColor);
         }
 
         animationEnded = t>(width+barWidth+2);

@@ -36,10 +36,10 @@ void AudioPlayer::begin(){
   // Input interrupts setup.
   DebounceButton::addInterrupt(4, []{
     if(isPlaying){
-      //pause();
+      pause();
       MenuManager::launchPauseAnimation();
     }else{
-      //play();
+      play();
       MenuManager::launchPlayAnimation();
     }
   });
