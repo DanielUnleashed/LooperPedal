@@ -147,7 +147,7 @@ bool AnalogButton::addInterrupt(uint8_t buttonIndex, std::function<void(void)> f
         buttonIndex>TOTAL_ANALOG_BUTTONS?buttonIndex-TOTAL_ANALOG_BUTTONS:buttonIndex);
 
     bool ok = systemButtons[buttonIndex]->addButtonFunction(func, mode);
-    if(!ok) Serial.printf(" (Button %d)", buttonIndex);
+    if(!ok) Serial.printf(" Button %d is already in use!", buttonIndex);
     return ok;
 }
 

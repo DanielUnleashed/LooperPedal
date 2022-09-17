@@ -34,7 +34,7 @@ void RECAudioFile::refreshBuffer(){
 
     // While recording, save to the SD file the stored ADC buffer.
     if(isRecording) writeToFile();
-    // If not recording, write silence to the file.
+    // If not recording, write silence to the file in the meantime.
     else if(recordingCount > 0) writeSilenceToFile();
 
     // Refresh the buffers of the last recording made.

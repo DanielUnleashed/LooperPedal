@@ -44,6 +44,7 @@ class MenuManager {
     static void launchRecordAnimation();
     static void launchWarningAnimation(String text);
     static void launchErrorAnimation(String text);
+    static void drawLoadingMessage(String line1 = "", String line2 = "", String line3 = "");
 
     private:
     static TFT_eSPI tft;

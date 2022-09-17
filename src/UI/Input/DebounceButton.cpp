@@ -35,12 +35,29 @@ void DebounceButton::saveAndRemoveButtons(){
     for(uint8_t i = 0; i < TOTAL_BUTTONS+TOTAL_ROTARY_BUTTONS; i++){
         systemButtons[i]->saveAndRemoveButton();
     }
+    Utilities::debug("Buttons saved and removed!\n");
 }
 
 void DebounceButton::undoRemoveButtons(){
     for(uint8_t i = 0; i < TOTAL_BUTTONS+TOTAL_ROTARY_BUTTONS; i++){
         systemButtons[i]->undoRemoveButton();
     }
+    Utilities::debug("Remove buttons undone!\n");
+}
+
+void DebounceButton::saveAndRemoveScreenButtons(){
+    ButtonInput::clearLongPressButton();
+    for(uint8_t i = 0; i < 4; i++){
+        systemButtons[i]->saveAndRemoveButton();
+    }
+    Utilities::debug("Screen buttons saved and removed!\n");
+}
+
+void DebounceButton::undoRemoveScreenButtons(){
+    for(uint8_t i = 0; i < 4; i++){
+        systemButtons[i]->undoRemoveButton();
+    }
+    Utilities::debug("Remove screen buttons undone!\n");
 }
 
 bool DebounceButton::addInterrupt(uint8_t buttonIndex, std::function<void(void)> func){
@@ -74,10 +91,13 @@ bool DebounceButton::addRotaryInterrupt(uint8_t buttonIndex, std::function<void(
 }
 
 bool DebounceButton::addInterrupt(uint8_t buttonIndex, std::function<void(void)> func, uint8_t mode){
-    if(buttonIndex > TOTAL_BUTTONS) Utilities::debug("%sButton %d is over the number of buttons!\n", 
-        buttonIndex>TOTAL_BUTTONS?"Rotary":"",  
-        buttonIndex>TOTAL_BUTTONS?buttonIndex-TOTAL_BUTTONS:buttonIndex);
+    if(buttonIndex >= TOTAL_BUTTONS+TOTAL_ROTARY_BUTTONS){
+        Utilities::debug("Button %d is over the number of buttons!\n", buttonIndex);
+        return false;
+    }
 
+    if(func) Utilities::debug("Adding function to %d (Mode %d)\n", buttonIndex, mode);
+    else Utilities::debug("Deleting function of Button %d (Mode %d)\n", buttonIndex, mode);
     bool ok = systemButtons[buttonIndex]->addButtonFunction(func, mode);
     if(!ok) Serial.printf(" (Button %d)", buttonIndex);
     return ok;
@@ -102,6 +122,7 @@ bool DebounceButton::clearAll(){
     for(uint8_t i = 0; i < TOTAL_BUTTONS+TOTAL_ROTARY_BUTTONS; i++){
         systemButtons[i]->clearEvents();
     }
+    Utilities::debug("All buttons cleared!\n");
     return true;
 }
 

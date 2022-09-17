@@ -1,4 +1,5 @@
 #include "Utilities.h"
+#include "UI/MenuManager.h"
 
 PLAYBACK_TIME Utilities::toPlaybackTimeStruct(uint32_t totalMillis){
   PLAYBACK_TIME ret;
@@ -69,12 +70,24 @@ void Utilities::error(const char* x, ... ) {
   va_list args;
   //fprintf(stderr, "AF: ");
   va_start(args, x);
-  vfprintf(stderr, x, args);
-  va_end(args );
+  char* outStr = new char[60];
+  vsprintf(outStr, x, args);
+  va_end(args);
+  
+  Serial.print("ERROR: ");
+  Serial.print(outStr);
+  MenuManager::launchErrorAnimation(outStr);
+  
   enterErrorState();
 }
 
 void Utilities::error(const char* x, va_list args) {
-  fprintf(stderr, x, args);
+  char* outStr = new char[60];
+  vsprintf(outStr, x, args);
+
+  Serial.print("ERROR: ");
+  Serial.print(outStr);
+  MenuManager::launchErrorAnimation(outStr);
+
   enterErrorState();
 }

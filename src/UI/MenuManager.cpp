@@ -15,9 +15,6 @@ bool MenuManager::isInTransition = false;
 bool MenuManager::isLaunched = false;
 
 void MenuManager::init(){
-    startTFT();
-    DisplayItem::startDisplayItems(width, height);
-    Widget::startWidgets();
 #if TOTAL_BUTTONS
     DebounceButton::init();
 #endif
@@ -28,19 +25,33 @@ void MenuManager::init(){
     //AnalogButton::init();
 #endif
 
-#ifdef LAUNCH_SPLASHSCREEN_AT_BOOT_UP
-    static SplashScreen sp;
-    static Display introDisplay("Intro");
-    introDisplay.addItem(&sp);
-    MenuManager::addDisplay(introDisplay);
+    startTFT();
+
+#ifdef USE_DISPLAY
+    DisplayItem::startDisplayItems(width, height);
+    Widget::startWidgets();
+
+    #ifdef LAUNCH_SPLASHSCREEN_AT_BOOT_UP
+        static SplashScreen sp;
+        static Display introDisplay("Intro");
+        introDisplay.addItem(&sp);
+        MenuManager::addDisplay(introDisplay);
+    #endif
+#else
+    tft.fillScreen(0);
+    tft.drawCentreString("Screen is off!", width/2, height/2,1);
 #endif
 }
 
 void MenuManager::launch(){
-    xTaskCreatePinnedToCore(drawTask, "DrawTask", 10000, NULL, 5, &drawTaskHandle, 0);
-    dispOverlay.diagonalRadius = sqrt(width*width + height*height);
-    displayList[0].launchDisplay();
-    isLaunched = true;
+    #ifdef USE_DISPLAY
+        xTaskCreatePinnedToCore(drawTask, "DrawTask", 10000, NULL, 5, &drawTaskHandle, 0);
+        dispOverlay.diagonalRadius = sqrt(width*width + height*height);
+        displayList[0].launchDisplay();
+        isLaunched = true;
+    #else
+        tft.drawCentreString("Screen is off!", width/2, height/2,1);
+    #endif
 }
 
 void MenuManager::drawTask(void* funcParams){
@@ -156,10 +167,8 @@ void MenuManager::startTFT(){
     width = tft.width();
     height = tft.height();
 
-    tft.fillScreen(TFT_BLACK);
-    tft.setTextDatum(CC_DATUM);
-    tft.drawString("Stargaze Looper Pedal", width/2, 3*height/6);
-    tft.drawString("Initializing...", width/2, 4*height/6);
+
+    drawLoadingMessage("Initializing...");
 
     Serial.printf("TFT(%dx%d tiles). w=%d  h=%d\n", TILES_X, TILES_Y, width, height);
 }
@@ -221,19 +230,34 @@ void MenuManager::launchWarningAnimation(String text){
 }
 
 void MenuManager::launchErrorAnimation(String text){
-    const std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN_LEFT, 
-                                DisplayOverlay::ANIM_POLYGON | 6, 
-                                DisplayOverlay::ANIM_EXCLAMATION, 
-                                DisplayOverlay::ANIM_TEXT,
-                                DisplayOverlay::ANIM_WAIT,
-                                DisplayOverlay::ANIM_SWEEP_IN_RIGHT};
-    const std::vector<uint16_t> c{TFT_RED, TFT_WHITE, TFT_BLACK, TFT_BLACK, 0, TFT_BLACK};
-    dispOverlay.drawMultipleAnimation(v, c);
-    dispOverlay.setAnimationText(text);
+    if(isLaunched){
+        const std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN_LEFT, 
+                            DisplayOverlay::ANIM_POLYGON | 6, 
+                            DisplayOverlay::ANIM_EXCLAMATION, 
+                            DisplayOverlay::ANIM_TEXT,
+                            DisplayOverlay::ANIM_WAIT,
+                            DisplayOverlay::ANIM_SWEEP_IN_RIGHT};
+        const std::vector<uint16_t> c{TFT_RED, TFT_WHITE, TFT_BLACK, TFT_BLACK, 0, TFT_BLACK};
+        dispOverlay.drawMultipleAnimation(v, c);
+        dispOverlay.setAnimationText(text);
 
-    displayList[currentDisplay].forceDraw();  
+        displayList[currentDisplay].forceDraw();  
 
-    isInTransition = true;
+        isInTransition = true;
+    }else{
+        drawLoadingMessage("- BOOT UP ERROR -", text);
+    }
+}
+
+void MenuManager::drawLoadingMessage(String line1, String line2, String line3){
+    tft.fillScreen(TFT_BLACK);
+    tft.setTextDatum(BC_DATUM);
+    tft.drawString("Stargaze Looper Pedal", width/2, height/6,1);
+    int startLine = height/6;
+
+    if(line1!="") tft.drawString(line1, width/2, startLine*3,1);
+    if(line2!="") tft.drawString(line2, width/2, startLine*4,1);
+    if(line3!="") tft.drawString(line3, width/2, startLine*5,1);
 }
 
 #else

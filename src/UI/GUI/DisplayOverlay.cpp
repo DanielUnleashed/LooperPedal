@@ -149,12 +149,12 @@ bool DisplayOverlay::drawNGon(uint8_t sides, double rotAngle, double sizeTweak){
     double theta_rot = theta + rotAngle;
 
     if(theta < TWO_PI){
-        double mod = y*(theta_rot/y - floor(theta_rot/y));
+        double mod = theta_rot - y*floor(theta_rot/y);
         double r = cos(PI/sides)/cos(mod - PI/sides)*(plottingRadius+sizeTweak);
         canvas->fillCircle(width/2 + r*cos(theta), height/2 + r*sin(theta),
                         outerPincelStroke, animationColor);
     }
-    double mod = y*(theta_rot/y - floor(theta_rot/y));
+    double mod = theta_rot - y*floor(theta_rot/y);
     double r = cos(PI/sides)/cos(mod - PI/sides)*(plottingRadius+sizeTweak) * theta_rot / (4.0*PI);
     canvas->fillCircle(width/2 + r*cos(theta), height/2 + r*sin(theta),
                         innerPincelStroke, animationColor);

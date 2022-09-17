@@ -46,6 +46,8 @@ class SplashScreen : public DisplayItem{
     void multMatrix(double matrixA[4][4], double matrixB[4][4], double outMatrix[4][4]);
     void multMatrixHomogeneous(double in[4], double matrix[4][4], double out[4]);
 
+    static void jumpToMainProgram();
+
 };
 
 #endif

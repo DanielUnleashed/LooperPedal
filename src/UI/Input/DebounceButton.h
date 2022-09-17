@@ -34,6 +34,9 @@ class DebounceButton : public ButtonInput{
         static void saveAndRemoveButtons();
         static void undoRemoveButtons();
 
+        static void saveAndRemoveScreenButtons();
+        static void undoRemoveScreenButtons();
+
     private:
         static DebounceButton* systemButtons[TOTAL_BUTTONS+TOTAL_ROTARY_BUTTONS];
 

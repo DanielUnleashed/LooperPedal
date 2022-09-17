@@ -2,11 +2,18 @@
 #include "UI/MenuManager.h"
 #include "AudioPlayer.h"
 
+void SplashScreen::jumpToMainProgram(){
+  xTaskCreate([](void* funcParams){
+    MenuManager::changeScreen("Main");
+    AudioPlayer::begin();
+    vTaskDelete(NULL);
+  }, "SplashScreen:Jump To Main Program", 4096, NULL, 5, NULL);
+}
+
 SplashScreen::SplashScreen() : DisplayItem("Splashscreen"){
     for(uint8_t i = 0; i < 4; i++){
         addButtonEvent(i,[this]{
-            MenuManager::changeScreen("Main");
-            AudioPlayer::begin();
+            SplashScreen::jumpToMainProgram();
         });
     }
 

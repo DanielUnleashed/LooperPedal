@@ -14,6 +14,7 @@
 #define REC_FILE_ID 1
 //#define MIDI_FILE 2
 
+// Used in the playback console.
 struct AUDIO_FILE_INFO{
   const char* fileName;
   uint32_t currentFileDirection;
@@ -44,8 +45,6 @@ class AudioFile{
 
       String getFileName();
       String getFileLocation();
-
-  private:
 
   protected:
       String fileLoc;

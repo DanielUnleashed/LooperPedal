@@ -19,6 +19,7 @@ struct WAV_FILE_INFO {
     uint32_t dataSize;
 };
 
+// Makes this struct be the size it is especified by each uint.
 #pragma pack(push, 1)
 struct  WAV_HEADER {
     // RIFF Chunk

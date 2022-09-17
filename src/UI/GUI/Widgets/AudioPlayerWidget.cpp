@@ -48,7 +48,7 @@ void AudioPlayerWidget::selectionFunctions(uint8_t selection){
     }else if(selection == 1){
         Taskbar* t = MenuManager::getCurrentDisplay()->getTaskbar();
         if(t != NULL) t->saveAndRemoveButtons();
-        DebounceButton::saveAndRemoveButtons();
+        DebounceButton::saveAndRemoveScreenButtons();
         RotaryEncoder::saveAndRemoveInputs();
 
         t->addButton(0, "Start");

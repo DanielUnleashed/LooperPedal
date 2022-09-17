@@ -25,6 +25,8 @@ TaskHandle_t AudioPlayer::statusMonitorTaskHandle;
 TaskHandle_t AudioPlayer::memoryTaskHandle;
 
 void AudioPlayer::begin(){
+  Serial.println("Starting AudioPlayer...");
+
   dac.begin();
   adc.begin();
 
@@ -34,7 +36,7 @@ void AudioPlayer::begin(){
   metronome.pause();
 
   // Input interrupts setup.
-  DebounceButton::addInterrupt(4, []{
+  DebounceButton::addInterrupt(PLAY_BUTTON, []{
     if(isPlaying){
       pause();
       MenuManager::launchPauseAnimation();
@@ -44,7 +46,7 @@ void AudioPlayer::begin(){
     }
   });
 
-  DebounceButton::addInterrupt(5, []{  
+  DebounceButton::addInterrupt(REC_BUTTON, []{  
     for(uint8_t i = 0; i < recChannelsUsed; i++){
       RECAudioFile* currCh = getRECAudioFile(i);
       // This is so that when the stop recording button is pressed, the audio is cut exactly at the end of the beat,
@@ -61,14 +63,14 @@ void AudioPlayer::begin(){
     if(!isPlaying) play();
   });
 
-  // DebounceButton::addInterrupt(2, []{  
-  //   for(uint8_t i = 0; i < recChannelsUsed; i++)
-  //     getRECAudioFile(i) -> undoRedoLastRecording();
-  // });
+  /*DebounceButton::addInterrupt(UNDO_BUTTON, []{  
+    for(uint8_t i = 0; i < recChannelsUsed; i++)
+      getRECAudioFile(i) -> undoRedoLastRecording();
+  });*/
 
 #ifdef LAUNCH_CONSOLE
-  // Audio processing and signal managing task running on core 0
-  xTaskCreatePinnedToCore(statusMonitorTask, "MonitorTask", 10000, NULL, 1, &statusMonitorTaskHandle, 0);
+  // Audio processing and signal managing task running on core 1
+  xTaskCreatePinnedToCore(statusMonitorTask, "MonitorTask", 10000, NULL, 1, &statusMonitorTaskHandle, 1);
   vTaskSuspend(statusMonitorTaskHandle);
 #endif 
 
@@ -90,6 +92,8 @@ void AudioPlayer::begin(){
 
   isPlaying = false;
   longestChannel = 0;
+  
+  Serial.println("AudioPlayer ready!");
 }
 
 void AudioPlayer::play(){

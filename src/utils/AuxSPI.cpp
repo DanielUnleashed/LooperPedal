@@ -43,13 +43,13 @@ void AuxSPI::SPI2_Sender(void* funcParams){
             if(holdPackets[i].isEmpty) continue;
             uint8_t packetType = holdPackets[i].packetType;
 
-            if(packetType == HOLDOUT_WRITE_READ){
+            if(packetType == RAW_WRITE_READ){
                 writeAndRead(holdPackets[i]);
-            }else if(packetType == HOLDOUT_ONLY_READ){
+            }else if(packetType == RAW_ONLY_READ){
                 write(holdPackets[i]);
-            }else if(packetType == HOLDOUT_LEDS){
+            }else if(packetType == LEDS){
                 sendToLEDs(holdPackets[i]);
-            }else if(packetType == HOLDOUT_SCREEN){
+            }else if(packetType == SCREEN){
                 sendToTFT(holdPackets[i]);
             }
         }
@@ -66,7 +66,7 @@ void AuxSPI::wakeSPI(){
 }
 
 HOLDOUT_PACKET* AuxSPI::writeFromISR(uint8_t chipSelect, uint32_t spiSpeed, uint8_t* data, uint8_t dataLength){
-    return writeFromISR(HOLDOUT_ONLY_READ, chipSelect, spiSpeed, data, dataLength);
+    return writeFromISR(RAW_ONLY_READ, chipSelect, spiSpeed, data, dataLength);
 }
 
 HOLDOUT_PACKET* AuxSPI::writeFromISR(uint8_t type, uint8_t chipSelect, uint32_t spiSpeed, uint8_t* data, uint8_t dataLength){
@@ -93,7 +93,7 @@ HOLDOUT_PACKET* AuxSPI::writeFromISR(uint8_t type, uint8_t chipSelect, uint32_t 
 }
 
 HOLDOUT_PACKET* AuxSPI::writeAndReadFromISR(uint8_t chipSelect, uint32_t spiSpeed, uint8_t* dataOut, uint8_t dataLength, uint8_t* dataInBuff){
-    HOLDOUT_PACKET* pack = writeFromISR(HOLDOUT_WRITE_READ, chipSelect, spiSpeed, dataOut, dataLength);
+    HOLDOUT_PACKET* pack = writeFromISR(RAW_WRITE_READ, chipSelect, spiSpeed, dataOut, dataLength);
     pack -> responseBuffer = dataInBuff; // Out buffer will be updated to the latest (more secure?).
     return pack;
 }
@@ -117,7 +117,7 @@ void AuxSPI::write(HOLDOUT_PACKET &p){
 }
 
 HOLDOUT_PACKET* AuxSPI::sendToLEDsFromISR(uint8_t chipSelect, uint8_t* dataOut){
-    HOLDOUT_PACKET* pack = writeFromISR(HOLDOUT_LEDS, chipSelect, 20000000, dataOut, 1);
+    HOLDOUT_PACKET* pack = writeFromISR(LEDS, chipSelect, 20000000, dataOut, 1);
     return pack;
 }
 
@@ -131,11 +131,11 @@ void AuxSPI::sendToLEDs(HOLDOUT_PACKET &p){
 }
 
 HOLDOUT_PACKET* AuxSPI::sendToTFTFromISR(TFT_eSprite* spr, SemaphoreHandle_t renderSemaphore){
-    holdPackets[HOLDOUT_SCREEN].isEmpty = false;
-    holdPackets[HOLDOUT_SCREEN].responseBuffer = spr;
-    holdPackets[HOLDOUT_SCREEN].packetType = HOLDOUT_SCREEN;
+    holdPackets[SCREEN].isEmpty = false;
+    holdPackets[SCREEN].responseBuffer = spr;
+    holdPackets[SCREEN].packetType = SCREEN;
     renderedSemaphore = renderSemaphore;
-    return &holdPackets[HOLDOUT_SCREEN];
+    return &holdPackets[SCREEN];
 }
 
 void AuxSPI::sendToTFT(HOLDOUT_PACKET &p){

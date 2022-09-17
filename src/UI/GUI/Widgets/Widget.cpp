@@ -176,7 +176,7 @@ void Widget::widgetEventTask(void* funcParams){
                 if(t != NULL) { //If the taskbar exists then...
                     //Substitute all the current buttons and add the custom move functions.
                     t->saveAndRemoveButtons();
-                    DebounceButton::saveAndRemoveButtons();
+                    DebounceButton::saveAndRemoveScreenButtons();
                     RotaryEncoder::saveAndRemoveInputs();
                     t->addButton(0, "Dim.X");
                     t->addButton(1, "Dim.Y");
@@ -242,7 +242,7 @@ void Widget::widgetEventTask(void* funcParams){
             displayedWidgets[selectedWidget] -> selectionFunctions(inWidgetSelection);
             displayedWidgets[selectedWidget] -> redraw();
         }else if(widgetEvent == RETURN_TO_PREVIOUS_INPUTS){
-            DebounceButton::undoRemoveButtons();
+            DebounceButton::undoRemoveScreenButtons();
             RotaryEncoder::undoRemoveInputs();
             Taskbar* t = MenuManager::getCurrentDisplay()->getTaskbar();
             if(t != NULL) {

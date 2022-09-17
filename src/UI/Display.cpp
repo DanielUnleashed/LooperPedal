@@ -41,6 +41,7 @@ void Display::removeItem(DisplayItem *item){
 
 void Display::launchDisplay(){
     Widget::clearWidgets();
+    DebounceButton::saveAndRemoveScreenButtons();
     for(DisplayItem *it : itemList){
         it -> attachEvents();
         if(it->itemName.equals("Widget")){

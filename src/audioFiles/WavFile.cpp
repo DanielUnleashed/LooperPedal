@@ -1,4 +1,5 @@
 #include "WavFile.h"
+#include "UI/MenuManager.h"
 
 WavFile::WavFile(String fileLoc){
     wavLoc = fileLoc;
@@ -156,6 +157,7 @@ bool WavFile::processAudioData(File outFile){
 
     wavFile.seek(40);
 
+    int progress = 0, lastProgress = 0;
     while(true){
         uint16_t bufLength = DATA_COPY_BUFFER_SIZE;
         if((dir + DATA_COPY_BUFFER_SIZE*2) > wavFileDataSize) bufLength = (wavFileDataSize - dir)/2;
@@ -202,7 +204,12 @@ bool WavFile::processAudioData(File outFile){
             break;
         }
 
-        if(it % 100 == 0) Utilities::debug("Progress: %d %%\n", it*100/totalIt);
+        progress = it*100/totalIt;
+        if(progress != lastProgress){
+            lastProgress = progress;
+            Utilities::debug("Progress: %d %%\n", progress);
+            MenuManager::drawLoadingMessage("Parsing:", wavLoc, "Progress: " + String(progress) + " %");
+        }
         it++;
 
         if(bufLength != DATA_COPY_BUFFER_SIZE) break;

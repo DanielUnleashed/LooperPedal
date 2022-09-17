@@ -30,10 +30,10 @@ struct HOLDOUT_PACKET{
 
 class AuxSPI{
     public:
-        static const uint8_t HOLDOUT_ONLY_READ = 0;
-        static const uint8_t HOLDOUT_WRITE_READ = 1;
-        static const uint8_t HOLDOUT_LEDS = 2;
-        static const uint8_t HOLDOUT_SCREEN = 3;
+        static const uint8_t RAW_ONLY_READ = 0;
+        static const uint8_t RAW_WRITE_READ = 1;
+        static const uint8_t LEDS = 2;
+        static const uint8_t SCREEN = 3;
 
         static void begin();
         static void begin(SPIClass* ref);
