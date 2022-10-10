@@ -36,12 +36,12 @@ void launchInitialWidgets(){
     return;
 #else
 
-  DemoWidget* demo = new DemoWidget(0,2,2,2);
-  AudioPlayerWidget* aud = new AudioPlayerWidget(0,0,4,2);
+  //DemoWidget* demo = new DemoWidget(0,2,2,2);
+  AudioPlayerWidget* aud = new AudioPlayerWidget(0,0,6,2);
 
   static Display mainDisplay("Main");
   mainDisplay.addTaskbar();
-  mainDisplay.addItem(demo);
+  //mainDisplay.addItem(demo);
   mainDisplay.addItem(aud);
   //mainDisplay.addItem(new Menu("Main Menu"));
 

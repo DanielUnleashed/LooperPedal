@@ -68,9 +68,7 @@ void DisplayItem::redraw(){
 }
 
 void DisplayItem::animationRedraw(){
-#ifdef ENABLE_DISPLAY_ANIMATIONS
     redraw();
-#endif
 }
 
 void DisplayItem::endAnimation(){

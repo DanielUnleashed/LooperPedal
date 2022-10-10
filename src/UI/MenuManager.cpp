@@ -173,12 +173,12 @@ void MenuManager::startTFT(){
     Serial.printf("TFT(%dx%d tiles). w=%d  h=%d\n", TILES_X, TILES_Y, width, height);
 }
 
-#ifdef ENABLE_DISPLAY_ANIMATIONS
 void MenuManager::launchPlayAnimation(){
     const std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN_LEFT, 
-                        DisplayOverlay::ANIM_PLAY_TRIANGLE, 
+                        DisplayOverlay::ANIM_PLAY_TRIANGLE,
+                        DisplayOverlay::ANIM_WAIT, 
                         DisplayOverlay::ANIM_SWEEP_IN_RIGHT};
-    const std::vector<uint16_t> c{TFT_GREEN, TFT_WHITE, TFT_BLACK};
+    const std::vector<uint16_t> c{TFT_GREEN, TFT_WHITE, 0,TFT_BLACK};
     dispOverlay.drawMultipleAnimation(v, c);
     displayList[currentDisplay].forceDraw();
     isInTransition = true;
@@ -187,8 +187,9 @@ void MenuManager::launchPlayAnimation(){
 void MenuManager::launchStopAnimation(){
     const std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN_LEFT, 
                         DisplayOverlay::ANIM_POLYGON | 4, 
+                        DisplayOverlay::ANIM_WAIT, 
                         DisplayOverlay::ANIM_SWEEP_IN_RIGHT};
-    const std::vector<uint16_t> c{TFT_RED, TFT_WHITE, TFT_BLACK};
+    const std::vector<uint16_t> c{TFT_RED, TFT_WHITE, 0,TFT_BLACK};
     dispOverlay.drawMultipleAnimation(v, c);
     displayList[currentDisplay].forceDraw();     
     isInTransition = true;
@@ -197,8 +198,9 @@ void MenuManager::launchStopAnimation(){
 void MenuManager::launchPauseAnimation(){
     const std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN_LEFT, 
                     DisplayOverlay::ANIM_PAUSE, 
+                    DisplayOverlay::ANIM_WAIT, 
                     DisplayOverlay::ANIM_SWEEP_IN_RIGHT};
-    const std::vector<uint16_t> c{TFT_BLUE, TFT_WHITE, TFT_BLACK};
+    const std::vector<uint16_t> c{TFT_BLUE, TFT_WHITE, 0,TFT_BLACK};
     dispOverlay.drawMultipleAnimation(v, c);
     displayList[currentDisplay].forceDraw();  
     isInTransition = true;
@@ -207,8 +209,9 @@ void MenuManager::launchPauseAnimation(){
 void MenuManager::launchRecordAnimation(){
     const std::vector<uint8_t> v{DisplayOverlay::ANIM_SWEEP_IN_LEFT, 
                     DisplayOverlay::ANIM_CIRCLE, 
+                    DisplayOverlay::ANIM_WAIT, 
                     DisplayOverlay::ANIM_SWEEP_IN_RIGHT};
-    const std::vector<uint16_t> c{TFT_RED, TFT_WHITE, TFT_BLACK};
+    const std::vector<uint16_t> c{TFT_RED, TFT_WHITE, 0,TFT_BLACK};
     dispOverlay.drawMultipleAnimation(v, c);
     displayList[currentDisplay].forceDraw();  
     isInTransition = true;
@@ -249,6 +252,7 @@ void MenuManager::launchErrorAnimation(String text){
     }
 }
 
+
 void MenuManager::drawLoadingMessage(String line1, String line2, String line3){
     tft.fillScreen(TFT_BLACK);
     tft.setTextDatum(BC_DATUM);
@@ -259,12 +263,3 @@ void MenuManager::drawLoadingMessage(String line1, String line2, String line3){
     if(line2!="") tft.drawString(line2, width/2, startLine*4,1);
     if(line3!="") tft.drawString(line3, width/2, startLine*5,1);
 }
-
-#else
-    void MenuManager::launchPlayAnimation(){}
-    void MenuManager::launchStopAnimation(){}
-    void MenuManager::launchPauseAnimation(){}
-    void MenuManager::launchRecordAnimation(){}
-    void MenuManager::launchWarningAnimation(String text){}
-    void MenuManager::launchErrorAnimation(String text){}
-#endif

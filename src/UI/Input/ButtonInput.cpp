@@ -125,7 +125,7 @@ void ButtonInput::clearLongPressButton(){
 bool ButtonInput::addButtonFunction(std::function<void(void)> func, uint8_t mode){
     for(uint8_t i = 0; i < eventFunction.size(); i++){
         if(eventFunction[i].functionalEvent == mode){
-            Utilities::debug("Button is already in use with mode %d", mode);
+            Serial.printf("< ERROR: Already in use with mode %d\n", mode);
             return false;
         }
     }

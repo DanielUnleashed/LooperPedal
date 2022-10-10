@@ -10,15 +10,17 @@
 #define PASS_AUDIO_INPUT_DURING_RECORDING
 
 #define USE_DISPLAY
+#ifdef USE_DISPLAY
 #define LAUNCH_SPLASHSCREEN_AT_BOOT_UP
+#endif
 
-// Will add LED animations (makes the pedal way to slow, maybe the problem happens only when connected to PC because low power?).
+// Will add LED animations (makes the pedal way too slow, maybe the problem happens only when connected to PC because low power?).
 #define METRONOME_LEDS
 
 // If left defined all animatoins will play, functionality of everything else will remain
 // untouched. If left undefined, DisplayOverlay animations will not play and all "good-looking"
 // animations will be disabled.
-#define ENABLE_DISPLAY_ANIMATIONS
+//#define ENABLE_DISPLAY_ANIMATIONS
 
 #define PLAY_FREQUENCY 22050
 #define BIT_RES 16

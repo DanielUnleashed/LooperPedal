@@ -14,6 +14,7 @@ void AudioPlayerWidget::widgetDraw(){
     // Play button
     drawCircle(20, 50, 14, color);
     //drawCircumference(20, 50, 14, 0x02AA);
+
     if(isSelected() && inWidgetSelection==0) 
         drawRoundRectangleByCenter(20,50,31,31,0xDD83);
 

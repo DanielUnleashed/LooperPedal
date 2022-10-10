@@ -50,6 +50,7 @@ void DebounceButton::saveAndRemoveScreenButtons(){
     for(uint8_t i = 0; i < 4; i++){
         systemButtons[i]->saveAndRemoveButton();
     }
+    systemButtons[TOTAL_BUTTONS]->saveAndRemoveButton();
     Utilities::debug("Screen buttons saved and removed!\n");
 }
 
@@ -57,6 +58,7 @@ void DebounceButton::undoRemoveScreenButtons(){
     for(uint8_t i = 0; i < 4; i++){
         systemButtons[i]->undoRemoveButton();
     }
+    systemButtons[TOTAL_BUTTONS]->undoRemoveButton();
     Utilities::debug("Remove screen buttons undone!\n");
 }
 
@@ -96,10 +98,10 @@ bool DebounceButton::addInterrupt(uint8_t buttonIndex, std::function<void(void)>
         return false;
     }
 
-    if(func) Utilities::debug("Adding function to %d (Mode %d)\n", buttonIndex, mode);
-    else Utilities::debug("Deleting function of Button %d (Mode %d)\n", buttonIndex, mode);
+    if(func) Utilities::debug("Adding function to %d (Mode %d)", buttonIndex, mode);
+    else Utilities::debug("Deleting function of Button %d (Mode %d)", buttonIndex, mode);
     bool ok = systemButtons[buttonIndex]->addButtonFunction(func, mode);
-    if(!ok) Serial.printf(" (Button %d)", buttonIndex);
+    if(ok) Utilities::debug("\n");
     return ok;
 }
 
